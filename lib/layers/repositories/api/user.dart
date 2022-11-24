@@ -7,7 +7,7 @@ import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
 class UserApiRepository {
   static Dio client = Dio(BaseOptions(
-    baseUrl: 'http://dev.market:8080/user',
+    baseUrl: 'http://192.168.17.9:8080/user',
     connectTimeout: 10000,
   ));
 

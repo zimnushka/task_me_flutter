@@ -26,7 +26,7 @@ class TaskMyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       builder: (context, child) {
-        return AppProvider(child ?? const SizedBox());
+        return AppProviderWidget(child ?? const SizedBox());
       },
     );
   }

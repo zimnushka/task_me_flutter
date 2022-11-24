@@ -3,7 +3,7 @@ import 'package:task_me_flutter/layers/models/api_response.dart';
 
 class AuthApiRepository {
   static Dio client = Dio(BaseOptions(
-    baseUrl: 'http://dev.market:8080/auth',
+    baseUrl: 'http://192.168.17.9:8080/auth',
     connectTimeout: 10000,
   ));
 

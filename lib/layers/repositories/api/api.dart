@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:html';
-
 import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
@@ -15,6 +13,16 @@ abstract class ApiRepository {
       baseUrl: 'http://192.168.17.9:8080',
       connectTimeout: 10000,
       headers: _session?.sign(),
-    ));
+      followRedirects: false,
+    ))
+      ..interceptors.add(
+        LogInterceptor(
+          requestHeader: true,
+          responseHeader: true,
+          requestBody: true,
+          responseBody: true,
+          error: false,
+        ),
+      );
   }
 }

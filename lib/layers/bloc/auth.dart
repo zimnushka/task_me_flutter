@@ -1,43 +1,44 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
-import 'package:task_me_flutter/app/models/error.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/repositories/api/auth.dart';
 
-enum AuthPageState { login, registration, preview }
+enum AuthPageState { login, registration }
 
 class AuthState extends AppState {
   final AuthPageState pageState;
-  const AuthState(this.pageState);
+  final String? authErrorMessage;
 
-  // AuthState copyWith({User? user, ThemeData? theme, bool nullUser = false, Color? color}) {
-  //   return AuthState(
-  //   );
-  // }
+  const AuthState(
+    this.pageState, {
+    this.authErrorMessage,
+  });
 }
 
 class AuthCubit extends Cubit<AppState> {
-  AuthCubit() : super(const AuthState(AuthPageState.preview));
+  AuthCubit() : super(const AuthState(AuthPageState.login));
   final AuthApiRepository _authApiRepository = AuthApiRepository();
 
   void setNewState(AuthPageState pageState) {
     emit(AuthState(pageState));
   }
 
-  Future<String> confirm(String email, String password, String? name) async {
-    final currentState = state as AuthState;
+  Future<String?> confirm(String email, String password, {String? name}) async {
     try {
-      if (currentState.pageState == AuthPageState.registration) {
-        if (name != null) {
-          return _errorIncriptor(await _authApiRepository.registration(email, password, name));
-        }
-      } else if (currentState.pageState == AuthPageState.login) {
+      if (name != null) {
+        return _errorIncriptor(await _authApiRepository.registration(email, password, name));
+      } else {
         return _errorIncriptor(await _authApiRepository.login(email, password));
       }
-    } catch (e, stackTrace) {
-      emit(AppErrorState(AppError(e.toString(), stackTrace)));
+    } catch (e) {
+      final AuthPageState pageState = (state as AuthState).pageState;
+      emit(AuthState(pageState, authErrorMessage: e.toString()));
+      Timer(const Duration(seconds: 3), () {
+        emit(AuthState(pageState, authErrorMessage: null));
+      });
     }
-    return '';
+    return null;
   }
 
   _errorIncriptor(ApiResponse data) {

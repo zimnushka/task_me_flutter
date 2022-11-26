@@ -42,17 +42,19 @@ class AppProvider extends Cubit<AppProviderState> {
   final UserApiRepository _userApiRepository = UserApiRepository();
 
   Future<void> load() async {
+    final theme = await _themeLocalRepository.getTheme();
+    final color = await _themeLocalRepository.getColor();
+    AppProviderState stateWithTheme =
+        AppProviderState(theme: setPrimaryColor(theme, color), color: color, user: null);
     final token = await _userLocalRepository.getUser();
     if (token != null) {
-      final theme = await _themeLocalRepository.getTheme();
-      final color = await _themeLocalRepository.getColor();
       ApiRepository.session = TaskMeSession(token: token);
       final userData = await _userApiRepository.getUserMe();
       if (userData.isSuccess) {
-        emit(AppProviderState(
-            theme: setPrimaryColor(theme, color), color: color, user: userData.data));
+        stateWithTheme = stateWithTheme.copyWith(user: userData.data);
       }
     }
+    emit(stateWithTheme);
   }
 
   Future<void> setTheme({required bool isLightTheme, required Color color}) async {
@@ -60,7 +62,7 @@ class AppProvider extends Cubit<AppProviderState> {
     await _themeLocalRepository.setColor(color.value);
     emit(state.copyWith(
       color: color,
-      theme: await _themeLocalRepository.getTheme(),
+      theme: setPrimaryColor(await _themeLocalRepository.getTheme(), color),
     ));
   }
 

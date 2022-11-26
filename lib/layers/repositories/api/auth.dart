@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 

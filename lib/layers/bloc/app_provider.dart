@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/repositories/local/theme.dart';
 import 'package:task_me_flutter/layers/repositories/local/user.dart';
@@ -45,9 +46,11 @@ class AppProvider extends Cubit<AppProviderState> {
     if (token != null) {
       final theme = await _themeLocalRepository.getTheme();
       final color = await _themeLocalRepository.getColor();
-      final userData = await _userApiRepository.getUserMe(TaskMeSession(token: token));
+      ApiRepository.session = TaskMeSession(token: token);
+      final userData = await _userApiRepository.getUserMe();
       if (userData.isSuccess) {
-        emit(AppProviderState(theme: theme, color: color, user: userData.data));
+        emit(AppProviderState(
+            theme: setPrimaryColor(theme, color), color: color, user: userData.data));
       }
     }
   }

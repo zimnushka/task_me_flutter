@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/ui/pages/auth.dart';
+import 'package:task_me_flutter/layers/ui/pages/menu.dart';
 
-class AppProviderWidget extends StatelessWidget {
+class AppProviderWidget extends StatefulWidget {
   final Widget child;
   const AppProviderWidget(this.child, {super.key});
 
   @override
+  State<AppProviderWidget> createState() => _AppProviderWidgetState();
+}
+
+class _AppProviderWidgetState extends State<AppProviderWidget> {
+  final AppProvider cubit = AppProvider();
+  @override
   Widget build(BuildContext context) {
-    final AppProvider cubit = AppProvider();
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: double.infinity, maxWidth: 1500),
@@ -20,7 +26,7 @@ class AppProviderWidget extends StatelessWidget {
               builder: (context, state) {
                 return Theme(
                   data: state.theme,
-                  child: state.user != null ? child : const AuthPage(),
+                  child: state.user != null ? Menu(widget.child) : const AuthPage(),
                 );
               }),
         ),

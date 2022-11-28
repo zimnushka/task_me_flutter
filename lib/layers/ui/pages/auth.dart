@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
+import 'package:task_me_flutter/app/ui/error_page.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
@@ -45,10 +46,10 @@ class AuthPage extends StatelessWidget {
                       )),
                 ],
               );
+            } else if (state is AppErrorState) {
+              return AppErrorPage(state.error);
             }
-            return const Center(
-              child: Text('Errrror'),
-            );
+            return const SizedBox();
           },
         ),
       ),

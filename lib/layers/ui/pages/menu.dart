@@ -28,6 +28,7 @@ class _MenuState extends State<Menu> {
                 widthExpand: 800,
                 sideBar: SideBar(
                   projects: state.projects,
+                  onUpdate: cubit.load,
                 ),
                 child: widget.child,
               );

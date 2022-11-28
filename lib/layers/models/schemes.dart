@@ -19,9 +19,9 @@ class User with _$User {
 class Project with _$Project {
   // @JsonSerializable(fieldRename: FieldRename.snake)
   factory Project({
-    required final int id,
     required final String title,
     required final int color,
+    final int? id,
   }) = _Project;
 
   factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/ui/pages/auth.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
+import 'package:task_me_flutter/layers/ui/pages/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 void main() => runApp(TaskMyApp());
@@ -15,10 +15,23 @@ class TaskMyApp extends StatelessWidget {
   late final GoRouter _route = GoRouter(
     routes: [
       GoRoute(
-        path: '/',
-        // builder: (context, state) => builder(state, const HomePage()),
-        pageBuilder: (context, state) => builder(context, state, const HomePage()),
-      ),
+          name: 'home',
+          path: '/',
+          // builder: (context, state) => builder(state, const HomePage()),
+          pageBuilder: (context, state) => builder(context, state, const HomePage()),
+          routes: [
+            GoRoute(
+              name: 'project',
+              path: 'project/:projectId',
+              pageBuilder: (context, state) => builder(
+                  context,
+                  state,
+                  ProjectPage(
+                    int.parse(state.params['projectId']!),
+                    key: ValueKey(state.params['projectId']!),
+                  )),
+            ),
+          ]),
     ],
   );
 

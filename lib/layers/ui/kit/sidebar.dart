@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_create_dialog.dart';
+import 'package:task_me_flutter/layers/ui/pages/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
@@ -34,78 +35,38 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       child: Column(
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.only(bottom: 20),
-            leading: const CircleAvatar(child: Icon(Icons.person)),
+            contentPadding: EdgeInsets.zero,
+            leading: GestureDetector(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => Center(
+                          child: Card(
+                            child: SizedBox(
+                                width: 320,
+                                height: 420,
+                                child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: ColorSelector(
+                                      initColor: Theme.of(context).primaryColor,
+                                      onSetColor: (value) {
+                                        provider.setTheme(
+                                            isLightTheme: themeController.index == 0, color: value);
+                                        Navigator.pop(context);
+                                      },
+                                    ))),
+                          ),
+                        ));
+              },
+              child: CircleAvatar(
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+            ),
             minLeadingWidth: 10,
             title: TextBold(appProvider.state.user!.name),
             subtitle: Text(appProvider.state.user!.email),
           ),
-          Row(
-            children: [
-              Container(
-                  height: 40,
-                  width: 40,
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).backgroundColor,
-                    borderRadius: const BorderRadius.all(radius),
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => Center(
-                                child: Card(
-                                  child: SizedBox(
-                                      width: 320,
-                                      height: 420,
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: ColorSelector(
-                                            initColor: Theme.of(context).primaryColor,
-                                            onSetColor: (value) {
-                                              provider.setTheme(
-                                                  isLightTheme: themeController.index == 0,
-                                                  color: value);
-                                              Navigator.pop(context);
-                                            },
-                                          ))),
-                                ),
-                              ));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: const BorderRadius.all(Radius.circular(5))),
-                    ),
-                  )),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).backgroundColor,
-                    borderRadius: const BorderRadius.all(radius),
-                  ),
-                  child: TabBar(
-                      controller: themeController,
-                      onTap: (value) {
-                        provider.setTheme(
-                            isLightTheme: value == 0, color: Theme.of(context).primaryColor);
-                      },
-                      indicator: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: const BorderRadius.all(radius),
-                      ),
-                      tabs: const [
-                        Tab(text: 'light'),
-                        Tab(text: 'dark'),
-                      ]),
-                ),
-              ),
-            ],
-          ),
+
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
@@ -141,11 +102,43 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                 itemCount: widget.projects.length,
                 itemBuilder: (context, index) {
                   final item = widget.projects[index];
-                  return ProjectButton(item);
+                  return ProjectButton(item, () {
+                    ProjectPage.route(context, item.id!);
+                  });
                 },
               ),
             ),
-          )
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Divider(),
+          ),
+          Container(
+            height: 40,
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Theme.of(context).backgroundColor,
+              borderRadius: const BorderRadius.all(radius),
+            ),
+            child: TabBar(
+                controller: themeController,
+                onTap: (value) {
+                  provider.setTheme(
+                      isLightTheme: value == 0, color: Theme.of(context).primaryColor);
+                },
+                indicator: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: const BorderRadius.all(radius),
+                ),
+                tabs: const [
+                  Tab(text: 'light'),
+                  Tab(text: 'dark'),
+                ]),
+          ),
+          // TextButton(
+          //     style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
+          //     onPressed: provider.deleteToken,
+          //     child: const Text('Logout'))
         ],
       ),
     );
@@ -153,8 +146,9 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
 }
 
 class ProjectButton extends StatefulWidget {
-  const ProjectButton(this.item, {super.key});
+  const ProjectButton(this.item, this.onTap, {super.key});
   final Project item;
+  final VoidCallback onTap;
 
   @override
   State<ProjectButton> createState() => _ProjectButtonState();
@@ -176,7 +170,7 @@ class _ProjectButtonState extends State<ProjectButton> {
           });
         },
         child: ListTile(
-          onTap: () {},
+          onTap: widget.onTap,
           selected: isHover,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
           leading: DecoratedBox(

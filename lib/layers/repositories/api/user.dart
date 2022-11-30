@@ -17,4 +17,19 @@ class UserApiRepository extends ApiRepository {
     return ApiResponse(
         data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
+
+  Future<ApiResponse<List<User>?>> getUserFromProject(int projectId) async {
+    final data = await client.get('/projectMembers/$projectId');
+    if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
+      final jsonData = jsonDecode(data.data);
+      return ApiResponse(
+          // ignore: unnecessary_lambdas
+          data: (jsonData as List).map((e) => User.fromJson(e)).toList(),
+          isSuccess: true,
+          message: null,
+          statusCode: data.statusCode!);
+    }
+    return ApiResponse(
+        data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
+  }
 }

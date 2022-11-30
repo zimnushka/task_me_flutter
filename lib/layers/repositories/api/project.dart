@@ -20,11 +20,14 @@ class ProjectApiRepository extends ApiRepository {
         data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
 
-  Future<ApiResponse<String?>> getById(String email, String password) async {
-    final data = await client.post('/project/login', data: {'email': email, 'password': password});
+  Future<ApiResponse<Project?>> getById(int id) async {
+    final data = await client.get('/project/$id');
     if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
       return ApiResponse(
-          data: data.data as String, isSuccess: true, message: null, statusCode: data.statusCode!);
+          data: Project.fromJson(jsonDecode(data.data)),
+          isSuccess: true,
+          message: null,
+          statusCode: data.statusCode!);
     }
     return ApiResponse(
         data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);

@@ -50,7 +50,11 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
         return Row(
           children: [
             widget.sideBar,
-            Expanded(child: widget.child),
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.only(top: 20, right: 20),
+              child: widget.child,
+            )),
           ],
         );
       }),

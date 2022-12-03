@@ -102,8 +102,8 @@ class ColorSelectorState extends State<ColorSelector> {
         ElevatedButton(
             style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 40), backgroundColor: selectedColor),
-            onPressed: () => widget.onSetColor(selectedColor),
-            child: Text('Next'))
+            onPressed: () => widget.onSetColor(selectedColor.withAlpha(255)),
+            child: const Text('Next'))
       ],
     );
   }

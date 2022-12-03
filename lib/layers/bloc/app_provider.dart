@@ -11,29 +11,22 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 class AppProviderState {
   final User? user;
   final ThemeData theme;
-  final Color color;
 
   const AppProviderState({
     required this.theme,
-    required this.color,
     this.user,
   });
 
-  AppProviderState copyWith({User? user, ThemeData? theme, bool nullUser = false, Color? color}) {
+  AppProviderState copyWith({User? user, ThemeData? theme, bool nullUser = false}) {
     return AppProviderState(
       theme: theme ?? this.theme,
-      color: color ?? this.color,
       user: nullUser ? null : user ?? this.user,
     );
   }
 }
 
 class AppProvider extends Cubit<AppProviderState> {
-  AppProvider()
-      : super(AppProviderState(
-          theme: lightTheme,
-          color: defaultPrimaryColor,
-        )) {
+  AppProvider() : super(AppProviderState(theme: lightTheme)) {
     load();
   }
 
@@ -42,28 +35,32 @@ class AppProvider extends Cubit<AppProviderState> {
   final UserApiRepository _userApiRepository = UserApiRepository();
 
   Future<void> load() async {
-    final theme = await _themeLocalRepository.getTheme();
-    final color = await _themeLocalRepository.getColor();
-    AppProviderState stateWithTheme =
-        AppProviderState(theme: setPrimaryColor(theme, color), color: color, user: null);
     final token = await _userLocalRepository.getUser();
+    User? user;
     if (token != null) {
       ApiRepository.session = TaskMeSession(token: token);
       final userData = await _userApiRepository.getUserMe();
-      if (userData.isSuccess) {
-        stateWithTheme = stateWithTheme.copyWith(user: userData.data);
-      }
+      user = userData.data;
     }
+    final stateWithTheme = AppProviderState(
+      theme: await _setTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
+      user: user,
+    );
     emit(stateWithTheme);
   }
 
-  Future<void> setTheme({required bool isLightTheme, required Color color}) async {
-    await _themeLocalRepository.setTheme(isLight: isLightTheme);
-    await _themeLocalRepository.setColor(color.value);
-    emit(state.copyWith(
-      color: color,
-      theme: setPrimaryColor(await _themeLocalRepository.getTheme(), color),
-    ));
+  Future<void> setTheme({required Color color, bool? isLightTheme}) async {
+    if (state.user != null) {
+      await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
+    }
+    emit(state.copyWith(theme: await _setTheme(color: color, isLightTheme: isLightTheme)));
+  }
+
+  Future<ThemeData> _setTheme({required Color color, bool? isLightTheme}) async {
+    if (isLightTheme != null) {
+      await _themeLocalRepository.setTheme(isLight: isLightTheme);
+    }
+    return setPrimaryColor(await _themeLocalRepository.getTheme(), color);
   }
 
   Future<void> setToken(String token) async {

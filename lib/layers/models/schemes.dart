@@ -5,11 +5,12 @@ part 'schemes.freezed.dart';
 
 @freezed
 class User with _$User {
-  // @JsonSerializable(fieldRename: FieldRename.snake)
   factory User({
     required final int id,
     required final String name,
     required final String email,
+    required final int color,
+    required final int cost,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -17,7 +18,6 @@ class User with _$User {
 
 @freezed
 class Project with _$Project {
-  // @JsonSerializable(fieldRename: FieldRename.snake)
   factory Project({
     required final String title,
     required final int color,
@@ -27,15 +27,26 @@ class Project with _$Project {
   factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
 }
 
+enum TaskStatus {
+  @JsonValue(0)
+  open,
+  @JsonValue(1)
+  progress,
+  @JsonValue(2)
+  review,
+  @JsonValue(3)
+  done,
+}
+
 @freezed
 class Task with _$Task {
-  // @JsonSerializable(fieldRename: FieldRename.snake)
   factory Task({
     required final int id,
     required final String title,
     required final String description,
     required final int projectId,
     required final DateTime dueDate,
+    @JsonKey(name: 'statusId') required final TaskStatus status,
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);

@@ -32,4 +32,13 @@ class UserApiRepository extends ApiRepository {
     return ApiResponse(
         data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
+
+  Future<ApiResponse<User?>> editUser(User user) async {
+    final data = await client.put('/user/', data: user.toJson());
+    if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
+      return ApiResponse(data: user, isSuccess: true, message: null, statusCode: data.statusCode!);
+    }
+    return ApiResponse(
+        data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
+  }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
-import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 

@@ -10,7 +10,7 @@ class AppLoadingIndecator extends StatefulWidget {
 class _AppLoadingIndecatorState extends State<AppLoadingIndecator> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: CircularProgressIndicator(),
     );
   }

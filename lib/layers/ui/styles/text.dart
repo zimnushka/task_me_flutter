@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
+String monthLabel(int indexMonth) => _month[indexMonth - 1];
+
+const _month = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Now',
+  'Dec',
+];
 
 class TextBold extends StatelessWidget {
   const TextBold(this.text, {super.key});

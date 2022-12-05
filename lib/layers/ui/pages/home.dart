@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_me_flutter/layers/ui/kit/responsive_ui.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,12 +10,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-          onTap: ResponsiveUiController.openDrawer,
-          child: Center(
-            child: Text('TASKME'),
-          )),
-    );
+    return const Scaffold(
+        body: Center(
+      child: Text('TASKME'),
+    ));
   }
 }

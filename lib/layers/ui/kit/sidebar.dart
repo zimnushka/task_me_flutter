@@ -26,7 +26,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
     return Container(
       width: 250,
       height: double.infinity,
-      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -66,7 +65,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             title: TextBold(appProvider.state.user!.name),
             subtitle: Text(appProvider.state.user!.email),
           ),
-
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
@@ -85,8 +83,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                           return ProjectCreateDialog(onCreate: widget.onUpdate);
                         },
                       );
-
-                      // context.go("/auth");
                     },
                     child: const Icon(
                       Icons.add,

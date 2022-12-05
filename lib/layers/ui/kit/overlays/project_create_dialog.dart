@@ -142,7 +142,7 @@ class __NameSelectorState extends State<_NameSelector> {
         ElevatedButton(
             style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
             onPressed: () => widget.onSetName(controller.text),
-            child: Text('Add'))
+            child: const Text('Add'))
       ],
     );
   }

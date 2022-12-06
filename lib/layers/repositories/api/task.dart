@@ -23,7 +23,7 @@ class TaskApiRepository extends ApiRepository {
     final data = await client.post('/task/', data: item.toJson());
     if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
       return ApiResponse(
-          data: Task.fromJson(data.data),
+          data: Task.fromJson(jsonDecode(data.data)),
           isSuccess: true,
           message: null,
           statusCode: data.statusCode!);

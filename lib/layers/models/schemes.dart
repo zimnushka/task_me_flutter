@@ -43,13 +43,26 @@ extension TaskStatusExt on TaskStatus {
   Color get color {
     switch (this) {
       case TaskStatus.open:
-        return const Color.fromARGB(255, 255, 222, 59);
+        return const Color.fromARGB(255, 207, 114, 0);
       case TaskStatus.progress:
-        return const Color.fromARGB(255, 63, 191, 255);
+        return const Color.fromARGB(255, 2, 127, 190);
       case TaskStatus.review:
-        return const Color.fromARGB(255, 152, 54, 244);
+        return const Color.fromARGB(255, 99, 1, 192);
       case TaskStatus.done:
-        return const Color.fromARGB(255, 82, 255, 30);
+        return const Color.fromARGB(255, 44, 186, 1);
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case TaskStatus.open:
+        return 'Open';
+      case TaskStatus.progress:
+        return 'In progress';
+      case TaskStatus.review:
+        return 'Review';
+      case TaskStatus.done:
+        return 'Done';
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -90,10 +91,57 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
           backgroundColor: Theme.of(context).primaryColor,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
           flexibleSpace: FlexibleSpaceBar(
-            background: Padding(
-              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-              child: Row(),
-            ),
+            background: widget.state.tasks.isNotEmpty
+                ? Center(
+                    child: Container(
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                      width: 200,
+                      height: 200,
+                      child: Stack(
+                        children: [
+                          PieChart(
+                            PieChartData(
+                              sectionsSpace: 5,
+                              centerSpaceRadius: 70,
+                              sections: TaskStatus.values
+                                  .map(
+                                    (e) => PieChartSectionData(
+                                        color: e.color,
+                                        title: '',
+                                        radius: 20,
+                                        value: widget.state.tasks
+                                                .where((element) => element.status == e)
+                                                .length /
+                                            widget.state.tasks.length *
+                                            100),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                          Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('closed tasks',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .copyWith(color: Theme.of(context).primaryColor)),
+                                Text(
+                                    widget.state.tasks
+                                        .where((element) => element.status == TaskStatus.done)
+                                        .length
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 40, color: Theme.of(context).primaryColor)),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
           ),
           bottom: PreferredSize(
             preferredSize: const Size(double.infinity, 40),
@@ -152,10 +200,10 @@ class _AddButton extends StatelessWidget {
           backgroundColor: Colors.white,
           foregroundColor: Theme.of(context).primaryColor,
         ),
-        onPressed: () {
+        onPressed: () async {
           switch (state.pageState) {
             case ProjectPageState.tasks:
-              showDialog(
+              await showDialog(
                 context: context,
                 builder: (context) {
                   return TaskDialog(
@@ -191,27 +239,97 @@ class _TasksView extends StatelessWidget {
         childCount: state.tasks.length,
         (context, index) {
           final item = state.tasks[index];
-          return SlideAnimatedContainer(
-              duration: Duration(milliseconds: 200 + (index * 100)),
-              curve: Curves.easeOut,
-              start: const Offset(1, 0),
-              end: Offset.zero,
-              child: _TaskCard(item, () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return TaskDialog(
-                      key: ValueKey(item.id),
-                      projectId: state.project!.id!,
-                      users: state.users,
-                      task: item,
-                      onUpdate: cubit.updateTasks,
+          TaskStatus? status;
+          for (final statusElement in TaskStatus.values) {
+            if (index == state.tasks.indexWhere((element) => element.status == statusElement)) {
+              status = statusElement;
+            }
+          }
+          final isShow = state.openedStatuses.contains(item.status);
+          return _TaskStatusHeader(
+            isShow: isShow,
+            status: status,
+            onTap: () {
+              final newStats = [...state.openedStatuses];
+              if (isShow) {
+                newStats.remove(item.status);
+                cubit.setOpenStatuses(newStats);
+              } else {
+                newStats.add(item.status);
+                cubit.setOpenStatuses(newStats);
+              }
+            },
+            child: isShow
+                ? _TaskCard(item, () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return TaskDialog(
+                          key: ValueKey(item.id),
+                          projectId: state.project!.id!,
+                          users: state.users,
+                          task: item,
+                          onUpdate: cubit.updateTasks,
+                        );
+                      },
                     );
-                  },
-                );
-              }));
+                  })
+                : const SizedBox(),
+          );
         },
       ),
+    );
+  }
+}
+
+class _TaskStatusHeader extends StatelessWidget {
+  const _TaskStatusHeader({
+    required this.child,
+    required this.isShow,
+    this.status,
+    this.onTap,
+  });
+  final TaskStatus? status;
+  final bool isShow;
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (status != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, top: 20),
+            child: Row(
+              children: [
+                Text(
+                  status!.label,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  style: TextButton.styleFrom(
+                      backgroundColor: status!.color.withOpacity(0.2),
+                      foregroundColor: status!.color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(radius),
+                        side: BorderSide(
+                          width: 1,
+                          color: status!.color,
+                        ),
+                      )),
+                  onPressed: onTap,
+                  child: Text(isShow ? 'Not show' : 'Show'),
+                )
+              ],
+            ),
+          )
+        else
+          const SizedBox(),
+        child
+      ],
     );
   }
 }

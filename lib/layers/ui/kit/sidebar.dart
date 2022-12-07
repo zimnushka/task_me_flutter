@@ -4,6 +4,7 @@ import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
+import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
@@ -44,6 +45,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       child: Column(
         children: [
           ListTile(
+            onTap: () => HomePage.route(context),
             contentPadding: EdgeInsets.zero,
             leading: GestureDetector(
               onTap: () {
@@ -103,9 +105,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                   final item = widget.projects[index];
                   return ProjectButton(
                     item: item,
-                    onTap: () {
-                      ProjectPage.route(context, item.id!);
-                    },
+                    onTap: () => ProjectPage.route(context, item.id!),
                     onEdit: () => showProjectEditor(project: item),
                     onDelete: () async {
                       await ProjectApiRepository().delete(item.id!);

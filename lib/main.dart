@@ -4,6 +4,7 @@ import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
+import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 void main() => runApp(TaskMyApp());
@@ -15,23 +16,32 @@ class TaskMyApp extends StatelessWidget {
   late final GoRouter _route = GoRouter(
     routes: [
       GoRoute(
-          name: 'home',
-          path: '/',
-          // builder: (context, state) => builder(state, const HomePage()),
-          pageBuilder: (context, state) => builder(context, state, const HomePage()),
-          routes: [
-            GoRoute(
-              name: 'project',
-              path: 'project/:projectId',
-              pageBuilder: (context, state) => builder(
-                  context,
-                  state,
-                  ProjectPage(
-                    int.parse(state.params['projectId']!),
-                    key: ValueKey(state.params['projectId']!),
-                  )),
-            ),
-          ]),
+        name: 'home',
+        path: '/',
+        pageBuilder: (context, state) => builder(context, state, const HomePage()),
+      ),
+      GoRoute(
+        name: 'project',
+        path: '/project/:projectId',
+        pageBuilder: (context, state) => builder(
+            context,
+            state,
+            ProjectPage(
+              int.parse(state.params['projectId']!),
+              key: ValueKey(state.params['projectId']!),
+            )),
+      ),
+      GoRoute(
+        name: 'task',
+        path: '/task/:taskId',
+        pageBuilder: (context, state) => builder(
+            context,
+            state,
+            TaskPage(
+              taskId: int.tryParse(state.params['taskId'] ?? ''),
+              projectId: int.parse(state.queryParams['projectId']!),
+            )),
+      ),
     ],
   );
 

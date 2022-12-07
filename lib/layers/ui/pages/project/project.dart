@@ -6,9 +6,9 @@ import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/task_dialog.dart';
+import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
-import 'package:task_me_flutter/layers/ui/pages/project/widgets/cards.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
@@ -192,7 +192,6 @@ class _AddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = _bloc(context);
     return BlocBuilder<ProjectCubit, AppState>(builder: (context, state) {
       state as ProjectState;
       return ElevatedButton(
@@ -203,18 +202,8 @@ class _AddButton extends StatelessWidget {
         onPressed: () async {
           switch (state.pageState) {
             case ProjectPageState.tasks:
-              await showDialog(
-                context: context,
-                builder: (context) {
-                  return TaskDialog(
-                    projectId: state.project!.id!,
-                    users: state.users,
-                    onUpdate: cubit.updateTasks,
-                  );
-                },
-              );
+              TaskPage.route(context, state.project!.id!);
               break;
-
             case ProjectPageState.users:
               break;
           }
@@ -260,20 +249,7 @@ class _TasksView extends StatelessWidget {
               }
             },
             child: isShow
-                ? TaskCard(item, () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return TaskDialog(
-                          key: ValueKey(item.id),
-                          projectId: state.project!.id!,
-                          users: state.users,
-                          task: item,
-                          onUpdate: cubit.updateTasks,
-                        );
-                      },
-                    );
-                  })
+                ? TaskCard(item, () => TaskPage.route(context, item.projectId, taskId: item.id!))
                 : const SizedBox(),
           );
         },

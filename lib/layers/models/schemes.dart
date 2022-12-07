@@ -75,7 +75,9 @@ class Task with _$Task {
     required final String description,
     required final int projectId,
     required final DateTime dueDate,
+    required final int cost,
     @JsonKey(name: 'statusId') required final TaskStatus status,
+    final int? assignerId,
     final int? id,
   }) = _Task;
 

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/project_create_dialog.dart';
-import 'package:task_me_flutter/layers/ui/pages/project.dart';
+import 'package:task_me_flutter/layers/repositories/api/project.dart';
+import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
@@ -19,6 +20,15 @@ class SideBar extends StatefulWidget {
 class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
   late final themeController = TabController(length: 2, vsync: this);
   late final AppProvider provider = context.read<AppProvider>();
+
+  Future<void> showProjectEditor({Project? project}) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return ProjectDialog(project: project, onUpdate: widget.onUpdate);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +86,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
               children: [
                 const TextBold('Projects'),
                 GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return ProjectCreateDialog(onCreate: widget.onUpdate);
-                        },
-                      );
-                    },
+                    onTap: showProjectEditor,
                     child: const Icon(
                       Icons.add,
                       size: 18,
@@ -98,9 +101,17 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                 itemCount: widget.projects.length,
                 itemBuilder: (context, index) {
                   final item = widget.projects[index];
-                  return ProjectButton(item, () {
-                    ProjectPage.route(context, item.id!);
-                  });
+                  return ProjectButton(
+                    item: item,
+                    onTap: () {
+                      ProjectPage.route(context, item.id!);
+                    },
+                    onEdit: () => showProjectEditor(project: item),
+                    onDelete: () async {
+                      await ProjectApiRepository().delete(item.id!);
+                      widget.onUpdate();
+                    },
+                  );
                 },
               ),
             ),
@@ -131,10 +142,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                   Tab(text: 'dark'),
                 ]),
           ),
-          // TextButton(
-          //     style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
-          //     onPressed: provider.deleteToken,
-          //     child: const Text('Logout'))
         ],
       ),
     );
@@ -142,9 +149,17 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
 }
 
 class ProjectButton extends StatefulWidget {
-  const ProjectButton(this.item, this.onTap, {super.key});
+  const ProjectButton({
+    required this.item,
+    required this.onTap,
+    required this.onDelete,
+    required this.onEdit,
+    super.key,
+  });
   final Project item;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   @override
   State<ProjectButton> createState() => _ProjectButtonState();
@@ -167,7 +182,6 @@ class _ProjectButtonState extends State<ProjectButton> {
         },
         child: ListTile(
           onTap: widget.onTap,
-          selected: isHover,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
           leading: DecoratedBox(
             decoration: BoxDecoration(
@@ -182,11 +196,18 @@ class _ProjectButtonState extends State<ProjectButton> {
           minLeadingWidth: 10,
           title: Text(widget.item.title),
           trailing: isHover
-              ? GestureDetector(
-                  child: const Icon(
-                  Icons.auto_awesome,
-                  size: 16,
-                ))
+              ? PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
+                  splashRadius: 0.1,
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(onTap: widget.onEdit, child: const Text('Edit')),
+                      PopupMenuItem(onTap: widget.onDelete, child: const Text('Delete')),
+                    ];
+                  },
+                )
               : const SizedBox(),
         ));
   }

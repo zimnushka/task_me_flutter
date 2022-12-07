@@ -22,6 +22,7 @@ class Project with _$Project {
   factory Project({
     required final String title,
     required final int color,
+    final int? ownerId,
     final int? id,
   }) = _Project;
 

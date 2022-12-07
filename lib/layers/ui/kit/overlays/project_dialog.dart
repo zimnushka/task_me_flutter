@@ -4,20 +4,30 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-class ProjectCreateDialog extends StatefulWidget {
-  const ProjectCreateDialog({required this.onCreate, super.key});
-  final VoidCallback onCreate;
+class ProjectDialog extends StatefulWidget {
+  const ProjectDialog({required this.onUpdate, this.project, super.key});
+  final VoidCallback onUpdate;
+  final Project? project;
 
   @override
-  State<ProjectCreateDialog> createState() => _ProjectCreateDialogState();
+  State<ProjectDialog> createState() => _ProjectDialogState();
 }
 
-class _ProjectCreateDialogState extends State<ProjectCreateDialog> {
-  late Color projectColor = Theme.of(context).primaryColor;
+class _ProjectDialogState extends State<ProjectDialog> {
   final ProjectApiRepository projectApiRepository = ProjectApiRepository();
-  String projectName = '';
-
+  late String projectName = '';
+  late Color projectColor = Theme.of(context).primaryColor;
   int stepIndex = 0;
+
+  @override
+  void initState() {
+    if (widget.project != null) {
+      projectColor = Color(widget.project!.color);
+      projectName = widget.project!.title;
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,7 @@ class _ProjectCreateDialogState extends State<ProjectCreateDialog> {
               ),
             );
             if (response.data) {
-              widget.onCreate();
+              widget.onUpdate();
               Navigator.pop(context);
             }
           })

@@ -8,7 +8,7 @@ import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/task_dialog.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
-import 'package:task_me_flutter/layers/ui/styles/text.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/widgets/cards.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
@@ -94,7 +94,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
             background: widget.state.tasks.isNotEmpty
                 ? Center(
                     child: Container(
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                       width: 200,
                       height: 200,
                       child: Stack(
@@ -246,7 +246,7 @@ class _TasksView extends StatelessWidget {
             }
           }
           final isShow = state.openedStatuses.contains(item.status);
-          return _TaskStatusHeader(
+          return TaskStatusHeader(
             isShow: isShow,
             status: status,
             onTap: () {
@@ -260,7 +260,7 @@ class _TasksView extends StatelessWidget {
               }
             },
             child: isShow
-                ? _TaskCard(item, () {
+                ? TaskCard(item, () {
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -277,88 +277,6 @@ class _TasksView extends StatelessWidget {
                 : const SizedBox(),
           );
         },
-      ),
-    );
-  }
-}
-
-class _TaskStatusHeader extends StatelessWidget {
-  const _TaskStatusHeader({
-    required this.child,
-    required this.isShow,
-    this.status,
-    this.onTap,
-  });
-  final TaskStatus? status;
-  final bool isShow;
-  final Widget child;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (status != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10, top: 20),
-            child: Row(
-              children: [
-                Text(
-                  status!.label,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                const SizedBox(width: 10),
-                TextButton(
-                  style: TextButton.styleFrom(
-                      backgroundColor: status!.color.withOpacity(0.2),
-                      foregroundColor: status!.color,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: const BorderRadius.all(radius),
-                        side: BorderSide(
-                          width: 1,
-                          color: status!.color,
-                        ),
-                      )),
-                  onPressed: onTap,
-                  child: Text(isShow ? 'Not show' : 'Show'),
-                )
-              ],
-            ),
-          )
-        else
-          const SizedBox(),
-        child
-      ],
-    );
-  }
-}
-
-class _TaskCard extends StatelessWidget {
-  const _TaskCard(
-    this.task,
-    this.onTap,
-  );
-  final Task task;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-        leading: Container(
-          width: 7,
-          height: 30,
-          decoration:
-              BoxDecoration(borderRadius: const BorderRadius.all(radius), color: task.status.color),
-        ),
-        minLeadingWidth: 10,
-        title: Text(task.title),
-        trailing:
-            Text('${task.dueDate.day} ${monthLabel(task.dueDate.month)} ${task.dueDate.year}'),
       ),
     );
   }
@@ -382,29 +300,8 @@ class _UsersView extends StatelessWidget {
               curve: Curves.easeOut,
               start: const Offset(1, 0),
               end: Offset.zero,
-              child: _UserCard(item));
+              child: UserCard(item, state.project!.ownerId == item.id));
         },
-      ),
-    );
-  }
-}
-
-class _UserCard extends StatelessWidget {
-  const _UserCard(
-    this.user,
-  );
-  final User user;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-        leading: CircleAvatar(backgroundColor: Color(user.color)),
-        minLeadingWidth: 10,
-        title: Text(user.name),
-        subtitle: Text(user.email),
       ),
     );
   }

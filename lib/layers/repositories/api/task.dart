@@ -1,15 +1,21 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 
 class TaskApiRepository extends ApiRepository {
   Future<ApiResponse<Task?>> getById(int id) async {
-    final data = await client.get('/task/$id');
+    late final Response<String> data;
+    try {
+      data = await client.get('/task/$id');
+    } catch (e) {
+      data = Response(data: e.toString(), requestOptions: RequestOptions(path: ''));
+    }
     if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
       return ApiResponse(
-          data: Task.fromJson(jsonDecode(data.data)),
+          data: Task.fromJson(jsonDecode(data.data!)),
           isSuccess: true,
           message: null,
           statusCode: data.statusCode!);

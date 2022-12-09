@@ -6,9 +6,10 @@ import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/info_view.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/task_view.dart';
+import 'package:task_me_flutter/layers/ui/pages/project/user_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
-import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
-import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
@@ -70,10 +71,21 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> with TickerProviderStateMixin {
-  late final TabController tabController = TabController(length: 2, vsync: this)
+  late final TabController tabController = TabController(length: 3, vsync: this)
     ..addListener(() {
-      _bloc(context)
-          .setPageState(tabController.index == 0 ? ProjectPageState.tasks : ProjectPageState.users);
+      switch (tabController.index) {
+        case 0:
+          _bloc(context).setPageState(ProjectPageState.tasks);
+          break;
+        case 1:
+          _bloc(context).setPageState(ProjectPageState.users);
+          break;
+        case 2:
+          _bloc(context).setPageState(ProjectPageState.info);
+          break;
+        default:
+          _bloc(context).setPageState(ProjectPageState.tasks);
+      }
     });
   @override
   Widget build(BuildContext context) {
@@ -169,6 +181,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                     tabs: const [
                       Tab(text: 'Tasks'),
                       Tab(text: 'Users'),
+                      Tab(text: 'Info'),
                     ],
                   ),
                 ),
@@ -181,7 +194,12 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
           ),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 10)),
-        if (tabController.index == 0) _TasksView(widget.state) else _UsersView(widget.state)
+        if (widget.state.pageState == ProjectPageState.tasks)
+          TasksProjectView(widget.state)
+        else if (widget.state.pageState == ProjectPageState.users)
+          UserProjectView(widget.state)
+        else
+          InfoProjectView(widget.state)
       ],
     );
   }
@@ -206,79 +224,16 @@ class _AddButton extends StatelessWidget {
               break;
             case ProjectPageState.users:
               break;
+            case ProjectPageState.info:
+              break;
           }
         },
-        child: Text(state.pageState == ProjectPageState.tasks ? 'Create task' : 'Invite user'),
+        child: Text(state.pageState == ProjectPageState.tasks
+            ? 'Create task'
+            : state.pageState == ProjectPageState.users
+                ? 'Invite user'
+                : 'Edit project'),
       );
     });
-  }
-}
-
-class _TasksView extends StatelessWidget {
-  const _TasksView(
-    this.state,
-  );
-  final ProjectState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final cubit = _bloc(context);
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: state.tasks.length,
-        (context, index) {
-          final item = state.tasks[index];
-          TaskStatus? status;
-          for (final statusElement in TaskStatus.values) {
-            if (index == state.tasks.indexWhere((element) => element.status == statusElement)) {
-              status = statusElement;
-            }
-          }
-          final isShow = state.openedStatuses.contains(item.status);
-          return TaskStatusHeader(
-            isShow: isShow,
-            status: status,
-            onTap: () {
-              final newStats = [...state.openedStatuses];
-              if (isShow) {
-                newStats.remove(item.status);
-                cubit.setOpenStatuses(newStats);
-              } else {
-                newStats.add(item.status);
-                cubit.setOpenStatuses(newStats);
-              }
-            },
-            child: isShow
-                ? TaskCard(item, () => TaskPage.route(context, item.projectId, taskId: item.id!))
-                : const SizedBox(),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _UsersView extends StatelessWidget {
-  const _UsersView(
-    this.state,
-  );
-  final ProjectState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: state.users.length,
-        (context, index) {
-          final item = state.users[index];
-          return SlideAnimatedContainer(
-              duration: Duration(milliseconds: 300 + (index * 100)),
-              curve: Curves.easeOut,
-              start: const Offset(1, 0),
-              end: Offset.zero,
-              child: UserCard(item, state.project!.ownerId == item.id));
-        },
-      ),
-    );
   }
 }

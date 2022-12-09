@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
@@ -106,11 +105,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                   return ProjectButton(
                     item: item,
                     onTap: () => ProjectPage.route(context, item.id!),
-                    onEdit: () => showProjectEditor(project: item),
-                    onDelete: () async {
-                      await ProjectApiRepository().delete(item.id!);
-                      widget.onUpdate();
-                    },
                   );
                 },
               ),
@@ -148,67 +142,33 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
   }
 }
 
-class ProjectButton extends StatefulWidget {
+class ProjectButton extends StatelessWidget {
   const ProjectButton({
     required this.item,
     required this.onTap,
-    required this.onDelete,
-    required this.onEdit,
     super.key,
   });
   final Project item;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
 
-  @override
-  State<ProjectButton> createState() => _ProjectButtonState();
-}
-
-class _ProjectButtonState extends State<ProjectButton> {
-  bool isHover = false;
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-        onEnter: (_) {
-          setState(() {
-            isHover = true;
-          });
-        },
-        onExit: (_) {
-          setState(() {
-            isHover = false;
-          });
-        },
         child: ListTile(
-          onTap: widget.onTap,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-          leading: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Color(widget.item.color),
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-            ),
-            child: const SizedBox(
-              height: 20,
-              width: 20,
-            ),
-          ),
-          minLeadingWidth: 10,
-          title: Text(widget.item.title),
-          trailing: isHover
-              ? PopupMenuButton(
-                  padding: EdgeInsets.zero,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
-                  splashRadius: 0.1,
-                  icon: const Icon(Icons.more_vert),
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(onTap: widget.onEdit, child: const Text('Edit')),
-                      PopupMenuItem(onTap: widget.onDelete, child: const Text('Delete')),
-                    ];
-                  },
-                )
-              : const SizedBox(),
-        ));
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      leading: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Color(item.color),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+        ),
+        child: const SizedBox(
+          height: 20,
+          width: 20,
+        ),
+      ),
+      minLeadingWidth: 10,
+      title: Text(item.title),
+    ));
   }
 }

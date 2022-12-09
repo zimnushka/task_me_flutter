@@ -56,30 +56,50 @@ class TaskStatusHeader extends StatelessWidget {
 }
 
 class TaskCard extends StatelessWidget {
-  const TaskCard(
-    this.task,
-    this.onTap,
-  );
+  const TaskCard(this.task, this.onTap, {this.user});
   final Task task;
+  final User? user;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      child: ListTile(
+      child: InkWell(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-        leading: Container(
-          width: 7,
-          height: 30,
-          decoration:
-              BoxDecoration(borderRadius: const BorderRadius.all(radius), color: task.status.color),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
+          child: Row(
+            children: [
+              Container(
+                width: 7,
+                height: 30,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(radius), color: task.status.color),
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(task.title, maxLines: 2, style: const TextStyle(fontSize: 16))),
+              const SizedBox(width: 20),
+              if (user != null)
+                Tooltip(
+                  showDuration: const Duration(milliseconds: 0),
+                  message: user!.name,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: Color(user!.color),
+                    child: Text(
+                      user!.initials,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(),
+              const SizedBox(width: 20),
+              Text('${task.dueDate.day} ${monthLabel(task.dueDate.month)} ${task.dueDate.year}')
+            ],
+          ),
         ),
-        minLeadingWidth: 10,
-        title: Text(task.title),
-        trailing:
-            Text('${task.dueDate.day} ${monthLabel(task.dueDate.month)} ${task.dueDate.year}'),
       ),
     );
   }

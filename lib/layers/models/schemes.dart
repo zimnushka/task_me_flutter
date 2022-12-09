@@ -14,7 +14,17 @@ class User with _$User {
     required final int cost,
   }) = _User;
 
+  const User._();
+
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
+  String get initials {
+    List<String> words = name.split(' ');
+    if (words.length > 1) {
+      words.removeRange(1, words.length);
+    }
+    return words.fold('', (previousValue, element) => previousValue + element.characters.first);
+  }
 }
 
 @freezed

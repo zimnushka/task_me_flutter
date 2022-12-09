@@ -9,7 +9,7 @@ import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
 
-enum ProjectPageState { tasks, users }
+enum ProjectPageState { tasks, users, info }
 
 class ProjectState extends AppState {
   final Project? project;

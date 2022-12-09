@@ -69,6 +69,15 @@ class ProjectCubit extends Cubit<AppState> {
     );
   }
 
+  Future<void> updateProject() async {
+    final projectData = await projectApiRepository.getById(projectId);
+    emit((state as ProjectState).copyWith(project: projectData.data));
+  }
+
+  Future<void> deleteProject() async {
+    await projectApiRepository.delete(projectId);
+  }
+
   Future<void> setPageState(ProjectPageState pageState) async {
     if (pageState == (state as ProjectState).pageState) {
       return;

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
@@ -107,6 +108,19 @@ class InfoProjectView extends StatelessWidget {
                         .toList(),
                   ),
                 ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(
+              child: TextButton(
+                style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
+                onPressed: () async {
+                  await _bloc(context).deleteProject();
+                  GoRouter.of(context).pushNamed('home');
+                },
+                child: Text('Delete project'),
               ),
             ),
           )

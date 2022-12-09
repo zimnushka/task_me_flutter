@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
+import 'package:task_me_flutter/layers/ui/kit/overlays/color_selector.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class ProjectDialog extends StatefulWidget {
@@ -49,13 +49,15 @@ class _ProjectDialogState extends State<ProjectDialog> {
             });
           },
           onSetName: (value) async {
-            final response = await projectApiRepository.add(
-              Project(
-                title: value,
-                color: projectColor.value,
-              ),
-            );
-            if (response.data) {
+            if (value.isNotEmpty) {
+              final project =
+                  Project(title: value, color: projectColor.value, id: widget.project?.id);
+              if (widget.project != null) {
+                await projectApiRepository.edit(project);
+              } else {
+                await projectApiRepository.add(project);
+              }
+
               widget.onUpdate();
               Navigator.pop(context);
             }
@@ -75,50 +77,6 @@ class _ProjectDialogState extends State<ProjectDialog> {
   }
 }
 
-class ColorSelector extends StatefulWidget {
-  const ColorSelector({required this.initColor, required this.onSetColor, Key? key})
-      : super(key: key);
-  final Function(Color) onSetColor;
-  final Color initColor;
-
-  @override
-  State<ColorSelector> createState() => ColorSelectorState();
-}
-
-class ColorSelectorState extends State<ColorSelector> {
-  late Color selectedColor = widget.initColor;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Select project color', style: Theme.of(context).textTheme.titleLarge)),
-        const SizedBox(height: 10),
-        ColorPicker(
-          enableAlpha: false,
-          pickerAreaBorderRadius: const BorderRadius.all(radius),
-          pickerAreaHeightPercent: 0.78,
-          labelTypes: const [],
-          portraitOnly: true,
-          pickerColor: selectedColor,
-          onColorChanged: (value) {
-            setState(() {
-              selectedColor = value;
-            });
-          },
-        ),
-        const Expanded(child: SizedBox()),
-        ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 40), backgroundColor: selectedColor),
-            onPressed: () => widget.onSetColor(selectedColor.withAlpha(255)),
-            child: const Text('Next'))
-      ],
-    );
-  }
-}
-
 class _NameSelector extends StatefulWidget {
   const _NameSelector(
       {required this.initName, required this.onSetName, required this.onBack, Key? key})
@@ -133,6 +91,13 @@ class _NameSelector extends StatefulWidget {
 
 class __NameSelectorState extends State<_NameSelector> {
   final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    controller.text = widget.initName;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -152,7 +117,7 @@ class __NameSelectorState extends State<_NameSelector> {
         ElevatedButton(
             style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
             onPressed: () => widget.onSetName(controller.text),
-            child: const Text('Add'))
+            child: const Text('Save'))
       ],
     );
   }

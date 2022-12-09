@@ -19,7 +19,7 @@ class User with _$User {
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   String get initials {
-    List<String> words = name.split(' ');
+    final words = name.split(' ');
     if (words.length > 1) {
       words.removeRange(1, words.length);
     }

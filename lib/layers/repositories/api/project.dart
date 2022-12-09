@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
@@ -42,15 +43,20 @@ class ProjectApiRepository extends ApiRepository {
         data: false, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
 
-  Future<ApiResponse<String?>> edit(String email, String password, String name) async {
-    final data = await client
-        .post('/project/registration', data: {'email': email, 'password': password, 'name': name});
-    if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
+  Future<ApiResponse<bool>> edit(Project item) async {
+    late final Response<String> data;
+    try {
+      data = await client.put('/project/', data: item.toJson());
+    } catch (e) {
       return ApiResponse(
-          data: data.data as String, isSuccess: true, message: null, statusCode: data.statusCode!);
+          data: false, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
+    }
+
+    if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
+      return ApiResponse(data: true, isSuccess: true, message: null, statusCode: data.statusCode!);
     }
     return ApiResponse(
-        data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
+        data: false, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
 
   Future<ApiResponse<bool>> delete(int id) async {

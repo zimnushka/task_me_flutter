@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
 abstract class ApiRepository {
@@ -25,4 +26,11 @@ abstract class ApiRepository {
         ),
       );
   }
+
+  // Future<ApiResponse> get(String url) async {
+  //   try {
+  //     final data = await client.get(url);
+  //     return ApiResponse(data: data.data,isSuccess: ApiResponse.isSuccessStatusCode(data.statusCode??0), message: null,statusCode: data.statusCode);
+  //   } catch (e) {}
+  // }
 }

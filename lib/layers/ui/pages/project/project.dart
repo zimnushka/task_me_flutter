@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
+import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/info_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/task_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/user_view.dart';
@@ -71,22 +73,35 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> with TickerProviderStateMixin {
-  late final TabController tabController = TabController(length: 3, vsync: this)
-    ..addListener(() {
-      switch (tabController.index) {
-        case 0:
-          _bloc(context).setPageState(ProjectPageState.tasks);
-          break;
-        case 1:
-          _bloc(context).setPageState(ProjectPageState.users);
-          break;
-        case 2:
-          _bloc(context).setPageState(ProjectPageState.info);
-          break;
-        default:
-          _bloc(context).setPageState(ProjectPageState.tasks);
-      }
-    });
+  late final User user = context.read<AppProvider>().state.user!;
+  late final TabController tabController;
+  final tabs = [const Tab(text: 'Tasks'), const Tab(text: 'Users')];
+
+  @override
+  void initState() {
+    final userIsOwner = user.id == widget.state.project?.ownerId;
+    tabController = TabController(length: userIsOwner ? 3 : 2, vsync: this)
+      ..addListener(() {
+        switch (tabController.index) {
+          case 0:
+            _bloc(context).setPageState(ProjectPageState.tasks);
+            break;
+          case 1:
+            _bloc(context).setPageState(ProjectPageState.users);
+            break;
+          case 2:
+            _bloc(context).setPageState(ProjectPageState.info);
+            break;
+          default:
+            _bloc(context).setPageState(ProjectPageState.tasks);
+        }
+      });
+    if (userIsOwner) {
+      tabs.add(const Tab(text: 'Info'));
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -178,11 +193,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                       color: Theme.of(context).primaryColor,
                     ),
                     isScrollable: true,
-                    tabs: const [
-                      Tab(text: 'Tasks'),
-                      Tab(text: 'Users'),
-                      Tab(text: 'Info'),
-                    ],
+                    tabs: tabs,
                   ),
                 ),
                 const Padding(
@@ -210,6 +221,7 @@ class _AddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = _bloc(context);
     return BlocBuilder<ProjectCubit, AppState>(builder: (context, state) {
       state as ProjectState;
       return ElevatedButton(
@@ -225,6 +237,12 @@ class _AddButton extends StatelessWidget {
             case ProjectPageState.users:
               break;
             case ProjectPageState.info:
+              await showDialog(
+                  context: context,
+                  builder: (context) => ProjectDialog(
+                        project: state.project,
+                        onUpdate: cubit.updateProject,
+                      ));
               break;
           }
         },

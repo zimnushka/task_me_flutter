@@ -63,6 +63,11 @@ class AppProvider extends Cubit<AppProviderState> {
     return setPrimaryColor(await _themeLocalRepository.getTheme(), color);
   }
 
+  Future<void> updateUser(User user) async {
+    await _userApiRepository.editUser(user);
+    await load();
+  }
+
   Future<void> setToken(String token) async {
     await _userLocalRepository.setUser(token);
     await load();

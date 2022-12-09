@@ -106,10 +106,7 @@ class TaskCard extends StatelessWidget {
 }
 
 class UserCard extends StatelessWidget {
-  const UserCard(
-    this.user,
-    this.isOwner,
-  );
+  const UserCard(this.user, {this.isOwner = false});
   final User user;
   final bool isOwner;
 

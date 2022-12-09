@@ -2,12 +2,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
-import 'package:task_me_flutter/layers/repositories/api/user.dart';
 
 class HomeState extends AppState {
   final List<User> users;

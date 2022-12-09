@@ -21,7 +21,7 @@ class UserProjectView extends StatelessWidget {
               curve: Curves.easeOut,
               start: const Offset(1, 0),
               end: Offset.zero,
-              child: UserCard(item, state.project!.ownerId == item.id));
+              child: UserCard(item, isOwner: state.project!.ownerId == item.id));
         },
       ),
     );

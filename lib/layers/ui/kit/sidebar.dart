@@ -77,6 +77,29 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             title: TextBold(appProvider.state.user!.name),
             subtitle: Text(appProvider.state.user!.email),
           ),
+          const SizedBox(height: 10),
+          Container(
+            height: 40,
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Theme.of(context).backgroundColor,
+              borderRadius: const BorderRadius.all(radius),
+            ),
+            child: TabBar(
+                controller: themeController,
+                onTap: (value) {
+                  provider.setTheme(
+                      isLightTheme: value == 0, color: Theme.of(context).primaryColor);
+                },
+                indicator: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: const BorderRadius.all(radius),
+                ),
+                tabs: const [
+                  Tab(text: 'light'),
+                  Tab(text: 'dark'),
+                ]),
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
@@ -115,28 +138,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
           ),
-          Container(
-            height: 40,
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              borderRadius: const BorderRadius.all(radius),
-            ),
-            child: TabBar(
-                controller: themeController,
-                onTap: (value) {
-                  provider.setTheme(
-                      isLightTheme: value == 0, color: Theme.of(context).primaryColor);
-                },
-                indicator: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.all(radius),
-                ),
-                tabs: const [
-                  Tab(text: 'light'),
-                  Tab(text: 'dark'),
-                ]),
-          ),
+          TextButton(onPressed: appProvider.deleteToken, child: const Text('logout')),
         ],
       ),
     );

@@ -95,6 +95,10 @@ class __BodyState extends State<_Body> {
   final List<PopupMenuItem<TaskStatus>> statusWidgets = [];
 
   Future<void> save() async {
+    if (status == TaskStatus.done && selectedUser == null) {
+      AppSnackBar.show(context, 'Add assigner before close task', AppSnackBarType.error);
+      return;
+    }
     int hourCount = -1;
     if (status == TaskStatus.done) {
       await showDialog(
@@ -124,11 +128,17 @@ class __BodyState extends State<_Body> {
 
     if (widget.task != null) {
       await repository.edit(task);
+      AppSnackBar.show(context, 'Edited', AppSnackBarType.success);
+      widget.onUpdate(task);
     } else {
-      await repository.create(task);
+      final newTask = (await repository.create(task)).data;
+      if (newTask != null) {
+        AppSnackBar.show(context, 'Created', AppSnackBarType.success);
+        widget.onUpdate(newTask);
+      } else {
+        AppSnackBar.show(context, 'Create error', AppSnackBarType.error);
+      }
     }
-    AppSnackBar.show(context, 'Saved', AppSnackBarType.success);
-    widget.onUpdate(task);
   }
 
   Future<void> delete() async {

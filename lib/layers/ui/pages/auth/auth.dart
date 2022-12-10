@@ -5,6 +5,7 @@ import 'package:task_me_flutter/app/ui/error_page.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
+import 'package:task_me_flutter/layers/ui/pages/auth/poster.dart';
 
 AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
@@ -23,8 +24,9 @@ class AuthPage extends StatelessWidget {
             if (state is AuthState) {
               return Row(
                 children: [
-                  const _AuthPreview(),
-                  SizedBox(
+                  const AuthPoster(),
+                  Container(
+                      color: Theme.of(context).cardColor,
                       width: 300,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
@@ -54,23 +56,6 @@ class AuthPage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _AuthPreview extends StatefulWidget {
-  const _AuthPreview();
-
-  @override
-  State<_AuthPreview> createState() => _AuthPreviewState();
-}
-
-class _AuthPreviewState extends State<_AuthPreview> {
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        child: Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-    ));
   }
 }
 

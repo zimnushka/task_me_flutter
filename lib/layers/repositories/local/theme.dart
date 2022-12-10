@@ -9,6 +9,11 @@ class ThemeLocalRepository {
     return isLightTheme ? lightTheme : darkTheme;
   }
 
+  Future<bool> getThemeBool() async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getBool('isLightTheme') ?? true;
+  }
+
   Future<void> setTheme({required bool isLight}) async {
     final pref = await SharedPreferences.getInstance();
     await pref.setBool('isLightTheme', isLight);

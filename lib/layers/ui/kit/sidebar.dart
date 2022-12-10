@@ -19,8 +19,9 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
-  late final themeController = TabController(length: 2, vsync: this);
-  late final AppProvider provider = context.read<AppProvider>();
+  late final themeController =
+      TabController(initialIndex: appProvider.state.isLightTheme ? 0 : 1, length: 2, vsync: this);
+  late final AppProvider appProvider = context.watch<AppProvider>();
 
   Future<void> showProjectEditor({Project? project}) async {
     await showDialog(
@@ -33,7 +34,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final AppProvider appProvider = context.watch<AppProvider>();
     return Container(
       width: 250,
       height: double.infinity,
@@ -61,7 +61,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                                     child: ColorSelector(
                                       initColor: Theme.of(context).primaryColor,
                                       onSetColor: (value) {
-                                        provider.setTheme(
+                                        appProvider.setTheme(
                                             isLightTheme: themeController.index == 0, color: value);
                                         Navigator.pop(context);
                                       },
@@ -88,16 +88,26 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             child: TabBar(
                 controller: themeController,
                 onTap: (value) {
-                  provider.setTheme(
+                  appProvider.setTheme(
                       isLightTheme: value == 0, color: Theme.of(context).primaryColor);
                 },
                 indicator: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: const BorderRadius.all(radius),
                 ),
-                tabs: const [
-                  Tab(text: 'light'),
-                  Tab(text: 'dark'),
+                tabs: [
+                  Tab(
+                    child: Text(
+                      'light',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      'dark',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
                 ]),
           ),
           const Padding(

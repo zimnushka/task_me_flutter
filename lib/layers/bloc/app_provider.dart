@@ -10,20 +10,24 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class AppProviderState {
   final User? user;
+  final bool isLightTheme;
   final ThemeData theme;
   final Config config;
 
   const AppProviderState({
     required this.theme,
     required this.config,
+    this.isLightTheme = false,
     this.user,
   });
 
-  AppProviderState copyWith({User? user, ThemeData? theme, bool nullUser = false, Config? config}) {
+  AppProviderState copyWith(
+      {User? user, ThemeData? theme, bool nullUser = false, Config? config, bool? isLightTheme}) {
     return AppProviderState(
       config: config ?? this.config,
       theme: theme ?? this.theme,
       user: nullUser ? null : user ?? this.user,
+      isLightTheme: isLightTheme ?? this.isLightTheme,
     );
   }
 }
@@ -46,9 +50,11 @@ class AppProvider extends Cubit<AppProviderState> {
       final userData = await _userApiRepository.getUserMe();
       user = userData.data;
     }
+
     final stateWithTheme = state.copyWith(
-      theme: await _setTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
+      theme: await _generateTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
       user: user,
+      isLightTheme: await _themeLocalRepository.getThemeBool(),
     );
     emit(stateWithTheme);
   }
@@ -57,10 +63,13 @@ class AppProvider extends Cubit<AppProviderState> {
     if (state.user != null) {
       await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
     }
-    emit(state.copyWith(theme: await _setTheme(color: color, isLightTheme: isLightTheme)));
+    emit(state.copyWith(
+      theme: await _generateTheme(color: color, isLightTheme: isLightTheme),
+      isLightTheme: isLightTheme,
+    ));
   }
 
-  Future<ThemeData> _setTheme({required Color color, bool? isLightTheme}) async {
+  Future<ThemeData> _generateTheme({required Color color, bool? isLightTheme}) async {
     if (isLightTheme != null) {
       await _themeLocalRepository.setTheme(isLight: isLightTheme);
     }

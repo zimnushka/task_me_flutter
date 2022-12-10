@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
+import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
+
+ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
 class UserProjectView extends StatelessWidget {
   const UserProjectView(
@@ -11,6 +15,7 @@ class UserProjectView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final repository = UserApiRepository();
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: state.users.length,
@@ -21,7 +26,10 @@ class UserProjectView extends StatelessWidget {
               curve: Curves.easeOut,
               start: const Offset(1, 0),
               end: Offset.zero,
-              child: UserCard(item, isOwner: state.project!.ownerId == item.id));
+              child: UserCard(item, () async {
+                await repository.deleteMemberFromProject(item.id, state.project!.id!);
+                await _bloc(context).updateUsers();
+              }, state.tasks, isOwner: state.project!.ownerId == item.id));
         },
       ),
     );

@@ -7,6 +7,7 @@ import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/kit/overlays/invite_member.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/info_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/task_view.dart';
@@ -235,6 +236,13 @@ class _AddButton extends StatelessWidget {
               TaskPage.route(context, state.project!.id!);
               break;
             case ProjectPageState.users:
+              await showDialog(
+                context: context,
+                builder: (context) => InviteMemberDialog(
+                  projectId: state.project!.id!,
+                  onInvite: cubit.updateUsers,
+                ),
+              );
               break;
             case ProjectPageState.info:
               await showDialog(

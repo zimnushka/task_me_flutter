@@ -5,6 +5,15 @@ part 'schemes.g.dart';
 part 'schemes.freezed.dart';
 
 @freezed
+class Config with _$Config {
+  const factory Config({
+    required final String apiBaseUrl,
+    required final bool debug,
+  }) = _Config;
+  factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
+}
+
+@freezed
 class User with _$User {
   factory User({
     required final int id,

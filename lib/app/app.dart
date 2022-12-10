@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
+import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-void main() => runApp(TaskMyApp());
-
 class TaskMyApp extends StatelessWidget {
-  TaskMyApp({super.key});
-  final AppProvider provider = AppProvider();
+  TaskMyApp({required this.config, super.key});
+  final Config config;
+  late final AppProvider provider = AppProvider(config);
 
   late final GoRouter _route = GoRouter(
     routes: [
@@ -45,12 +45,13 @@ class TaskMyApp extends StatelessWidget {
     ],
   );
 
-  CustomTransitionPage builder(BuildContext context, GoRouterState state, Widget child) =>
-      buildPageWithDefaultTransition(
-        context: context,
-        state: state,
-        child: AppProviderWidget(child, provider),
-      );
+  CustomTransitionPage builder(BuildContext context, GoRouterState state, Widget child) {
+    return buildPageWithDefaultTransition(
+      context: context,
+      state: state,
+      child: AppProviderWidget(child, provider),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +59,7 @@ class TaskMyApp extends StatelessWidget {
       routeInformationProvider: _route.routeInformationProvider,
       routeInformationParser: _route.routeInformationParser,
       routerDelegate: _route.routerDelegate,
+      debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
       theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
     );

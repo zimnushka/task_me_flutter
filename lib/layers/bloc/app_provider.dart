@@ -11,14 +11,17 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 class AppProviderState {
   final User? user;
   final ThemeData theme;
+  final Config config;
 
   const AppProviderState({
     required this.theme,
+    required this.config,
     this.user,
   });
 
-  AppProviderState copyWith({User? user, ThemeData? theme, bool nullUser = false}) {
+  AppProviderState copyWith({User? user, ThemeData? theme, bool nullUser = false, Config? config}) {
     return AppProviderState(
+      config: config ?? this.config,
       theme: theme ?? this.theme,
       user: nullUser ? null : user ?? this.user,
     );
@@ -26,7 +29,7 @@ class AppProviderState {
 }
 
 class AppProvider extends Cubit<AppProviderState> {
-  AppProvider() : super(AppProviderState(theme: lightTheme)) {
+  AppProvider(Config config) : super(AppProviderState(theme: lightTheme, config: config)) {
     load();
   }
 
@@ -35,6 +38,7 @@ class AppProvider extends Cubit<AppProviderState> {
   final UserApiRepository _userApiRepository = UserApiRepository();
 
   Future<void> load() async {
+    ApiRepository.url = state.config.apiBaseUrl;
     final token = await _userLocalRepository.getUser();
     User? user;
     if (token != null) {
@@ -42,7 +46,7 @@ class AppProvider extends Cubit<AppProviderState> {
       final userData = await _userApiRepository.getUserMe();
       user = userData.data;
     }
-    final stateWithTheme = AppProviderState(
+    final stateWithTheme = state.copyWith(
       theme: await _setTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
       user: user,
     );

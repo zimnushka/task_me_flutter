@@ -4,13 +4,14 @@ import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
 abstract class ApiRepository {
   static Session? _session;
+  static String? url;
 
   static set session(Session value) => _session = value;
 
   Dio get client {
     log('Get DIO client');
     return Dio(BaseOptions(
-      baseUrl: 'http://192.168.17.9:8080',
+      baseUrl: url ?? '',
       connectTimeout: 10000,
       headers: _session?.sign(),
       followRedirects: false,

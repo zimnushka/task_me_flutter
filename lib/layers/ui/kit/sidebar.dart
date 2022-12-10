@@ -138,7 +138,10 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
           ),
-          TextButton(onPressed: appProvider.deleteToken, child: const Text('logout')),
+          TextButton(
+              style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
+              onPressed: appProvider.deleteToken,
+              child: const Text('logout')),
         ],
       ),
     );

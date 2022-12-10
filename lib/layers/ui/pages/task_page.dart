@@ -138,12 +138,13 @@ class __BodyState extends State<_Body> {
 
   @override
   void initState() {
-    nameController.text = widget.task?.title ?? '';
-    descController.text = widget.task?.description ?? '';
-    status = widget.task?.status ?? TaskStatus.open;
-    selectedUser = widget.task?.assignerId != null
-        ? widget.users.firstWhere((element) => element.id == widget.task!.assignerId)
-        : null;
+    if (widget.task != null) {
+      nameController.text = widget.task!.title;
+      descController.text = widget.task!.description;
+      status = widget.task!.status;
+      final users = widget.users.where((element) => element.id == widget.task!.assignerId);
+      selectedUser = users.isNotEmpty ? users.first : null;
+    }
 
     userWidgets.add(PopupMenuItem(
       value: null,
@@ -194,7 +195,6 @@ class __BodyState extends State<_Body> {
           },
           readOnly: widget.task?.status == TaskStatus.done,
           controller: nameController,
-          textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: 20),
         const Text('Description'),
@@ -254,7 +254,11 @@ class __BodyState extends State<_Body> {
                             ? Theme.of(context).primaryColor
                             : Theme.of(context).disabledColor,
                       ),
-                      onPressed: save,
+                      onPressed: () {
+                        if (hasUpdate) {
+                          save();
+                        }
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(10),
                         child: Text(widget.task != null ? 'Save' : 'Add'),

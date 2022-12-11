@@ -9,10 +9,9 @@ class ThemeLocalRepository {
     return isLightTheme ? lightTheme : darkTheme;
   }
 
-  Future<Color> getColor() async {
+  Future<bool> getThemeBool() async {
     final pref = await SharedPreferences.getInstance();
-    final colorValue = pref.getInt('primaryColor');
-    return colorValue != null ? Color(colorValue) : defaultPrimaryColor;
+    return pref.getBool('isLightTheme') ?? true;
   }
 
   Future<void> setTheme({required bool isLight}) async {
@@ -20,18 +19,8 @@ class ThemeLocalRepository {
     await pref.setBool('isLightTheme', isLight);
   }
 
-  Future<void> setColor(int value) async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.setInt('primaryColor', value);
-  }
-
   Future<void> deleteTheme() async {
     final pref = await SharedPreferences.getInstance();
     await pref.remove('isLightTheme');
-  }
-
-  Future<void> deleteColor() async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.remove('primaryColor');
   }
 }

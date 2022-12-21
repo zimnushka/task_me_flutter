@@ -7,7 +7,7 @@ import 'package:task_me_flutter/layers/repositories/api/api.dart';
 
 class ProjectApiRepository extends ApiRepository {
   Future<ApiResponse<List<Project>?>> getAll() async {
-    final data = await client.get('/project');
+    final data = await client.get('/project/');
     if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
       final jsonData = jsonDecode(data.data);
       return ApiResponse(

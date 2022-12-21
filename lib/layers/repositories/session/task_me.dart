@@ -7,6 +7,8 @@ class TaskMeSession implements Session {
 
   @override
   Map<String, String> sign() {
-    return {'Authorization': token};
+    return {
+      'Authorization': token,
+    };
   }
 }

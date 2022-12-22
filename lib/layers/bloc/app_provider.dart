@@ -54,6 +54,7 @@ class AppProvider extends Cubit<AppProviderState> {
     final stateWithTheme = state.copyWith(
       theme: await _generateTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
       user: user,
+      nullUser: user == null,
       isLightTheme: await _themeLocalRepository.getThemeBool(),
     );
     emit(stateWithTheme);

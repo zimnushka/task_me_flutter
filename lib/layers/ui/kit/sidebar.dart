@@ -130,19 +130,38 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             ),
           ),
           Expanded(
-            child: Material(
-              type: MaterialType.transparency,
-              child: ListView.builder(
-                itemCount: widget.projects.length,
-                itemBuilder: (context, index) {
-                  final item = widget.projects[index];
-                  return ProjectButton(
-                    item: item,
-                    onTap: () => ProjectPage.route(context, item.id!),
-                  );
-                },
-              ),
-            ),
+            child: widget.projects.isNotEmpty
+                ? Material(
+                    type: MaterialType.transparency,
+                    child: ListView.builder(
+                      itemCount: widget.projects.length,
+                      itemBuilder: (context, index) {
+                        final item = widget.projects[index];
+                        return ProjectButton(
+                          item: item,
+                          onTap: () => ProjectPage.route(context, item.id!),
+                        );
+                      },
+                    ),
+                  )
+                : Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.live_help_outlined,
+                          size: 40,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'Click + to add new project, or ask your project member of invite you',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),

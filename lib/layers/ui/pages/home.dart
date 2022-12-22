@@ -178,7 +178,28 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
           )),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 10)),
-        _TasksView(widget.state)
+        if (widget.state.tasks.isEmpty)
+          SliverToBoxAdapter(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  SizedBox(height: 30),
+                  Icon(
+                    Icons.update,
+                    size: 60,
+                  ),
+                  SizedBox(height: 30),
+                  Text(
+                    'Task list is empty or try update page',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          _TasksView(widget.state)
       ],
     );
   }

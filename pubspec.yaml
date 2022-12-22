@@ -15,7 +15,7 @@ dependencies:
   hive: ^2.2.2
   hive_flutter: ^1.1.0
   cupertino_icons: ^1.0.2
-  fl_chart: ^0.55.0
+  syncfusion_flutter_charts: ^20.4.38
   intl: ^0.17.0
   flutter_svg: ^1.1.1+1
   flutter_colorpicker: ^1.0.3

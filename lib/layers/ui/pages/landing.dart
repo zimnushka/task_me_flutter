@@ -25,12 +25,7 @@ class _AppProviderWidgetState extends State<AppProviderWidget> {
               data: state.theme,
               child: DecoratedBox(
                 decoration: BoxDecoration(color: state.theme.backgroundColor),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: double.infinity, maxWidth: 1500),
-                    child: state.user != null ? Menu(widget.child) : const AuthPage(),
-                  ),
-                ),
+                child: state.user != null ? Menu(widget.child) : const AuthPage(),
               ),
             );
           }),

@@ -1,7 +1,7 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
@@ -127,24 +127,23 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                       height: 200,
                       child: Stack(
                         children: [
-                          PieChart(
-                            PieChartData(
-                              sectionsSpace: 5,
-                              centerSpaceRadius: 70,
-                              sections: TaskStatus.values
-                                  .map(
-                                    (e) => PieChartSectionData(
-                                        color: e.color,
-                                        title: '',
-                                        radius: 20,
-                                        value: widget.state.tasks
-                                                .where((element) => element.status == e)
-                                                .length /
-                                            widget.state.tasks.length *
-                                            100),
-                                  )
-                                  .toList(),
-                            ),
+                          SfCircularChart(
+                            borderWidth: 0,
+                            series: <CircularSeries>[
+                              DoughnutSeries<TaskStatus, String>(
+                                radius: '100%',
+                                innerRadius: '80%',
+                                dataSource: TaskStatus.values,
+                                pointColorMapper: (data, index) => data.color,
+                                xValueMapper: (data, _) => data.label,
+                                yValueMapper: (data, _) =>
+                                    widget.state.tasks
+                                        .where((element) => element.status == data)
+                                        .length /
+                                    widget.state.tasks.length *
+                                    100,
+                              )
+                            ],
                           ),
                           Center(
                             child: Column(

@@ -1,12 +1,7 @@
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
-const releaseMobileConfig = Config(
-  apiBaseUrl: 'http://localhost:8080',
-  debug: false,
-);
-
 const releaseWebConfig = Config(
-  apiBaseUrl: 'http://localhost:8080',
+  apiBaseUrl: 'http://192.168.81.199:8080',
   debug: false,
 );
 

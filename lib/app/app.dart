@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
@@ -55,6 +57,7 @@ class TaskMyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var url = window.location.href;
     return MaterialApp.router(
       routeInformationProvider: _route.routeInformationProvider,
       routeInformationParser: _route.routeInformationParser,
@@ -62,6 +65,9 @@ class TaskMyApp extends StatelessWidget {
       debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
       theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
+      builder: (context, child) {
+        return child ?? const SizedBox();
+      },
     );
   }
 }

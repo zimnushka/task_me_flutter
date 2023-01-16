@@ -147,8 +147,8 @@ class _UserCardState extends State<UserCard> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             leading: CircleAvatar(backgroundColor: Color(widget.user.color)),
             minLeadingWidth: 10,
-            title: Text(widget.user.name),
-            subtitle: Text(widget.user.email),
+            title: SelectableText(widget.user.name),
+            subtitle: SelectableText(widget.user.email),
             trailing: widget.isOwner
                 ? Card(
                     color: Theme.of(context).backgroundColor,
@@ -167,7 +167,7 @@ class _UserCardState extends State<UserCard> {
                 height: 10,
                 width: double.infinity,
                 child: percents.isEmpty
-                    ? Expanded(child: Container(color: Theme.of(context).disabledColor))
+                    ? Container(color: Theme.of(context).disabledColor)
                     : Row(
                         children: percents
                             .map((e) => Flexible(

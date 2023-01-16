@@ -51,6 +51,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - README.md
     - assets/
     - assets/animations/

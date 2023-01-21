@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_me_flutter/layers/ui/styles/icons.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -8,13 +9,6 @@ abstract class AppSnackBar {
   static void show(BuildContext context, String text, AppSnackBarType type) {
     switch (type) {
       case AppSnackBarType.error:
-        // showTopSnackBar(
-        //   context,
-        //   CustomSnackBar.error(
-        //     messagePadding: EdgeInsets.zero,
-        //     message: text,
-        //   ),
-        // );
         showTopSnackBar(
           context,
           Row(
@@ -28,10 +22,7 @@ abstract class AppSnackBar {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.white,
-                      ),
+                      const AppAnimatedIcon(AppAnimatedIcons.error, size: 25),
                       const SizedBox(width: 10),
                       Text(
                         text,
@@ -59,10 +50,7 @@ abstract class AppSnackBar {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.check_circle_outline_outlined,
-                        color: Colors.white,
-                      ),
+                      const AppAnimatedIcon(AppAnimatedIcons.done, size: 25),
                       const SizedBox(width: 10),
                       Text(
                         text,
@@ -90,10 +78,7 @@ abstract class AppSnackBar {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.info_outline,
-                        color: Colors.white,
-                      ),
+                      const AppAnimatedIcon(AppAnimatedIcons.error, size: 25),
                       const SizedBox(width: 10),
                       Text(
                         text,

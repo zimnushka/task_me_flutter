@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
@@ -55,7 +56,7 @@ class TasksProjectView extends StatelessWidget {
             child: isShow
                 ? TaskCard(
                     item,
-                    () => TaskPage.route(context, item.projectId, taskId: item.id!),
+                    () => AppRouter.goTo(TaskPage.route(item.projectId, taskId: item.id!)),
                     user: getUserTask(item.assignerId),
                   )
                 : const SizedBox(),

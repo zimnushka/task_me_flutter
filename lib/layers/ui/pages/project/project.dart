@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/project.dart';
@@ -17,12 +17,26 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
+class ProjectRoute implements AppPage {
+  final int projectId;
+
+  const ProjectRoute(this.projectId);
+
+  @override
+  String get name => 'project';
+
+  @override
+  Map<String, String> get params => {'projectId': projectId.toString()};
+
+  @override
+  Map<String, String>? get queryParams => null;
+}
+
 class ProjectPage extends StatefulWidget {
   const ProjectPage(this.id, {super.key});
   final int id;
 
-  static void route(BuildContext context, int projectId) =>
-      context.goNamed('project', params: {'projectId': projectId.toString()});
+  static AppPage route(int projectId) => ProjectRoute(projectId);
 
   @override
   State<ProjectPage> createState() => _ProjectPageState();
@@ -232,7 +246,7 @@ class _AddButton extends StatelessWidget {
         onPressed: () async {
           switch (state.pageState) {
             case ProjectPageState.tasks:
-              TaskPage.route(context, state.project!.id!);
+              await AppRouter.goTo(TaskPage.route(state.project!.id!));
               break;
             case ProjectPageState.users:
               await showDialog(

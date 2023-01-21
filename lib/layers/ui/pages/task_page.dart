@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/hour_selector.dart';
+
+class TaskRoute implements AppPage {
+  final int projectId;
+  final int? taskId;
+
+  const TaskRoute(this.projectId, this.taskId);
+
+  @override
+  String get name => 'task';
+
+  @override
+  Map<String, String> get params => {'taskId': taskId.toString()};
+
+  @override
+  Map<String, String>? get queryParams => {'projectId': projectId.toString()};
+}
 
 class TaskPage extends StatefulWidget {
   const TaskPage({
@@ -16,8 +33,7 @@ class TaskPage extends StatefulWidget {
   final int projectId;
   final int? taskId;
 
-  static void route(BuildContext context, int projectId, {int? taskId}) => context.goNamed('task',
-      params: {'taskId': taskId.toString()}, queryParams: {'projectId': projectId.toString()});
+  static AppPage route(int projectId, {int? taskId}) => TaskRoute(projectId, taskId);
 
   @override
   State<TaskPage> createState() => _TaskPageState();

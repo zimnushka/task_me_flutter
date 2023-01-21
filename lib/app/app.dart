@@ -1,7 +1,9 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
@@ -10,23 +12,25 @@ import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class TaskMyApp extends StatelessWidget {
   TaskMyApp({required this.config, super.key});
   final Config config;
-  late final AppProvider provider = AppProvider(config);
+  late final AppProvider provider;
 
   late final GoRouter _route = GoRouter(
+    navigatorKey: navigatorKey,
     routes: [
       GoRoute(
         name: 'home',
         path: '/',
-        pageBuilder: (context, state) => builder(context, state, const HomePage()),
+        pageBuilder: (context, state) => builder(state, const HomePage()),
       ),
       GoRoute(
         name: 'project',
         path: '/project/:projectId',
         pageBuilder: (context, state) => builder(
-            context,
             state,
             ProjectPage(
               int.parse(state.params['projectId']!),
@@ -37,7 +41,6 @@ class TaskMyApp extends StatelessWidget {
         name: 'task',
         path: '/task/:taskId',
         pageBuilder: (context, state) => builder(
-            context,
             state,
             TaskPage(
               taskId: int.tryParse(state.params['taskId'] ?? ''),
@@ -47,9 +50,8 @@ class TaskMyApp extends StatelessWidget {
     ],
   );
 
-  CustomTransitionPage builder(BuildContext context, GoRouterState state, Widget child) {
-    return buildPageWithDefaultTransition(
-      context: context,
+  CustomTransitionPage builder(GoRouterState state, Widget child) {
+    return buildTransition(
       state: state,
       child: AppProviderWidget(child, provider),
     );
@@ -57,7 +59,14 @@ class TaskMyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var url = window.location.href;
+    AppRouter.init(navigatorKey);
+    String url = config.apiBaseUrl;
+    if (config.setUrlFromHTML) {
+      final port = window.location.port;
+      final origin = window.location.origin;
+      url = origin.replaceAll(port, '8080');
+    }
+    provider = AppProvider(config.copyWith(apiBaseUrl: url));
     return MaterialApp.router(
       routeInformationProvider: _route.routeInformationProvider,
       routeInformationParser: _route.routeInformationParser,
@@ -65,15 +74,11 @@ class TaskMyApp extends StatelessWidget {
       debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
       theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
-      builder: (context, child) {
-        return child ?? const SizedBox();
-      },
     );
   }
 }
 
-CustomTransitionPage buildPageWithDefaultTransition<T>({
-  required BuildContext context,
+CustomTransitionPage buildTransition<T>({
   required GoRouterState state,
   required Widget child,
 }) {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/home.dart';
@@ -14,10 +15,21 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 HomeCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
+class HomeRoute implements AppPage {
+  @override
+  String get name => 'home';
+
+  @override
+  Map<String, String>? get params => null;
+
+  @override
+  Map<String, String>? get queryParams => null;
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  static void route(BuildContext context) => context.goNamed('home');
+  static AppPage route() => HomeRoute();
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -240,7 +252,8 @@ class _TasksView extends StatelessWidget {
               }
             },
             child: isShow
-                ? TaskCard(item, () => TaskPage.route(context, item.projectId, taskId: item.id))
+                ? TaskCard(
+                    item, () => AppRouter.goTo(TaskPage.route(item.projectId, taskId: item.id)))
                 : const SizedBox(),
           );
         },

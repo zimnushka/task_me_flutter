@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/color_selector.dart';
@@ -45,7 +46,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       child: Column(
         children: [
           ListTile(
-            onTap: () => HomePage.route(context),
+            onTap: () => AppRouter.goTo(HomePage.route()),
             contentPadding: EdgeInsets.zero,
             leading: GestureDetector(
               onTap: () {
@@ -139,7 +140,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                         final item = widget.projects[index];
                         return ProjectButton(
                           item: item,
-                          onTap: () => ProjectPage.route(context, item.id!),
+                          onTap: () => AppRouter.goTo(ProjectPage.route(item.id!)),
                         );
                       },
                     ),

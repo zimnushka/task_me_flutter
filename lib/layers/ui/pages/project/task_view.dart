@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/service/router.dart';
-import 'package:task_me_flutter/layers/bloc/project.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
 
-ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
+ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class TasksProjectView extends StatelessWidget {
   const TasksProjectView(
     this.state,
   );
-  final ProjectState state;
+  final ProjectLoadedState state;
 
   User? getUserTask(int? id) {
     if (id == null) {
@@ -27,7 +29,6 @@ class TasksProjectView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = _bloc(context);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: state.tasks.length,
@@ -43,16 +44,7 @@ class TasksProjectView extends StatelessWidget {
           return TaskStatusHeader(
             isShow: isShow,
             status: status,
-            onTap: () {
-              final newStats = [...state.openedStatuses];
-              if (isShow) {
-                newStats.remove(item.status);
-                cubit.setOpenStatuses(newStats);
-              } else {
-                newStats.add(item.status);
-                cubit.setOpenStatuses(newStats);
-              }
-            },
+            onTap: () => _bloc(context).add(OnTaskStatusTap(item.status)),
             child: isShow
                 ? TaskCard(
                     item,

@@ -56,10 +56,8 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
                       ),
                     ),
                     Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                       child: widget.child,
-                    )),
+                    ),
                   ],
                 ),
                 if (ResponsiveUiController._widthSize)

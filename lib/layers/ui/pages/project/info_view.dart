@@ -2,18 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:task_me_flutter/layers/bloc/project.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 
-ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
+ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class InfoProjectView extends StatefulWidget {
-  const InfoProjectView(
-    this.state,
-  );
-  final ProjectState state;
+  const InfoProjectView(this.state);
+  final ProjectLoadedState state;
 
   @override
   State<InfoProjectView> createState() => _InfoProjectViewState();
@@ -183,10 +182,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             child: Center(
               child: TextButton(
                 style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
-                onPressed: () async {
-                  await _bloc(context).deleteProject();
-                  GoRouter.of(context).pushNamed('home');
-                },
+                onPressed: () => _bloc(context).add(OnDeleteProject()),
                 child: Text('Delete project'),
               ),
             ),

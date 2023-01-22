@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/app/ui/loader.dart';
@@ -62,24 +61,27 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: load(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return _Body(
-            projectId: widget.projectId,
-            task: task,
-            users: users,
-            onUpdate: (value) {
-              setState(() {
-                task = value;
-              });
-            },
-          );
-        } else {
-          return const AppLoadingIndecator();
-        }
-      },
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: FutureBuilder(
+        future: load(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return _Body(
+              projectId: widget.projectId,
+              task: task,
+              users: users,
+              onUpdate: (value) {
+                setState(() {
+                  task = value;
+                });
+              },
+            );
+          } else {
+            return const AppLoadingIndecator();
+          }
+        },
+      ),
     );
   }
 }

@@ -73,6 +73,8 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     }
     if (event.project) {
       final projectData = await projectApiRepository.getById(currentState.project.id!);
+      final provider = AppRouter.context.read<AppProvider>();
+      await provider.load();
       newState = newState.copyWith(project: projectData.data);
     }
     if (event.tasks) {

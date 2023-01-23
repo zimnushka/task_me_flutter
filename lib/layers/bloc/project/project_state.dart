@@ -5,14 +5,12 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 class ProjectLoadedState extends AppLoadedState {
   final Project project;
   final List<User> users;
-  final List<Task> tasks;
+  final List<TaskUi> tasks;
   final ProjectPageState pageState;
-  final List<TaskStatus> openedStatuses;
 
   const ProjectLoadedState({
     required this.users,
     required this.tasks,
-    required this.openedStatuses,
     required this.project,
     this.pageState = ProjectPageState.tasks,
   });
@@ -20,7 +18,7 @@ class ProjectLoadedState extends AppLoadedState {
   ProjectLoadedState copyWith({
     Project? project,
     List<User>? users,
-    List<Task>? tasks,
+    List<TaskUi>? tasks,
     ProjectPageState? pageState,
     List<TaskStatus>? openedStatuses,
   }) {
@@ -29,7 +27,6 @@ class ProjectLoadedState extends AppLoadedState {
       users: users ?? this.users,
       tasks: tasks ?? this.tasks,
       pageState: pageState ?? this.pageState,
-      openedStatuses: openedStatuses ?? this.openedStatuses,
     );
   }
 }

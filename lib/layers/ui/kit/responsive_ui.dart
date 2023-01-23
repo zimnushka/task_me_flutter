@@ -56,7 +56,10 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
                       ),
                     ),
                     Expanded(
-                      child: widget.child,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: widget.child,
+                      ),
                     ),
                   ],
                 ),

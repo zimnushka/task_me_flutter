@@ -1,8 +1,7 @@
-import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
-abstract class ProjectEvent extends AppState {}
+abstract class ProjectEvent {}
 
 class Load extends ProjectEvent {
   final int projectId;
@@ -24,11 +23,18 @@ class OnTabTap extends ProjectEvent {
 
 class OnHeaderButtonTap extends ProjectEvent {}
 
-class OnTaskStatusTap extends ProjectEvent {
-  final TaskStatus status;
-  OnTaskStatusTap(this.status);
+class Refresh extends ProjectEvent {
+  final bool user;
+  final bool tasks;
+  final bool project;
+
+  Refresh({this.project = false, this.tasks = false, this.user = false});
 }
 
-class Refresh extends ProjectEvent {}
-
 class OnDeleteProject extends ProjectEvent {}
+
+class OnDeleteUser extends ProjectEvent {
+  final int userId;
+
+  OnDeleteUser(this.userId);
+}

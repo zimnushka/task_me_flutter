@@ -39,21 +39,24 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     on<OnTabTap>(_onTabTap);
     on<OnTaskTap>(_onTaskTap);
     on<Refresh>(_refresh);
-    on<OnTaskStatusTap>(_onTaskStatusTap);
     on<OnDeleteProject>(_onDeleteProject);
+    on<OnDeleteUser>(_onDeleteUser);
   }
 
   Future<void> _load(Load event, Emitter emit) async {
     final projectData = await projectApiRepository.getById(event.projectId);
     final users = await userApiRepository.getUserFromProject(event.projectId);
-    final tasks = await taskApiRepository.getByProject(event.projectId);
-    tasks.data?.sort((a, b) => a.status.index.compareTo(b.status.index));
+    final tasksData = await taskApiRepository.getByProject(event.projectId);
+    final tasks = tasksData.data ?? [];
+    tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
+
     emit(
       ProjectLoadedState(
         project: projectData.data!,
         users: users.data ?? [],
-        tasks: tasks.data ?? [],
-        openedStatuses: TaskStatus.values,
+        tasks: tasks
+            .map((task) => TaskUi(task, user: _getUserTask(task.id, users.data ?? [])))
+            .toList(),
       ),
     );
   }
@@ -61,16 +64,34 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
   Future<void> _refresh(Refresh event, Emitter emit) async {
     final currentState = state as ProjectLoadedState;
 
-    final projectData = await projectApiRepository.getById(currentState.project.id!);
-    final users = await userApiRepository.getUserFromProject(currentState.project.id!);
-    final tasks = await taskApiRepository.getByProject(currentState.project.id!);
-    tasks.data?.sort((a, b) => a.status.index.compareTo(b.status.index));
+    ProjectLoadedState newState = currentState;
 
-    emit(currentState.copyWith(
-      project: projectData.data,
-      users: users.data,
-      tasks: tasks.data,
-    ));
+    if (event.user) {
+      final users = await userApiRepository.getUserFromProject(currentState.project.id!);
+      newState = newState.copyWith(users: users.data);
+    }
+    if (event.project) {
+      final projectData = await projectApiRepository.getById(currentState.project.id!);
+      newState = newState.copyWith(project: projectData.data);
+    }
+    if (event.tasks) {
+      final tasksData = await taskApiRepository.getByProject(currentState.project.id!);
+      final tasks = tasksData.data ?? [];
+      tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
+      newState = newState.copyWith(
+        tasks: tasks
+            .map((task) => TaskUi(task, user: _getUserTask(task.id, currentState.users)))
+            .toList(),
+      );
+    }
+
+    emit(newState);
+  }
+
+  Future<void> _onDeleteUser(OnDeleteUser event, Emitter emit) async {
+    final currentState = state as ProjectLoadedState;
+    await userApiRepository.deleteMemberFromProject(event.userId, currentState.project.id!);
+    add(Refresh(user: true));
   }
 
   Future<void> _onDeleteProject(OnDeleteProject event, Emitter emit) async {
@@ -90,14 +111,14 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
         await AppRouter.dialog(
           (context) => InviteMemberDialog(
             projectId: currentState.project.id!,
-            onInvite: () => add(Refresh()),
+            onInvite: () => add(Refresh(user: true)),
           ),
         );
         break;
       case ProjectPageState.info:
         await AppRouter.dialog((context) => ProjectDialog(
               project: currentState.project,
-              onUpdate: () => add(Refresh()),
+              onUpdate: () => add(Refresh(project: true)),
             ));
         break;
     }
@@ -116,17 +137,14 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     emit(currentState.copyWith(pageState: event.page));
   }
 
-  Future<void> _onTaskStatusTap(OnTaskStatusTap event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-
-    if (currentState.openedStatuses.contains(event.status)) {
-      final statuses = List.of(currentState.openedStatuses);
-      statuses.remove(event.status);
-      emit(currentState.copyWith(openedStatuses: statuses));
-    } else {
-      final statuses = List.of(currentState.openedStatuses);
-      statuses.add(event.status);
-      emit(currentState.copyWith(openedStatuses: statuses));
+  User? _getUserTask(int? id, List<User> users) {
+    if (id == null) {
+      return null;
     }
+    final usersTask = users.where((element) => element.id == id);
+    if (usersTask.isEmpty) {
+      return null;
+    }
+    return usersTask.first;
   }
 }

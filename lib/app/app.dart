@@ -2,6 +2,7 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
@@ -53,7 +54,7 @@ class TaskMyApp extends StatelessWidget {
   CustomTransitionPage builder(GoRouterState state, Widget child) {
     return buildTransition(
       state: state,
-      child: AppProviderWidget(child, provider),
+      child: Landing(child: child),
     );
   }
 
@@ -74,6 +75,9 @@ class TaskMyApp extends StatelessWidget {
       debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
       theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
+      builder: (context, child) {
+        return BlocProvider.value(value: provider, child: child);
+      },
     );
   }
 }

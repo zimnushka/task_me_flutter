@@ -4,31 +4,27 @@ import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/ui/pages/auth/auth.dart';
 import 'package:task_me_flutter/layers/ui/pages/menu.dart';
 
-class AppProviderWidget extends StatefulWidget {
+class Landing extends StatefulWidget {
   final Widget child;
-  final AppProvider cubit;
-  const AppProviderWidget(this.child, this.cubit, {super.key});
+  const Landing({required this.child, super.key});
 
   @override
-  State<AppProviderWidget> createState() => _AppProviderWidgetState();
+  State<Landing> createState() => _LandingState();
 }
 
-class _AppProviderWidgetState extends State<AppProviderWidget> {
+class _LandingState extends State<Landing> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: widget.cubit,
-      child: BlocBuilder<AppProvider, AppProviderState>(
-          bloc: widget.cubit,
-          builder: (context, state) {
-            return Theme(
-              data: state.theme,
-              child: DecoratedBox(
-                decoration: BoxDecoration(color: state.theme.backgroundColor),
-                child: state.user != null ? Menu(widget.child) : const AuthPage(),
-              ),
-            );
-          }),
+    return BlocBuilder<AppProvider, AppProviderState>(
+      builder: (context, state) {
+        return Theme(
+          data: state.theme,
+          child: DecoratedBox(
+            decoration: BoxDecoration(color: state.theme.backgroundColor),
+            child: state.user != null ? Menu(widget.child) : const AuthPage(),
+          ),
+        );
+      },
     );
   }
 }

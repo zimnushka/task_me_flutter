@@ -103,3 +103,10 @@ class Task with _$Task {
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 }
+
+class TaskUi {
+  final Task task;
+  final User? user;
+
+  const TaskUi(this.task, {this.user});
+}

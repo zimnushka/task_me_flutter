@@ -9,7 +9,7 @@ import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/info_view.dart';
-import 'package:task_me_flutter/layers/ui/pages/project/task_view.dart';
+import 'package:task_me_flutter/layers/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/user_view.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
@@ -105,128 +105,126 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            sliver: SliverAppBar(
-              automaticallyImplyLeading: false,
-              title: Text(widget.state.project.title),
-              titleTextStyle: const TextStyle(fontSize: 25, color: Colors.white),
-              centerTitle: false,
-              pinned: true,
-              snap: false,
-              forceElevated: true,
-              expandedHeight: 250,
-              backgroundColor: Theme.of(context).primaryColor,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
-              flexibleSpace: FlexibleSpaceBar(
-                background: widget.state.tasks.isNotEmpty
-                    ? Center(
-                        child: Container(
-                          decoration:
-                              const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                          width: 200,
-                          height: 200,
-                          child: Stack(
-                            children: [
-                              SfCircularChart(
-                                borderWidth: 0,
-                                series: <CircularSeries>[
-                                  DoughnutSeries<TaskStatus, String>(
-                                    radius: '100%',
-                                    innerRadius: '80%',
-                                    dataSource: TaskStatus.values,
-                                    pointColorMapper: (data, index) => data.color,
-                                    xValueMapper: (data, _) => data.label,
-                                    yValueMapper: (data, _) =>
-                                        widget.state.tasks
-                                            .where((element) => element.status == data)
-                                            .length /
-                                        widget.state.tasks.length *
-                                        100,
-                                  )
+    return NestedScrollView(
+      headerSliverBuilder: (context, _) => [
+        SliverPadding(
+          padding: const EdgeInsets.only(bottom: 10),
+          sliver: SliverAppBar(
+            automaticallyImplyLeading: false,
+            title: Text(widget.state.project.title),
+            titleTextStyle: const TextStyle(fontSize: 25, color: Colors.white),
+            centerTitle: false,
+            pinned: true,
+            snap: false,
+            forceElevated: true,
+            expandedHeight: 250,
+            backgroundColor: Theme.of(context).primaryColor,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
+            flexibleSpace: FlexibleSpaceBar(
+              background: widget.state.tasks.isNotEmpty
+                  ? Center(
+                      child: Container(
+                        decoration:
+                            const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                        width: 200,
+                        height: 200,
+                        child: Stack(
+                          children: [
+                            SfCircularChart(
+                              borderWidth: 0,
+                              series: <CircularSeries>[
+                                DoughnutSeries<TaskStatus, String>(
+                                  radius: '100%',
+                                  innerRadius: '80%',
+                                  dataSource: TaskStatus.values,
+                                  pointColorMapper: (data, index) => data.color,
+                                  xValueMapper: (data, _) => data.label,
+                                  yValueMapper: (data, _) =>
+                                      widget.state.tasks
+                                          .where((element) => element.task.status == data)
+                                          .length /
+                                      widget.state.tasks.length *
+                                      100,
+                                )
+                              ],
+                            ),
+                            Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('closed tasks',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .copyWith(color: Theme.of(context).primaryColor)),
+                                  Text(
+                                      widget.state.tasks
+                                          .where(
+                                              (element) => element.task.status == TaskStatus.done)
+                                          .length
+                                          .toString(),
+                                      style: TextStyle(
+                                          fontSize: 40, color: Theme.of(context).primaryColor)),
                                 ],
                               ),
-                              Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('closed tasks',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall!
-                                            .copyWith(color: Theme.of(context).primaryColor)),
-                                    Text(
-                                        widget.state.tasks
-                                            .where((element) => element.status == TaskStatus.done)
-                                            .length
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: 40, color: Theme.of(context).primaryColor)),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                      )
-                    : const SizedBox(),
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size(double.infinity, 40),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: 40,
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).disabledColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                          bottomLeft: Radius.circular(10),
-                        ),
-                      ),
-                      child: TabBar(
-                        controller: tabController,
-                        indicator: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        isScrollable: true,
-                        tabs: tabs,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Theme.of(context).primaryColor,
-                        ),
-                        onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
-                        child: Text(widget.state.pageState.headerButtonLabel),
                       ),
                     )
-                  ],
-                ),
+                  : const SizedBox(),
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size(double.infinity, 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).disabledColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
+                    ),
+                    child: TabBar(
+                      controller: tabController,
+                      indicator: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      isScrollable: true,
+                      tabs: tabs,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).primaryColor,
+                      ),
+                      onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
+                      child: Text(widget.state.pageState.headerButtonLabel),
+                    ),
+                  )
+                ],
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 10)),
-          SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              sliver: widget.state.pageState == ProjectPageState.info
-                  ? InfoProjectView(widget.state)
-                  : widget.state.pageState == ProjectPageState.users
-                      ? UserProjectView(widget.state)
-                      : TasksProjectView(widget.state))
-        ],
-      ),
+        ),
+      ],
+      body: widget.state.pageState == ProjectPageState.info
+          ? InfoProjectView(widget.state)
+          : widget.state.pageState == ProjectPageState.users
+              ? UserProjectView(widget.state)
+              : TasksProjectView(
+                  tasks: widget.state.tasks,
+                  onTaskTap: (id) => _bloc(context).add(OnTaskTap(id)),
+                ),
     );
   }
 }

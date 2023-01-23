@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
-import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/cards.dart';
 
@@ -17,23 +16,19 @@ class UserProjectView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repository = UserApiRepository();
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: state.users.length,
-        (context, index) {
-          final item = state.users[index];
-          return SlideAnimatedContainer(
-              duration: Duration(milliseconds: 300 + (index * 100)),
-              curve: Curves.easeOut,
-              start: const Offset(1, 0),
-              end: Offset.zero,
-              child: UserCard(item, () async {
-                await repository.deleteMemberFromProject(item.id, state.project.id!);
-                _bloc(context).add(Refresh());
-              }, state.tasks, isOwner: state.project.ownerId == item.id));
-        },
-      ),
+    return ListView.builder(
+      itemCount: state.users.length,
+      itemBuilder: (context, index) {
+        final item = state.users[index];
+        return SlideAnimatedContainer(
+            duration: Duration(milliseconds: 300 + (index * 100)),
+            curve: Curves.easeOut,
+            start: const Offset(1, 0),
+            end: Offset.zero,
+            child: UserCard(item, () => _bloc(context).add(OnDeleteUser(item.id)),
+                state.tasks.map((e) => e.task).toList(),
+                isOwner: state.project.ownerId == item.id));
+      },
     );
   }
 }

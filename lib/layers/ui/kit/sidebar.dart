@@ -49,27 +49,23 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             onTap: () => AppRouter.goTo(HomePage.route()),
             contentPadding: EdgeInsets.zero,
             leading: GestureDetector(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => Center(
-                          child: Card(
-                            child: SizedBox(
-                                width: 320,
-                                height: 420,
-                                child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: ColorSelector(
-                                      initColor: Theme.of(context).primaryColor,
-                                      onSetColor: (value) {
-                                        appProvider.setTheme(
-                                            isLightTheme: themeController.index == 0, color: value);
-                                        Navigator.pop(context);
-                                      },
-                                    ))),
-                          ),
-                        ));
-              },
+              onTap: () => AppRouter.dialog((context) => Center(
+                    child: Card(
+                      child: SizedBox(
+                          width: 320,
+                          height: 420,
+                          child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: ColorSelector(
+                                initColor: Theme.of(context).primaryColor,
+                                onSetColor: (value) {
+                                  appProvider.setTheme(
+                                      isLightTheme: themeController.index == 0, color: value);
+                                  Navigator.pop(context);
+                                },
+                              ))),
+                    ),
+                  )),
               child: CircleAvatar(
                 backgroundColor: Theme.of(context).primaryColor,
               ),

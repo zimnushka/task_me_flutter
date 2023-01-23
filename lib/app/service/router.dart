@@ -12,7 +12,7 @@ abstract class AppRouter {
   }
 
   static Future<void> goTo(AppPage page) async {
-    _navigatorKey!.currentContext!.goNamed(
+    context.goNamed(
       page.name,
       params: page.params ?? {},
       queryParams: page.queryParams ?? {},
@@ -20,7 +20,7 @@ abstract class AppRouter {
   }
 
   static Future<void> dialog(WidgetBuilder builder) async {
-    final provider = _navigatorKey!.currentContext!.read<AppProvider>();
+    final provider = context.read<AppProvider>();
     await showDialog(
         context: navigatorKey.currentContext!,
         builder: (context) {
@@ -31,6 +31,8 @@ abstract class AppRouter {
         });
     return;
   }
+
+  static BuildContext get context => _navigatorKey!.currentContext!;
 }
 
 abstract class AppPage {

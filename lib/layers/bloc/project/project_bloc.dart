@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
+import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
@@ -97,8 +98,9 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
   Future<void> _onDeleteProject(OnDeleteProject event, Emitter emit) async {
     final currentState = state as ProjectLoadedState;
     await projectApiRepository.delete(currentState.project.id!);
+    final provider = AppRouter.context.read<AppProvider>();
+    await provider.load();
     await AppRouter.goTo(HomePage.route());
-    //TODO(kirill zima): fix deletion from side bar
   }
 
   Future<void> _onHeaderButtonTap(OnHeaderButtonTap event, Emitter emit) async {

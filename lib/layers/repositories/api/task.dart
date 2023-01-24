@@ -27,7 +27,7 @@ class TaskApiRepository extends ApiRepository {
   }
 
   Future<ApiResponse<List<Task>?>> getAll() async {
-    final data = await client.get('/taskProject');
+    final data = await client.get('/taskProject/');
     if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
       final jsonData = jsonDecode(data.data);
       return ApiResponse(

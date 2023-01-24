@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/color_selector.dart';
@@ -45,30 +46,26 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       child: Column(
         children: [
           ListTile(
-            onTap: () => HomePage.route(context),
+            onTap: () => AppRouter.goTo(HomePage.route()),
             contentPadding: EdgeInsets.zero,
             leading: GestureDetector(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => Center(
-                          child: Card(
-                            child: SizedBox(
-                                width: 320,
-                                height: 420,
-                                child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: ColorSelector(
-                                      initColor: Theme.of(context).primaryColor,
-                                      onSetColor: (value) {
-                                        appProvider.setTheme(
-                                            isLightTheme: themeController.index == 0, color: value);
-                                        Navigator.pop(context);
-                                      },
-                                    ))),
-                          ),
-                        ));
-              },
+              onTap: () => AppRouter.dialog((context) => Center(
+                    child: Card(
+                      child: SizedBox(
+                          width: 320,
+                          height: 420,
+                          child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: ColorSelector(
+                                initColor: Theme.of(context).primaryColor,
+                                onSetColor: (value) {
+                                  appProvider.setTheme(
+                                      isLightTheme: themeController.index == 0, color: value);
+                                  Navigator.pop(context);
+                                },
+                              ))),
+                    ),
+                  )),
               child: CircleAvatar(
                 backgroundColor: Theme.of(context).primaryColor,
               ),
@@ -130,19 +127,38 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             ),
           ),
           Expanded(
-            child: Material(
-              type: MaterialType.transparency,
-              child: ListView.builder(
-                itemCount: widget.projects.length,
-                itemBuilder: (context, index) {
-                  final item = widget.projects[index];
-                  return ProjectButton(
-                    item: item,
-                    onTap: () => ProjectPage.route(context, item.id!),
-                  );
-                },
-              ),
-            ),
+            child: widget.projects.isNotEmpty
+                ? Material(
+                    type: MaterialType.transparency,
+                    child: ListView.builder(
+                      itemCount: widget.projects.length,
+                      itemBuilder: (context, index) {
+                        final item = widget.projects[index];
+                        return ProjectButton(
+                          item: item,
+                          onTap: () => AppRouter.goTo(ProjectPage.route(item.id!)),
+                        );
+                      },
+                    ),
+                  )
+                : Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.live_help_outlined,
+                          size: 40,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'Click + to add new project, or ask your project member of invite you',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),

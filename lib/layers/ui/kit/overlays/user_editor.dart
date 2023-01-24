@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
 class UserEditDialog extends StatefulWidget {
-  const UserEditDialog({required this.onUpdate, required this.initialUser, super.key});
-  final Function(User) onUpdate;
-  final User initialUser;
+  const UserEditDialog({super.key});
 
   @override
   State<UserEditDialog> createState() => _UserEditDialogState();
@@ -16,6 +16,8 @@ class _UserEditDialogState extends State<UserEditDialog> {
   String? errorCostMessage;
   String? errorNameMessage;
   String? errorEmailMessage;
+  late final User initialUser;
+  late final provider = context.read<AppProvider>();
   final costController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -36,13 +38,14 @@ class _UserEditDialogState extends State<UserEditDialog> {
         });
         return;
       } else {
-        final user = widget.initialUser.copyWith(
+        final user = initialUser.copyWith(
           name: nameController.text,
           email: emailController.text,
           cost: count,
         );
 
-        widget.onUpdate(user);
+        Navigator.pop(context);
+        await provider.updateUser(user);
       }
     } else {
       setState(() {
@@ -58,9 +61,10 @@ class _UserEditDialogState extends State<UserEditDialog> {
 
   @override
   void initState() {
-    nameController.text = widget.initialUser.name;
-    emailController.text = widget.initialUser.email;
-    costController.text = widget.initialUser.cost.toString();
+    initialUser = provider.state.user!;
+    nameController.text = initialUser.name;
+    emailController.text = initialUser.email;
+    costController.text = initialUser.cost.toString();
     super.initState();
   }
 

@@ -8,6 +8,7 @@ part 'schemes.freezed.dart';
 class Config with _$Config {
   const factory Config({
     required final String apiBaseUrl,
+    required final bool setUrlFromHTML,
     required final bool debug,
   }) = _Config;
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
@@ -101,4 +102,11 @@ class Task with _$Task {
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+}
+
+class TaskUi {
+  final Task task;
+  final User? user;
+
+  const TaskUi(this.task, {this.user});
 }

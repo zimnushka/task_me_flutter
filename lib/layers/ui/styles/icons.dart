@@ -12,7 +12,7 @@ class AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      'assets/${_icon.name}.svg',
+      'assets/${_icon.name}.png',
       width: size ?? 20,
       height: size ?? 20,
       color: color ?? Theme.of(context).iconTheme.color,
@@ -40,8 +40,9 @@ class AppAnimatedIcon extends StatelessWidget {
       'assets/animations/${_icon.name}.gif',
       width: size ?? 200,
       height: size ?? 200,
+      color: color,
     );
   }
 }
 
-enum AppAnimatedIcons { global, place }
+enum AppAnimatedIcons { done, error }

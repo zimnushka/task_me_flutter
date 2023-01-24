@@ -13,3 +13,7 @@ class AppErrorState extends AppState {
 class AppLoadingState extends AppState {
   const AppLoadingState();
 }
+
+class AppLoadedState extends AppState {
+  const AppLoadedState();
+}

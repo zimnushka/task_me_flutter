@@ -2,18 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:task_me_flutter/layers/bloc/project.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
+import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 
-ProjectCubit _bloc(BuildContext context) => BlocProvider.of(context);
+ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class InfoProjectView extends StatefulWidget {
-  const InfoProjectView(
-    this.state,
-  );
-  final ProjectState state;
+  const InfoProjectView(this.state);
+  final ProjectLoadedState state;
 
   @override
   State<InfoProjectView> createState() => _InfoProjectViewState();
@@ -28,8 +27,8 @@ class _InfoProjectViewState extends State<InfoProjectView> {
     for (final element in widget.state.users) {
       bestUser ??= element;
       final index = widget.state.tasks
-          .where(
-              (element) => element.assignerId == bestUser?.id && element.status == TaskStatus.done)
+          .where((element) =>
+              element.task.assignerId == bestUser?.id && element.task.status == TaskStatus.done)
           .length;
       if (index > maxCountGetedTasks) {
         bestUser = element;
@@ -41,8 +40,8 @@ class _InfoProjectViewState extends State<InfoProjectView> {
 
   @override
   void initState() {
-    for (final task in widget.state.tasks) {
-      cost = cost + task.cost;
+    for (final element in widget.state.tasks) {
+      cost = cost + element.task.cost;
     }
 
     getBestUser();
@@ -51,7 +50,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
+    return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -159,7 +158,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                                         child: Center(
                                           child: Text(
                                             widget.state.tasks
-                                                .where((element) => element.status == e)
+                                                .where((element) => element.task.status == e)
                                                 .length
                                                 .toString(),
                                             style:
@@ -183,10 +182,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             child: Center(
               child: TextButton(
                 style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
-                onPressed: () async {
-                  await _bloc(context).deleteProject();
-                  GoRouter.of(context).pushNamed('home');
-                },
+                onPressed: () => _bloc(context).add(OnDeleteProject()),
                 child: Text('Delete project'),
               ),
             ),

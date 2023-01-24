@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
@@ -8,7 +6,7 @@ import 'package:task_me_flutter/layers/bloc/home/home_event.dart';
 import 'package:task_me_flutter/layers/bloc/home/home_state.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/user_editor.dart';
-import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
+import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 class HomeBloc extends Bloc<HomeEvent, AppState> {
   HomeBloc() : super(HomeLoadingState()) {

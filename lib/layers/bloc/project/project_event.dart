@@ -1,5 +1,4 @@
 import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
-import 'package:task_me_flutter/layers/models/schemes.dart';
 
 abstract class ProjectEvent {}
 

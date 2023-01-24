@@ -10,7 +10,7 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
-import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
+import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -76,7 +76,13 @@ class TaskMyApp extends StatelessWidget {
       title: 'Task Me',
       theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
       builder: (context, child) {
-        return BlocProvider.value(value: provider, child: child);
+        return Overlay(initialEntries: [
+          OverlayEntry(
+            builder: (context) {
+              return BlocProvider.value(value: provider, child: child);
+            },
+          )
+        ]);
       },
     );
   }

@@ -5,7 +5,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 enum AppSnackBarType { error, success, info }
 
-abstract class AppSnackBar {
+class AppSnackBar {
   static void show(BuildContext context, String text, AppSnackBarType type) {
     switch (type) {
       case AppSnackBarType.error:

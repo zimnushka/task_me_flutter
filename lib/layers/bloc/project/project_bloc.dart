@@ -12,7 +12,7 @@ import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/invite_member.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
-import 'package:task_me_flutter/layers/ui/pages/task_page.dart';
+import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 enum ProjectPageState { tasks, users, info }
 

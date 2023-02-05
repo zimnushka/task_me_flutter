@@ -8,8 +8,8 @@ ThemeData setPrimaryColor(ThemeData data, Color color) {
   return data.copyWith(
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: color,
-        selectionColor: Colors.grey,
-        selectionHandleColor: Colors.grey,
+        selectionColor: Colors.grey.withOpacity(0.3),
+        selectionHandleColor: Colors.grey.withOpacity(0.3),
       ),
       cardTheme:
           const CardTheme(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(radius))),

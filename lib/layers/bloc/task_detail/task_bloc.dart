@@ -100,8 +100,6 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     }
     final task = currentState.editedTask.copyWith(
       dueDate: currentState.task?.dueDate ?? DateTime.now(),
-      title: event.title,
-      description: event.desc,
       cost: currentState.assigner != null ? hourCount * currentState.assigner!.cost : 0,
     );
 

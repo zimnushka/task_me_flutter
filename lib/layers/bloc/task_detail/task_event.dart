@@ -31,8 +31,4 @@ class OnTitleUpdate extends TaskDetailEvent {
   OnTitleUpdate(this.value);
 }
 
-class OnSubmit extends TaskDetailEvent {
-  final String title;
-  final String desc;
-  OnSubmit(this.title, this.desc);
-}
+class OnSubmit extends TaskDetailEvent {}

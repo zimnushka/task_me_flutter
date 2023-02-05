@@ -1,29 +1,19 @@
 // ignore_for_file: unnecessary_lambdas
 
 import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 
 class TaskApiRepository extends ApiRepository {
   Future<ApiResponse<Task?>> getById(int id) async {
-    late final Response<String> data;
     try {
-      data = await client.get('/task/$id');
+      final data = await client.get('/task/$id');
+
+      return ApiResponse(body: Task.fromJson(jsonDecode(data.data!)), status: data.statusCode!);
     } catch (e) {
-      data = Response(data: e.toString(), requestOptions: RequestOptions(path: ''));
+      return unexpectedError;
     }
-    if (ApiResponse.isSuccessStatusCode(data.statusCode ?? 0)) {
-      return ApiResponse(
-          data: Task.fromJson(jsonDecode(data.data!)),
-          isSuccess: true,
-          message: null,
-          statusCode: data.statusCode!);
-    }
-    return ApiResponse(
-        data: null, isSuccess: false, message: data.data, statusCode: data.statusCode ?? 0);
   }
 
   Future<ApiResponse<List<Task>?>> getAll() async {

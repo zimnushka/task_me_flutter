@@ -50,14 +50,12 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     final tasksData = await taskApiRepository.getByProject(event.projectId);
     final tasks = tasksData.data ?? [];
     tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
-
+// TODO(kirill): fix assigner
     emit(
       ProjectLoadedState(
         project: projectData.data!,
         users: users.data ?? [],
-        tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, users.data ?? [])))
-            .toList(),
+        tasks: tasks.map((task) => TaskUi(task, user: _getUserTask(0, users.data ?? []))).toList(),
       ),
     );
   }
@@ -82,9 +80,8 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
       final tasks = tasksData.data ?? [];
       tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
       newState = newState.copyWith(
-        tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, currentState.users)))
-            .toList(),
+        tasks:
+            tasks.map((task) => TaskUi(task, user: _getUserTask(0, currentState.users))).toList(),
       );
     }
 

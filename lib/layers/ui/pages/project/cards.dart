@@ -19,9 +19,11 @@ class _UserCardState extends State<UserCard> {
   @override
   void initState() {
     for (final status in TaskStatus.values) {
-      final count = widget.tasks
-          .where((element) => element.status == status && element.assignerId == widget.user.id)
-          .length;
+      // TODO(kirill): fix assigner
+      final count = 0;
+      // widget.tasks
+      //     .where((element) => element.status == status && element.assignerId == widget.user.id)
+      //     .length;
       if (count > 0) {
         final percent = count / widget.tasks.length * 100;
         percents.add(TaskPercent(percent: percent.toDouble(), status: status, taskCount: count));

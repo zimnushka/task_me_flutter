@@ -4,6 +4,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'schemes.g.dart';
 part 'schemes.freezed.dart';
 
+DateTime? _getDateTime(Map<dynamic, dynamic> json, String key) {
+  final value = json[key] as String;
+  return value.isEmpty ? null : DateTime.tryParse(value);
+}
+
 @freezed
 class Config with _$Config {
   const factory Config({
@@ -47,6 +52,19 @@ class Project with _$Project {
   }) = _Project;
 
   factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
+}
+
+@freezed
+class Interval with _$Interval {
+  factory Interval({
+    required final int id,
+    required final int taskId,
+    required final int userId,
+    required final DateTime timeStart,
+    @JsonKey(readValue: _getDateTime) required final DateTime? timeEnd,
+  }) = _Interval;
+
+  factory Interval.fromJson(Map<String, dynamic> json) => _$IntervalFromJson(json);
 }
 
 enum TaskStatus {
@@ -94,10 +112,10 @@ class Task with _$Task {
     required final String title,
     required final String description,
     required final int projectId,
-    required final DateTime dueDate,
+    @JsonKey(readValue: _getDateTime) required final DateTime? stopDate,
+    required final DateTime startDate,
     required final int cost,
     @JsonKey(name: 'statusId') required final TaskStatus status,
-    final int? assignerId,
     final int? id,
   }) = _Task;
 

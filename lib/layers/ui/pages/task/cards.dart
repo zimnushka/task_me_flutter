@@ -99,7 +99,7 @@ class TaskCard extends StatelessWidget {
               SizedBox(
                   width: 80,
                   child: Text(
-                      '${item.task.dueDate.day} ${monthLabel(item.task.dueDate.month)} ${item.task.dueDate.year}'))
+                      '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
             ],
           ),
         ),

@@ -31,7 +31,9 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
       final taskData = await _taskApiRepository.getById(event.taskId!);
       if (taskData.data != null) {
         final users = usersData.data ?? [];
-        final _usersWithAssignerId = users.where((user) => user.id == taskData.data!.assignerId);
+        // TODO(kirill): fix assigner
+        // users.where((user) => user.id == taskData.data!.assignerId)
+        final _usersWithAssignerId = [];
         final User? selectedUser = _usersWithAssignerId.isEmpty ? null : _usersWithAssignerId.first;
         emit(TaskDetailState(
             assigner: selectedUser,
@@ -49,10 +51,11 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
       TaskDetailState(
         task: null,
         editedTask: Task(
+          stopDate: null,
           title: '',
           description: '',
           projectId: event.projectId,
-          dueDate: DateTime.now(),
+          startDate: DateTime.now(),
           cost: 0,
           status: TaskStatus.open,
         ),
@@ -99,7 +102,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
       hourCount = 0;
     }
     final task = currentState.editedTask.copyWith(
-      dueDate: currentState.task?.dueDate ?? DateTime.now(),
+      startDate: currentState.task?.startDate ?? DateTime.now(),
       cost: currentState.assigner != null ? hourCount * currentState.assigner!.cost : 0,
     );
 

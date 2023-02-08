@@ -19,7 +19,7 @@ class _InviteMemberDialogState extends State<InviteMemberDialog> {
 
   Future<void> save() async {
     if (controller.text.isNotEmpty) {
-      if (await repository.addMemberToProject(controller.text, widget.projectId)) {
+      if ((await repository.addMemberToProject(controller.text, widget.projectId)).data ?? false) {
         Navigator.pop(context);
         widget.onInvite();
       } else {

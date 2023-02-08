@@ -1,17 +1,28 @@
-import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
 abstract class ApiRepository {
   static Session? _session;
-  static String? url;
+  static String? _url;
+  static Dio _dio = Dio();
 
-  static set session(Session value) => _session = value;
+  static set session(Session value) => _setSession(value);
+  static set url(String value) => _setUrl(value);
 
-  Dio get client {
-    log('Get DIO client');
-    return Dio(BaseOptions(
-      baseUrl: url ?? '',
+  static _setUrl(String value) {
+    _url = value;
+    _updateDio();
+  }
+
+  static _setSession(Session value) {
+    _session = value;
+    _updateDio();
+  }
+
+  static _updateDio() {
+    _dio = Dio(BaseOptions(
+      baseUrl: _url ?? '',
       connectTimeout: 10000,
       headers: _session?.sign(),
       followRedirects: false,
@@ -27,10 +38,23 @@ abstract class ApiRepository {
       );
   }
 
-  // Future<ApiResponse> get(String url) async {
-  //   try {
-  //     final data = await client.get(url);
-  //     return ApiResponse(data: data.data,isSuccess: ApiResponse.isSuccessStatusCode(data.statusCode??0), message: null,statusCode: data.statusCode);
-  //   } catch (e) {}
-  // }
+  Dio get client => _dio;
+}
+
+class ApiErrorHandler<T> {
+  final Future<ApiResponse<T?>> Function() func;
+  const ApiErrorHandler(this.func);
+
+  Future<ApiResponse<T?>> get result => _errorHandler();
+
+  Future<ApiResponse<T?>> _errorHandler() async {
+    try {
+      final result = await func();
+      return result;
+    } on DioError catch (e) {
+      return ApiResponse<T?>(status: e.response?.statusCode ?? 0, error: e);
+    } catch (e) {
+      return ApiResponse<T?>(status: 0, error: e as Exception);
+    }
+  }
 }

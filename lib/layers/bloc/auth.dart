@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
-import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/repositories/api/auth.dart';
 
 enum AuthPageState { login, registration }
@@ -27,9 +26,25 @@ class AuthCubit extends Cubit<AppState> {
   Future<String?> confirm(String email, String password, {String? name}) async {
     try {
       if (name != null) {
-        return _errorIncriptor(await _authApiRepository.registration(email, password, name));
+        final data = await _authApiRepository.registration(email, password, name);
+        if (data.message != null) {
+          final AuthPageState pageState = (state as AuthState).pageState;
+          emit(AuthState(pageState, authErrorMessage: data.message.toString()));
+          Timer(const Duration(seconds: 3), () {
+            emit(AuthState(pageState, authErrorMessage: null));
+          });
+        }
+        return data.data;
       } else {
-        return _errorIncriptor(await _authApiRepository.login(email, password));
+        final data = await _authApiRepository.login(email, password);
+        if (data.message != null) {
+          final AuthPageState pageState = (state as AuthState).pageState;
+          emit(AuthState(pageState, authErrorMessage: data.message.toString()));
+          Timer(const Duration(seconds: 3), () {
+            emit(AuthState(pageState, authErrorMessage: null));
+          });
+        }
+        return data.data;
       }
     } catch (e) {
       final AuthPageState pageState = (state as AuthState).pageState;
@@ -39,12 +54,5 @@ class AuthCubit extends Cubit<AppState> {
       });
     }
     return null;
-  }
-
-  _errorIncriptor(ApiResponse data) {
-    if (data.isSuccess) {
-      return data.data;
-    }
-    throw Exception(data.message);
   }
 }

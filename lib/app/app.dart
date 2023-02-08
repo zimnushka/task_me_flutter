@@ -1,5 +1,5 @@
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html';
+// import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,11 +62,16 @@ class TaskMyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     AppRouter.init(navigatorKey);
     String url = config.apiBaseUrl;
-    if (config.setUrlFromHTML) {
-      final port = window.location.port;
-      final origin = window.location.origin;
-      url = origin.replaceAll(port, '8080');
-    }
+    // try {
+    //   if (config.setUrlFromHTML) {
+    //     final port = window.location.port;
+    //     final origin = window.location.origin;
+    //     url = origin.replaceAll(port, '8080');
+    //   }
+    // } catch (e) {
+    url = config.apiBaseUrl;
+    // }
+
     provider = AppProvider(config.copyWith(apiBaseUrl: url));
     return MaterialApp.router(
       routeInformationProvider: _route.routeInformationProvider,

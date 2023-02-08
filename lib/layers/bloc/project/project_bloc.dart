@@ -56,7 +56,7 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
         project: projectData.data!,
         users: users.data ?? [],
         tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.id, users.data ?? [])))
+            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, users.data ?? [])))
             .toList(),
       ),
     );
@@ -83,7 +83,7 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
       tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
       newState = newState.copyWith(
         tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.id, currentState.users)))
+            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, currentState.users)))
             .toList(),
       );
     }

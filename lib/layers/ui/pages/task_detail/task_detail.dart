@@ -151,12 +151,12 @@ class __TaskEditedViewState extends State<_TaskEditedView> {
               height: 300,
               width: double.infinity,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(radius), color: Theme.of(context).cardColor),
+                  borderRadius: const BorderRadius.all(radius), color: Theme.of(context).cardColor),
               child: quil.QuillEditor(
                 focusNode: focusNode,
                 scrollController: scrollController,
                 scrollable: true,
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 autoFocus: false,
                 expands: true,
                 controller: descController,

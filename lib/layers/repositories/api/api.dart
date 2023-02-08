@@ -10,8 +10,6 @@ abstract class ApiRepository {
   static set session(Session value) => _setSession(value);
   static set url(String value) => _setUrl(value);
 
-  final unexpectedError = ApiResponse(body: 'unexpected error', status: 0);
-
   static _setUrl(String value) {
     _url = value;
     _updateDio();
@@ -41,4 +39,22 @@ abstract class ApiRepository {
   }
 
   Dio get client => _dio;
+}
+
+class ApiErrorHandler<T> {
+  final Future<ApiResponse<T?>> Function() func;
+  const ApiErrorHandler(this.func);
+
+  Future<ApiResponse<T?>> get result => _errorHandler();
+
+  Future<ApiResponse<T?>> _errorHandler() async {
+    try {
+      final result = await func();
+      return result;
+    } on DioError catch (e) {
+      return ApiResponse<T?>(status: e.response?.statusCode ?? 0, error: e);
+    } catch (e) {
+      return ApiResponse<T?>(status: 0, error: e as Exception);
+    }
+  }
 }

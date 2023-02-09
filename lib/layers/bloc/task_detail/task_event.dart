@@ -14,9 +14,9 @@ class OnTaskStatusSwap extends TaskDetailEvent {
   OnTaskStatusSwap(this.status);
 }
 
-class OnUserSwap extends TaskDetailEvent {
-  final User? user;
-  OnUserSwap(this.user);
+class OnUserListChange extends TaskDetailEvent {
+  final List<User> users;
+  OnUserListChange(this.users);
 }
 
 class OnDeleteTask extends TaskDetailEvent {}

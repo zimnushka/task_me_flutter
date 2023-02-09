@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/kit/multi_user_show.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
@@ -80,21 +81,7 @@ class TaskCard extends StatelessWidget {
               Expanded(
                   child: Text(item.task.title, maxLines: 2, style: const TextStyle(fontSize: 16))),
               const SizedBox(width: 20),
-              if (item.user != null)
-                Tooltip(
-                  showDuration: const Duration(milliseconds: 0),
-                  message: item.user!.name,
-                  child: CircleAvatar(
-                    radius: 15,
-                    backgroundColor: Color(item.user!.color),
-                    child: Text(
-                      item.user!.initials,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                )
-              else
-                const SizedBox(),
+              MultiUserShow(item.users),
               const SizedBox(width: 20),
               SizedBox(
                   width: 80,

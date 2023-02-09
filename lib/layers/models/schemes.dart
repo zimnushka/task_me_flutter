@@ -117,6 +117,7 @@ class Task with _$Task {
     required final int cost,
     @JsonKey(name: 'statusId') required final TaskStatus status,
     final int? id,
+    final List<int>? assigners,
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -124,7 +125,7 @@ class Task with _$Task {
 
 class TaskUi {
   final Task task;
-  final User? user;
+  final List<User> users;
 
-  const TaskUi(this.task, {this.user});
+  const TaskUi(this.task, this.users);
 }

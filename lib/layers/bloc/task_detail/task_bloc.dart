@@ -19,7 +19,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     on<OnDeleteTask>(_delete);
     on<OnSubmit>(_submit);
     on<OnTaskStatusSwap>(_onTaskStatusSwap);
-    on<OnUserSwap>(_onUserSwap);
+    on<OnUserListChange>(_onUserSwap);
     on<OnDescriptionUpdate>(_onDescriptionUpdate);
     on<OnTitleUpdate>(_onTitleUpdate);
   }
@@ -28,15 +28,13 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(TaskDetailLoadState());
     final usersData = await _userApiRepository.getUserFromProject(event.projectId);
     if (event.taskId != null) {
+      final assignersData = await _userApiRepository.getUserFromTask(event.taskId!);
       final taskData = await _taskApiRepository.getById(event.taskId!);
       if (taskData.data != null) {
         final users = usersData.data ?? [];
-        // TODO(kirill): fix assigner
-        // users.where((user) => user.id == taskData.data!.assignerId)
-        final _usersWithAssignerId = [];
-        final User? selectedUser = _usersWithAssignerId.isEmpty ? null : _usersWithAssignerId.first;
+        final assigners = assignersData.data ?? [];
         emit(TaskDetailState(
-            assigner: selectedUser,
+            assigners: assigners,
             task: taskData.data,
             editedTask: taskData.data!,
             users: users,
@@ -50,6 +48,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(
       TaskDetailState(
         task: null,
+        assigners: [],
         editedTask: Task(
           stopDate: null,
           title: '',
@@ -79,7 +78,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   Future<void> _submit(OnSubmit event, Emitter emit) async {
     final currentState = state as TaskDetailState;
 
-    if (currentState.editedTask.status == TaskStatus.done && currentState.assigner == null) {
+    if (currentState.editedTask.status == TaskStatus.done && currentState.assigners == null) {
       AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
       return;
     }
@@ -94,16 +93,17 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
           },
         ),
       );
-      //TODO: add snack 'add work hour'
+      // TODO(kirill): add snack 'add work hour'
       if (hourCount == -1) {
         return;
       }
     } else {
       hourCount = 0;
     }
+    // TODO(kirill): check cost from time intervals
     final task = currentState.editedTask.copyWith(
       startDate: currentState.task?.startDate ?? DateTime.now(),
-      cost: currentState.assigner != null ? hourCount * currentState.assigner!.cost : 0,
+      cost: 0,
     );
 
     if (task.id != null) {
@@ -127,11 +127,12 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(currentState.copyWith(editedTask: task));
   }
 
-  Future<void> _onUserSwap(OnUserSwap event, Emitter emit) async {
+  Future<void> _onUserSwap(OnUserListChange event, Emitter emit) async {
     final currentState = state as TaskDetailState;
+    await _userApiRepository.updateTaskMemberList(currentState.task!.id!, event.users);
 
     emit(TaskDetailState(
-      assigner: event.user,
+      assigners: List.of(event.users),
       state: currentState.state,
       task: currentState.task,
       editedTask: currentState.editedTask,

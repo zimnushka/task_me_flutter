@@ -7,10 +7,12 @@ class TaskDetailTaskStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(backgroundColor: status.color),
-      title: Text(status.label),
+    return Row(
+      children: [
+        CircleAvatar(radius: 20, backgroundColor: status.color),
+        const SizedBox(width: 10),
+        Text(status.label),
+      ],
     );
   }
 }

@@ -189,7 +189,8 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               ),
             )
           : TasksProjectView(
-              tasks: widget.state.tasks.map(TaskUi.new).toList(),
+              // TODO(kirill): add another assigners
+              tasks: widget.state.tasks.map((e) => TaskUi(e, [])).toList(),
               onTaskTap: (id) => _bloc(context).add(OnTaskTap(id)),
             ),
     );

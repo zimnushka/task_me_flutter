@@ -20,12 +20,11 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
     descController = quil.QuillController.basic()
       ..addListener(() {
         final text = jsonEncode(descController.document.toDelta().toJson());
-        _bloc(context).add(OnDescriptionUpdate(text.replaceAll(r'\n', r'\\n')));
+        _bloc(context).add(OnDescriptionUpdate(text));
       });
 
-    statusWidgets.addAll(TaskStatus.values
-        .map((e) => PopupMenuItem(value: e, child: TaskDetailTaskStatusCard(e)))
-        .toList());
+    statusWidgets.addAll(
+        TaskStatus.values.map((e) => PopupMenuItem(value: e, child: _StatusCard(e))).toList());
 
     super.initState();
   }
@@ -92,7 +91,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
                       tooltip: '',
                       onSelected: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
                       itemBuilder: (context) => statusWidgets,
-                      child: TaskDetailTaskStatusCard(widget.state.editedTask.status),
+                      child: _StatusCard(widget.state.editedTask.status),
                     ),
                   ),
                   const SizedBox(height: 20),

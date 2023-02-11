@@ -40,7 +40,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
             users: users,
             projectId: event.projectId,
             state: taskData.data!.status == TaskStatus.done
-                ? TaskDetailPageState.done
+                ? TaskDetailPageState.view
                 : TaskDetailPageState.edit));
         return;
       }
@@ -78,7 +78,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   Future<void> _submit(OnSubmit event, Emitter emit) async {
     final currentState = state as TaskDetailState;
 
-    if (currentState.editedTask.status == TaskStatus.done && currentState.assigners == null) {
+    if (currentState.editedTask.status == TaskStatus.done && currentState.assigners.isEmpty) {
       AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
       return;
     }
@@ -102,6 +102,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     }
     // TODO(kirill): check cost from time intervals
     final task = currentState.editedTask.copyWith(
+      description: currentState.editedTask.description.replaceAll(r'\n', r'\\n'),
       startDate: currentState.task?.startDate ?? DateTime.now(),
       cost: 0,
     );

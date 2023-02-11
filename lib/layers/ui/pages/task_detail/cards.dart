@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:task_me_flutter/layers/models/schemes.dart';
+part of 'task_detail.dart';
 
-class TaskDetailTaskStatusCard extends StatelessWidget {
-  const TaskDetailTaskStatusCard(this.status);
+class _StatusCard extends StatelessWidget {
+  const _StatusCard(this.status);
   final TaskStatus status;
 
   @override
@@ -17,22 +16,17 @@ class TaskDetailTaskStatusCard extends StatelessWidget {
   }
 }
 
-class TaskDetailUserButton extends StatelessWidget {
-  const TaskDetailUserButton(this.user);
-  final User? user;
+class _UserButton extends StatelessWidget {
+  const _UserButton(this.user);
+  final User user;
 
   @override
   Widget build(BuildContext context) {
-    return user != null
-        ? ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: CircleAvatar(backgroundColor: Color(user!.color)),
-            title: Text(user!.name),
-            subtitle: Text(user!.email),
-          )
-        : const ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text('Without assigner'),
-          );
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(backgroundColor: Color(user.color)),
+      title: Text(user.name),
+      subtitle: Text(user.email),
+    );
   }
 }

@@ -1,25 +1,22 @@
 part of 'task_detail.dart';
 
-class _TaskEditView extends StatefulWidget {
-  const _TaskEditView(this.state);
+class _TaskView extends StatefulWidget {
+  const _TaskView(this.state);
   final TaskDetailState state;
 
   @override
-  State<_TaskEditView> createState() => __TaskEditViewState();
+  State<_TaskView> createState() => __TaskViewState();
 }
 
-class __TaskEditViewState extends State<_TaskEditView> {
+class __TaskViewState extends State<_TaskView> {
   final nameController = TextEditingController();
   late final quil.QuillController descController;
   final scrollController = ScrollController();
   final focusNode = FocusNode();
-  final List<PopupMenuItem<User?>> userWidgets = [];
-  final List<PopupMenuItem<TaskStatus>> statusWidgets = [];
 
   @override
   void initState() {
     nameController.text = widget.state.editedTask.title;
-
     try {
       descController = quil.QuillController(
         document: widget.state.editedTask.description != ''
@@ -30,21 +27,12 @@ class __TaskEditViewState extends State<_TaskEditView> {
     } catch (e) {
       descController = quil.QuillController.basic();
     }
-    descController.addListener(() {
-      final text = jsonEncode(descController.document.toDelta().toJson());
-      _bloc(context).add(OnDescriptionUpdate(text));
-    });
-
-    statusWidgets.addAll(
-        TaskStatus.values.map((e) => PopupMenuItem(value: e, child: _StatusCard(e))).toList());
-
+    descController.addListener(focusNode.unfocus);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasUpdate = widget.state.task != widget.state.editedTask;
-
     return Align(
       alignment: Alignment.topCenter,
       child: SingleChildScrollView(
@@ -56,22 +44,12 @@ class __TaskEditViewState extends State<_TaskEditView> {
             const Text('Title'),
             const SizedBox(height: 10),
             TextField(
-              onChanged: (value) => _bloc(context).add(OnTitleUpdate(value)),
-              readOnly: widget.state.task?.status == TaskStatus.done,
+              readOnly: true,
               decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
               controller: nameController,
             ),
             const SizedBox(height: 20),
             const Text('Description'),
-            const SizedBox(height: 10),
-            quil.QuillToolbar.basic(
-              iconTheme: quil.QuillIconTheme(iconSelectedFillColor: Theme.of(context).primaryColor),
-              controller: descController,
-              showSearchButton: false,
-              showFontFamily: false,
-              showFontSize: false,
-              showHeaderStyle: false,
-            ),
             const SizedBox(height: 10),
             Container(
               height: 300,
@@ -86,7 +64,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 autoFocus: false,
                 expands: true,
                 controller: descController,
-                readOnly: widget.state.task?.status == TaskStatus.done, // true for view only mode
+                readOnly: true, // true for view only mode
               ),
             ),
             const SizedBox(height: 20),
@@ -99,12 +77,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                     const Text('Status'),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-                      child: PopupMenuButton(
-                        tooltip: '',
-                        onSelected: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
-                        itemBuilder: (context) => statusWidgets,
-                        child: _StatusCard(widget.state.editedTask.status),
-                      ),
+                      child: _StatusCard(widget.state.editedTask.status),
                     ),
                   ],
                 ),
@@ -120,22 +93,35 @@ class __TaskEditViewState extends State<_TaskEditView> {
                         showDialog(
                             context: context,
                             builder: (_context) {
-                              return MultiSelector<User>(
-                                  title: 'Select assigners',
-                                  onChange: (newList) {
-                                    final activeUsers = newList
-                                        .where((e) => e.isActive)
-                                        .map((e) => e.value)
-                                        .toList();
-                                    _bloc(context).add(OnUserListChange(activeUsers));
-                                    Navigator.pop(_context);
-                                  },
-                                  items: widget.state.users.map((e) {
-                                    return MultiSelectItem(
-                                        isActive: widget.state.assigners.contains(e),
-                                        value: e,
-                                        child: _UserButton(e));
-                                  }).toList());
+                              return Center(
+                                child: Card(
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 320, maxHeight: 500),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text('Assigners',
+                                              style: Theme.of(context).textTheme.titleLarge),
+                                          const SizedBox(height: 20),
+                                          Expanded(
+                                            child: ListView.builder(
+                                              itemCount: widget.state.assigners.length,
+                                              itemBuilder: (context, index) {
+                                                final item = widget.state.assigners[index];
+                                                return _UserButton(item);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
                             });
                       },
                       child: Padding(
@@ -153,22 +139,6 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 ),
               )
             ]),
-            const SizedBox(height: 20),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 300),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 40),
-                    backgroundColor: hasUpdate
-                        ? Theme.of(context).primaryColor
-                        : Theme.of(context).disabledColor,
-                  ),
-                  onPressed: () => _bloc(context).add(OnSubmit()),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text('Save'),
-                  )),
-            ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: TextButton(

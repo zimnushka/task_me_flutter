@@ -11,12 +11,12 @@ import 'package:task_me_flutter/layers/bloc/task_detail/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/multi_user_show.dart';
 import 'package:task_me_flutter/layers/ui/kit/multiselector.dart';
-import 'package:task_me_flutter/layers/ui/pages/task_detail/cards.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 part 'create_state.dart';
 part 'edit_state.dart';
-part 'done_state.dart';
+part 'cards.dart';
+part 'view_state.dart';
 
 TaskDetailBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
@@ -64,8 +64,8 @@ class _Body extends StatelessWidget {
     return BlocStateBuilder<TaskDetailBloc>(builder: (state, context) {
       state as TaskDetailState;
       switch (state.state) {
-        case TaskDetailPageState.done:
-          return _TaskDoneView(state);
+        case TaskDetailPageState.view:
+          return _TaskView(state);
         case TaskDetailPageState.edit:
           return _TaskEditView(state);
         case TaskDetailPageState.creation:

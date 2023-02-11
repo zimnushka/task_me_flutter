@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
-enum TaskDetailPageState { done, edit, creation }
+enum TaskDetailPageState { view, edit, creation }
 
 class TaskDetailLoadState extends AppLoadingState {}
 

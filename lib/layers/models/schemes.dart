@@ -75,7 +75,7 @@ enum TaskStatus {
   @JsonValue(2)
   review,
   @JsonValue(3)
-  done,
+  closed,
 }
 
 extension TaskStatusExt on TaskStatus {
@@ -87,7 +87,7 @@ extension TaskStatusExt on TaskStatus {
         return const Color.fromARGB(255, 2, 127, 190);
       case TaskStatus.review:
         return const Color.fromARGB(255, 99, 1, 192);
-      case TaskStatus.done:
+      case TaskStatus.closed:
         return const Color.fromARGB(255, 44, 186, 1);
     }
   }
@@ -100,8 +100,8 @@ extension TaskStatusExt on TaskStatus {
         return 'In progress';
       case TaskStatus.review:
         return 'Review';
-      case TaskStatus.done:
-        return 'Done';
+      case TaskStatus.closed:
+        return 'Closed';
     }
   }
 }

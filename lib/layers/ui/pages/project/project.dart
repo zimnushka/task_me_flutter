@@ -160,7 +160,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                                   Text(
                                       widget.state.tasks
                                           .where(
-                                              (element) => element.task.status == TaskStatus.done)
+                                              (element) => element.task.status == TaskStatus.closed)
                                           .length
                                           .toString(),
                                       style: TextStyle(

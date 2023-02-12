@@ -151,7 +151,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                                         .copyWith(color: Theme.of(context).primaryColor)),
                                 Text(
                                     widget.state.tasks
-                                        .where((element) => element.status == TaskStatus.done)
+                                        .where((element) => element.status == TaskStatus.closed)
                                         .length
                                         .toString(),
                                     style: TextStyle(
@@ -189,7 +189,6 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               ),
             )
           : TasksProjectView(
-              // TODO(kirill): add another assigners
               tasks: widget.state.tasks.map((e) => TaskUi(e, [])).toList(),
               onTaskTap: (id) => _bloc(context).add(OnTaskTap(id)),
             ),

@@ -39,7 +39,7 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
             editedTask: taskData.data!,
             users: users,
             projectId: event.projectId,
-            state: taskData.data!.status == TaskStatus.done
+            state: taskData.data!.status == TaskStatus.closed
                 ? TaskDetailPageState.view
                 : TaskDetailPageState.edit));
         return;
@@ -78,14 +78,14 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   Future<void> _submit(OnSubmit event, Emitter emit) async {
     final currentState = state as TaskDetailState;
 
-    if (currentState.editedTask.status == TaskStatus.done && currentState.assigners.isEmpty) {
+    if (currentState.editedTask.status == TaskStatus.closed && currentState.assigners.isEmpty) {
       AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
       return;
     }
 
     int hourCount = -1;
 
-    if (currentState.editedTask.status == TaskStatus.done) {
+    if (currentState.editedTask.status == TaskStatus.closed) {
       await AppRouter.dialog(
         (context) => SelectHourCountDialog(
           onSetHourCount: (value) {

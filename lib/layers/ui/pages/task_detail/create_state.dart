@@ -46,7 +46,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
             const SizedBox(height: 10),
             TextField(
               onChanged: (value) => _bloc(context).add(OnTitleUpdate(value)),
-              readOnly: widget.state.task?.status == TaskStatus.done,
+              readOnly: widget.state.task?.status == TaskStatus.closed,
               decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
               controller: nameController,
             ),
@@ -60,6 +60,8 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
               showFontFamily: false,
               showFontSize: false,
               showHeaderStyle: false,
+              showRedo: false,
+              showUndo: false,
             ),
             const SizedBox(height: 10),
             Container(
@@ -75,7 +77,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
                 autoFocus: false,
                 expands: true,
                 controller: descController,
-                readOnly: widget.state.task?.status == TaskStatus.done, // true for view only mode
+                readOnly: widget.state.task?.status == TaskStatus.closed, // true for view only mode
               ),
             ),
             const SizedBox(height: 10),

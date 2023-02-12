@@ -8,6 +8,7 @@ class SlideAnimatedContainer extends StatefulWidget {
     this.repeat = false,
     this.curve = Curves.elasticIn,
     this.duration = const Duration(milliseconds: 300),
+    this.replayInBuild = true,
     Key? key,
   }) : super(key: key);
   final Widget child;
@@ -15,6 +16,7 @@ class SlideAnimatedContainer extends StatefulWidget {
   final Offset end;
   final Duration duration;
   final bool repeat;
+  final bool replayInBuild;
   final Curve curve;
 
   @override
@@ -50,10 +52,12 @@ class _SlideAnimatedContainerState extends State<SlideAnimatedContainer>
 
   @override
   Widget build(BuildContext context) {
-    if (_controller.isCompleted) {
-      _controller.reset();
+    if (widget.replayInBuild) {
+      if (_controller.isCompleted) {
+        _controller.reset();
+      }
+      _controller.forward();
     }
-    _controller.forward();
 
     return SlideTransition(
       position: _offsetAnimation,

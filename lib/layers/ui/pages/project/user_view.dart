@@ -25,8 +25,7 @@ class UserProjectView extends StatelessWidget {
             curve: Curves.easeOut,
             start: const Offset(1, 0),
             end: Offset.zero,
-            child: UserCard(item, () => _bloc(context).add(OnDeleteUser(item.id)),
-                state.tasks.map((e) => e.task).toList(),
+            child: UserCard(item, () => _bloc(context).add(OnDeleteUser(item.id)), state.tasks,
                 isOwner: state.project.ownerId == item.id));
       },
     );

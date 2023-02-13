@@ -6,13 +6,14 @@ import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/repositories/api/interval.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/hour_selector.dart';
 
 class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   final _taskApiRepository = TaskApiRepository();
   final _userApiRepository = UserApiRepository();
+  final _intervalsApiRepository = IntervalApiRepository();
 
   TaskDetailBloc() : super(TaskDetailLoadState()) {
     on<Load>(_load);
@@ -82,29 +83,29 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
       AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
       return;
     }
-
-    int hourCount = -1;
+    int cost = 0;
+    final List<TimeInterval> intervals = currentState.editedTask.id != null
+        ? (await _intervalsApiRepository.getTaskIntervals(currentState.editedTask.id!)).data ?? []
+        : [];
 
     if (currentState.editedTask.status == TaskStatus.closed) {
-      await AppRouter.dialog(
-        (context) => SelectHourCountDialog(
-          onSetHourCount: (value) {
-            hourCount = value;
-          },
-        ),
-      );
-      // TODO(kirill): add snack 'add work hour'
-      if (hourCount == -1) {
+      if (intervals.where((element) => element.timeEnd == null).isNotEmpty) {
+        AppSnackBar.show(AppRouter.context, 'Please end all intervals', AppSnackBarType.error);
         return;
       }
-    } else {
-      hourCount = 0;
+      for (final user in currentState.users) {
+        final duration = intervals
+            .where((element) => element.userId == user.id)
+            .map((e) => (e.timeStart.difference(e.timeEnd!)).abs())
+            .fold(const Duration(), (previousValue, element) => previousValue + element);
+        cost = cost + duration.inHours * user.cost;
+      }
     }
-    // TODO(kirill): check cost from time intervals
+
     final task = currentState.editedTask.copyWith(
       description: currentState.editedTask.description.replaceAll(r'\n', r'\\n'),
       startDate: currentState.task?.startDate ?? DateTime.now(),
-      cost: 0,
+      cost: cost,
     );
 
     if (task.id != null) {

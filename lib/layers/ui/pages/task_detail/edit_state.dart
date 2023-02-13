@@ -161,6 +161,13 @@ class __TaskEditViewState extends State<_TaskEditView> {
                       widget.state.task?.status == TaskStatus.closed, // true for view only mode
                 ),
               ),
+              const SizedBox(height: 20),
+              const Text('Time intervals'),
+              const SizedBox(height: 10),
+              IntervalView(
+                  users: widget.state.users,
+                  readOnly: widget.state.editedTask.status == TaskStatus.closed,
+                  taskId: widget.state.editedTask.id!)
             ],
           ),
         ),
@@ -176,7 +183,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 curve: Curves.elasticOut,
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  margin: EdgeInsets.only(bottom: 10),
+                  margin: const EdgeInsets.only(bottom: 10),
                   height: 60,
                   width: double.infinity,
                   decoration: BoxDecoration(

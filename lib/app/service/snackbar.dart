@@ -16,7 +16,7 @@ class AppSnackBar {
             children: [
               Material(
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: Row(

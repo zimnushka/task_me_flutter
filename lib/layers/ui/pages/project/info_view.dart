@@ -26,12 +26,11 @@ class _InfoProjectViewState extends State<InfoProjectView> {
   User? getBestUser() {
     for (final element in widget.state.users) {
       bestUser ??= element;
-      final index = 0;
-      // TODO(kirill): fix assigner
-      // widget.state.tasks
-      //     .where((element) =>
-      //         element.task.assignerId == bestUser?.id && element.task.status == TaskStatus.done)
-      //     .length;
+      final index = widget.state.tasks
+          .where((element) =>
+              element.users.where((element) => element.id == bestUser?.id).isNotEmpty &&
+              element.task.status == TaskStatus.closed)
+          .length;
       if (index > maxCountGetedTasks) {
         bestUser = element;
         maxCountGetedTasks = index;

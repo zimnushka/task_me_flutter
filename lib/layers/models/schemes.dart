@@ -4,9 +4,15 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'schemes.g.dart';
 part 'schemes.freezed.dart';
 
-DateTime? _getDateTime(Map<dynamic, dynamic> json, String key) {
-  final value = json[key] as String;
-  return value.isEmpty ? null : DateTime.tryParse(value);
+String? getStringDateTime(Map<dynamic, dynamic> data, String key) {
+  if (data[key] is String) {
+    if ((data[key] as String).isNotEmpty) {
+      if (DateTime.tryParse(data[key]) != null) {
+        return data[key];
+      }
+    }
+  }
+  return null;
 }
 
 @freezed
@@ -55,16 +61,17 @@ class Project with _$Project {
 }
 
 @freezed
-class Interval with _$Interval {
-  factory Interval({
+class TimeInterval with _$TimeInterval {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  factory TimeInterval({
     required final int id,
     required final int taskId,
     required final int userId,
     required final DateTime timeStart,
-    @JsonKey(readValue: _getDateTime) required final DateTime? timeEnd,
-  }) = _Interval;
+    @JsonKey(readValue: getStringDateTime) required final DateTime? timeEnd,
+  }) = _TimeInterval;
 
-  factory Interval.fromJson(Map<String, dynamic> json) => _$IntervalFromJson(json);
+  factory TimeInterval.fromJson(Map<String, dynamic> json) => _$TimeIntervalFromJson(json);
 }
 
 enum TaskStatus {
@@ -112,7 +119,7 @@ class Task with _$Task {
     required final String title,
     required final String description,
     required final int projectId,
-    @JsonKey(readValue: _getDateTime) required final DateTime? stopDate,
+    @JsonKey(readValue: getStringDateTime) required final DateTime? stopDate,
     required final DateTime startDate,
     required final int cost,
     @JsonKey(name: 'statusId') required final TaskStatus status,

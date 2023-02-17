@@ -52,7 +52,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return SliverToBoxAdapter(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

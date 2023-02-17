@@ -47,9 +47,7 @@ class TaskStatusHeader extends StatelessWidget {
                 )
               ],
             ),
-          )
-        else
-          const SizedBox(),
+          ),
         child
       ],
     );

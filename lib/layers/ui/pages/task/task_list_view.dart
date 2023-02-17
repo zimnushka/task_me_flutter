@@ -19,12 +19,12 @@ class _TaskListView extends StatelessWidget {
             }
           }
           final isShow = state.openedStatuses.contains(item.task.status);
-          return TaskStatusHeader(
+          return TaskListStatusHeader(
             isShow: isShow,
             status: status,
             onTap: () => _bloc(context).add(OnTaskStatusTap(item.task.status)),
             child: isShow
-                ? TaskCard(item, () => _bloc(context).add(OnTaskTap(item.task.id!)))
+                ? TaskListCard(item, () => _bloc(context).add(OnTaskTap(item.task.id!)))
                 : const SizedBox(),
           );
         },

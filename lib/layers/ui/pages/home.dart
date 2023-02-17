@@ -6,6 +6,7 @@ import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/home/home_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/home/home_event.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
@@ -66,6 +67,8 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> with TickerProviderStateMixin {
+  late final TaskBloc _taskBloc = TaskBloc((id) => _bloc(context).add(OnTaskTap(id)),
+      widget.state.tasks.map((e) => TaskUi(e, [])).toList());
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
@@ -191,10 +194,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               ),
             )
           else
-            TasksProjectView(
-              tasks: widget.state.tasks.map((e) => TaskUi(e, [])).toList(),
-              onTaskTap: (id) => _bloc(context).add(OnTaskTap(id)),
-            ),
+            TasksViewProvider(bloc: _taskBloc, child: const TaskView()),
         ],
       ),
     );

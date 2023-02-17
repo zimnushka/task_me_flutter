@@ -4,8 +4,8 @@ import 'package:task_me_flutter/layers/ui/kit/multi_user_show.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-class TaskStatusHeader extends StatelessWidget {
-  const TaskStatusHeader({
+class TaskListStatusHeader extends StatelessWidget {
+  const TaskListStatusHeader({
     required this.child,
     required this.isShow,
     this.status,
@@ -27,10 +27,7 @@ class TaskStatusHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  status!.label,
-                  style: const TextStyle(fontSize: 20),
-                ),
+                AppTitleText(status!.label),
                 TextButton(
                   style: TextButton.styleFrom(
                       backgroundColor: status!.color.withOpacity(0.2),
@@ -54,8 +51,33 @@ class TaskStatusHeader extends StatelessWidget {
   }
 }
 
-class TaskCard extends StatelessWidget {
-  const TaskCard(this.item, this.onTap);
+class TaskBoardStatusHeader extends StatelessWidget {
+  const TaskBoardStatusHeader({required this.status, required this.tasksCount});
+  final TaskStatus status;
+  final int tasksCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        AppTitleText(status.label),
+        DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              shape: BoxShape.circle,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: AppText(tasksCount.toString()),
+            )),
+      ],
+    );
+  }
+}
+
+class TaskListCard extends StatelessWidget {
+  const TaskListCard(this.item, this.onTap);
   final TaskUi item;
   final VoidCallback onTap;
 
@@ -85,6 +107,43 @@ class TaskCard extends StatelessWidget {
                   width: 80,
                   child: Text(
                       '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TaskBoardCard extends StatelessWidget {
+  const TaskBoardCard({required this.item, required this.onTap, super.key});
+  final TaskUi item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 5),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppText(
+                item.task.title,
+                weight: FontWeight.bold,
+              ),
+              const SizedBox(height: 5),
+              AppSmallText(
+                  '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'),
+              if (item.users.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: MultiUserShow(item.users),
+                ),
             ],
           ),
         ),

@@ -129,7 +129,7 @@ class _IntervalCard extends StatelessWidget {
             _DateText(item.interval.timeStart),
             if (item.interval.timeEnd != null)
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: const EdgeInsets.only(left: defaultPadding),
                 child: _DateText(item.interval.timeEnd!),
               )
           ],

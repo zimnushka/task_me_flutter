@@ -49,6 +49,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: defaultPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -56,7 +57,6 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 children: [
                   Container(
                     height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(radius),
                       color: Theme.of(context).cardColor,
@@ -64,20 +64,42 @@ class __TaskEditViewState extends State<_TaskEditView> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Task ${widget.state.task!.id!}',
-                            style: const TextStyle(fontSize: 20)),
-                        Container(
-                          height: 40,
-                          width: 2,
-                          color: Theme.of(context).backgroundColor,
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                        GestureDetector(
+                          onTap: AppRouter.pop,
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    right: BorderSide(
+                                        width: 2,
+                                        color: Theme.of(context).colorScheme.background))),
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text('Task ${widget.state.task!.id!}',
+                              style: const TextStyle(fontSize: 20)),
                         ),
                         GestureDetector(
                           onTap: () => _bloc(context).add(OnDeleteTask()),
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: Theme.of(context).errorColor,
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    left: BorderSide(
+                                        width: 2,
+                                        color: Theme.of(context).colorScheme.background))),
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                           ),
                         ),
                       ],
@@ -91,7 +113,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                     itemBuilder: (context) => statusWidgets,
                     child: _StatusCard(widget.state.editedTask.status),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: defaultPadding),
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -119,7 +141,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: defaultPadding),
               const Text('Title'),
               const SizedBox(height: 10),
               TextField(
@@ -128,7 +150,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
                 controller: nameController,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: defaultPadding),
               const Text('Description'),
               const SizedBox(height: 10),
               quil.QuillToolbar.basic(
@@ -161,7 +183,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                       widget.state.task?.status == TaskStatus.closed, // true for view only mode
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: defaultPadding),
               const Text('Time intervals'),
               const SizedBox(height: 10),
               IntervalView(

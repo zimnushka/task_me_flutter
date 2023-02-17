@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class SelectHourCountDialog extends StatefulWidget {
   const SelectHourCountDialog({required this.onSetHourCount, super.key});
@@ -44,13 +45,13 @@ class _SelectHourCountDialogState extends State<SelectHourCountDialog> {
         child: SizedBox(
           width: 320,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('Select hours count', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 20),
+                const SizedBox(height: defaultPadding),
                 TextField(
                   controller: controller,
                   onEditingComplete: setHour,

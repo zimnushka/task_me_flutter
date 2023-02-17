@@ -70,7 +70,8 @@ class _ProjectDialogState extends State<ProjectDialog> {
           child: SizedBox(
               width: 320,
               height: 420,
-              child: Padding(padding: const EdgeInsets.all(20), child: steps[stepIndex])),
+              child:
+                  Padding(padding: const EdgeInsets.all(defaultPadding), child: steps[stepIndex])),
         ),
       ),
     );

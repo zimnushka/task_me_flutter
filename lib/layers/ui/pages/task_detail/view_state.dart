@@ -55,7 +55,7 @@ class __TaskViewState extends State<_TaskView> {
                       Container(
                         height: 40,
                         width: 2,
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).colorScheme.background,
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                       ),
                       GestureDetector(
@@ -63,7 +63,7 @@ class __TaskViewState extends State<_TaskView> {
                         child: Icon(
                           Icons.close,
                           size: 16,
-                          color: Theme.of(context).errorColor,
+                          color: Theme.of(context).colorScheme.error,
                         ),
                       ),
                     ],
@@ -71,7 +71,7 @@ class __TaskViewState extends State<_TaskView> {
                 ),
                 const Expanded(child: SizedBox()),
                 _StatusCard(widget.state.editedTask.status),
-                const SizedBox(width: 20),
+                const SizedBox(width: defaultPadding),
                 GestureDetector(
                   onTap: () {
                     showDialog(
@@ -82,14 +82,14 @@ class __TaskViewState extends State<_TaskView> {
                               child: ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 320, maxHeight: 500),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(20),
+                                  padding: const EdgeInsets.all(defaultPadding),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text('Assigners',
                                           style: Theme.of(context).textTheme.titleLarge),
-                                      const SizedBox(height: 20),
+                                      const SizedBox(height: defaultPadding),
                                       Expanded(
                                         child: ListView.builder(
                                           itemCount: widget.state.assigners.length,
@@ -113,7 +113,7 @@ class __TaskViewState extends State<_TaskView> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
             const Text('Title'),
             const SizedBox(height: 10),
             TextField(
@@ -121,7 +121,7 @@ class __TaskViewState extends State<_TaskView> {
               decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
               controller: nameController,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
             const Text('Description'),
             const SizedBox(height: 10),
             Container(

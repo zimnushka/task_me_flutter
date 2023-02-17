@@ -6,6 +6,7 @@ import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/pages/auth/poster.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
@@ -29,7 +30,7 @@ class AuthPage extends StatelessWidget {
                       color: Theme.of(context).cardColor,
                       width: 300,
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(defaultPadding),
                         child: state.pageState == AuthPageState.login
                             ? const SlideAnimatedContainer(
                                 duration: Duration(milliseconds: 400),
@@ -111,14 +112,14 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
             ListTile(
               leading: Icon(
                 Icons.info,
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
               ),
               minLeadingWidth: 10,
               contentPadding: const EdgeInsets.symmetric(vertical: 10),
               title: Text(errMess, maxLines: 2),
             )
           else
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
           ElevatedButton(
               style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
               onPressed: confirm,
@@ -188,7 +189,7 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: defaultPadding),
           ElevatedButton(
               style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
               onPressed: confirm,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class UserEditDialog extends StatefulWidget {
   const UserEditDialog({super.key});
@@ -75,13 +76,13 @@ class _UserEditDialogState extends State<UserEditDialog> {
         child: SizedBox(
           width: 320,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('Edit user', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 20),
+                const SizedBox(height: defaultPadding),
                 const Text('Name'),
                 const SizedBox(height: 5),
                 TextField(

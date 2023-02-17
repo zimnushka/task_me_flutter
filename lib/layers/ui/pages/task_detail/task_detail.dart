@@ -53,7 +53,7 @@ class TaskPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<TaskDetailBloc>(
       create: (_) => TaskDetailBloc()..add(Load(projectId: projectId, taskId: taskId)),
-      child: const Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), child: _Body()),
+      child: const _Body(),
     );
   }
 }

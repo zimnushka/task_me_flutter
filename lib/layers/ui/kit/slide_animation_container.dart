@@ -30,7 +30,6 @@ class _SlideAnimatedContainerState extends State<SlideAnimatedContainer>
 
   @override
   void initState() {
-    super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _offsetAnimation = Tween<Offset>(
       begin: widget.start,
@@ -42,12 +41,13 @@ class _SlideAnimatedContainerState extends State<SlideAnimatedContainer>
       ),
     );
     widget.repeat ? _controller.repeat(reverse: true) : _controller.forward();
+    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override

@@ -28,7 +28,7 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
     return Scaffold(
       // drawerScrimColor: Colors.transparent,
       drawer: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: widget.sideBar,
       ),
       body: Center(
@@ -46,26 +46,27 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
                   children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: ResponsiveUiController._widthSize ? 0 : 290,
+                      width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
+                          padding: const EdgeInsets.fromLTRB(
+                              defaultPadding, defaultPadding, 0, defaultPadding),
                           child: widget.sideBar,
                         ),
                       ),
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 0),
                         child: widget.child,
                       ),
                     ),
                   ],
                 ),
                 if (ResponsiveUiController._widthSize)
-                  Positioned(
-                      top: 270,
+                  Align(
+                      alignment: Alignment.centerLeft,
                       child: Container(
                         decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
@@ -81,8 +82,6 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
                           ),
                         ),
                       ))
-                else
-                  const SizedBox()
               ],
             );
           }),

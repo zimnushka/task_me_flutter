@@ -23,7 +23,7 @@ class TaskStatusHeader extends StatelessWidget {
       children: [
         if (status != null)
           Padding(
-            padding: const EdgeInsets.only(bottom: 10, top: 20),
+            padding: const EdgeInsets.only(bottom: 10, top: defaultPadding),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -80,9 +80,9 @@ class TaskCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                   child: Text(item.task.title, maxLines: 2, style: const TextStyle(fontSize: 16))),
-              const SizedBox(width: 20),
+              const SizedBox(width: defaultPadding),
               MultiUserShow(item.users),
-              const SizedBox(width: 20),
+              const SizedBox(width: defaultPadding),
               SizedBox(
                   width: 80,
                   child: Text(

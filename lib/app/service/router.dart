@@ -12,11 +12,17 @@ abstract class AppRouter {
   }
 
   static Future<void> goTo(AppPage page) async {
-    context.goNamed(
+    GoRouter.of(context).pushNamed(
       page.name,
       params: page.params ?? {},
       queryParams: page.queryParams ?? {},
     );
+  }
+
+  static Future<void> pop() async {
+    if (GoRouter.of(context).canPop()) {
+      GoRouter.of(context).pop();
+    }
   }
 
   static Future<void> dialog(WidgetBuilder builder) async {

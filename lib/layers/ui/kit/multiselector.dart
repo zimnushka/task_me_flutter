@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class MultiSelectItem<T> {
   final bool isActive;
@@ -54,13 +55,13 @@ class _MultiSelectorState<T> extends State<MultiSelector<T>> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 320, maxHeight: 500),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 20),
+                const SizedBox(height: defaultPadding),
                 Expanded(
                   child: ListView.builder(
                     itemCount: newList.length,

@@ -41,7 +41,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
               widget.state.task?.id != null ? 'Task #${widget.state.task!.id!}' : 'Task creation',
               style: const TextStyle(fontSize: 25),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
             const Text('Title'),
             const SizedBox(height: 10),
             TextField(
@@ -50,7 +50,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
               decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
               controller: nameController,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
             const Text('Description'),
             const SizedBox(height: 10),
             quil.QuillToolbar.basic(
@@ -96,7 +96,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
                       child: _StatusCard(widget.state.editedTask.status),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: defaultPadding),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 300),
                     child: ElevatedButton(

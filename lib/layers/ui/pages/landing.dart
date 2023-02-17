@@ -20,8 +20,8 @@ class _LandingState extends State<Landing> {
       builder: (context, state) {
         return Theme(
           data: state.theme,
-          child: DecoratedBox(
-            decoration: BoxDecoration(color: state.theme.backgroundColor),
+          child: ColoredBox(
+            color: state.theme.colorScheme.background,
             child: state.user != null
                 ? ResponsiveUi(
                     widthExpand: 800,

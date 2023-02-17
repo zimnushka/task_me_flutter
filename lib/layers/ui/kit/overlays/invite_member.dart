@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class InviteMemberDialog extends StatefulWidget {
   const InviteMemberDialog({required this.projectId, required this.onInvite, super.key});
@@ -48,13 +49,13 @@ class _InviteMemberDialogState extends State<InviteMemberDialog> {
         child: SizedBox(
           width: 320,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('Enter email new member', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 20),
+                const SizedBox(height: defaultPadding),
                 TextField(
                   controller: controller,
                   onEditingComplete: save,

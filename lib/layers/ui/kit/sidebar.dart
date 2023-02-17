@@ -41,7 +41,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.horizontal(right: radius),
+        borderRadius: const BorderRadius.all(radius),
       ),
       child: Column(
         children: [
@@ -71,7 +71,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
               ),
             ),
             minLeadingWidth: 10,
-            title: TextBold(appProvider.state.user!.name),
+            title: AppText(appProvider.state.user!.name, weight: FontWeight.bold),
             subtitle: Text(appProvider.state.user!.email),
           ),
           const SizedBox(height: 10),
@@ -116,7 +116,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const TextBold('Projects'),
+                const AppText('Projects', weight: FontWeight.bold),
                 GestureDetector(
                     onTap: showProjectEditor,
                     child: const Icon(

@@ -9,13 +9,25 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
   final Function(int) _onTaskClick;
 
   TaskBloc(this._onTaskClick, List<TaskUi> tasks)
-      : super(TaskState(tasks: tasks, openedStatuses: TaskStatus.values)) {
+      : super(TaskState(
+          tasks: tasks,
+          openedStatuses: TaskStatus.values,
+          state: TaskViewState.list,
+        )) {
     on<OnTaskTap>(_onTaskTap);
     on<OnTaskStatusTap>(_onTaskStatusTap);
+    on<OnChangeViewState>(_onChangeViewState);
   }
 
   Future<void> _onTaskTap(OnTaskTap event, Emitter emit) async {
     _onTaskClick(event.id);
+  }
+
+  Future<void> _onChangeViewState(OnChangeViewState event, Emitter emit) async {
+    final currentState = state as TaskState;
+    if (currentState.state != event.state) {
+      emit(currentState.copyWith(state: event.state));
+    }
   }
 
   Future<void> _onTaskStatusTap(OnTaskStatusTap event, Emitter emit) async {

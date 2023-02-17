@@ -6,20 +6,21 @@ import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/repositories/api/interval.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/hour_selector.dart';
 
 class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   final _taskApiRepository = TaskApiRepository();
   final _userApiRepository = UserApiRepository();
+  final _intervalsApiRepository = IntervalApiRepository();
 
   TaskDetailBloc() : super(TaskDetailLoadState()) {
     on<Load>(_load);
     on<OnDeleteTask>(_delete);
     on<OnSubmit>(_submit);
     on<OnTaskStatusSwap>(_onTaskStatusSwap);
-    on<OnUserSwap>(_onUserSwap);
+    on<OnUserListChange>(_onUserSwap);
     on<OnDescriptionUpdate>(_onDescriptionUpdate);
     on<OnTitleUpdate>(_onTitleUpdate);
   }
@@ -28,19 +29,19 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(TaskDetailLoadState());
     final usersData = await _userApiRepository.getUserFromProject(event.projectId);
     if (event.taskId != null) {
+      final assignersData = await _userApiRepository.getUserFromTask(event.taskId!);
       final taskData = await _taskApiRepository.getById(event.taskId!);
       if (taskData.data != null) {
         final users = usersData.data ?? [];
-        final _usersWithAssignerId = users.where((user) => user.id == taskData.data!.assignerId);
-        final User? selectedUser = _usersWithAssignerId.isEmpty ? null : _usersWithAssignerId.first;
+        final assigners = assignersData.data ?? [];
         emit(TaskDetailState(
-            assigner: selectedUser,
+            assigners: assigners,
             task: taskData.data,
             editedTask: taskData.data!,
             users: users,
             projectId: event.projectId,
-            state: taskData.data!.status == TaskStatus.done
-                ? TaskDetailPageState.done
+            state: taskData.data!.status == TaskStatus.closed
+                ? TaskDetailPageState.view
                 : TaskDetailPageState.edit));
         return;
       }
@@ -48,11 +49,13 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(
       TaskDetailState(
         task: null,
+        assigners: [],
         editedTask: Task(
+          stopDate: null,
           title: '',
           description: '',
           projectId: event.projectId,
-          dueDate: DateTime.now(),
+          startDate: DateTime.now(),
           cost: 0,
           status: TaskStatus.open,
         ),
@@ -76,31 +79,33 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   Future<void> _submit(OnSubmit event, Emitter emit) async {
     final currentState = state as TaskDetailState;
 
-    if (currentState.editedTask.status == TaskStatus.done && currentState.assigner == null) {
+    if (currentState.editedTask.status == TaskStatus.closed && currentState.assigners.isEmpty) {
       AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
       return;
     }
+    int cost = 0;
+    final List<TimeInterval> intervals = currentState.editedTask.id != null
+        ? (await _intervalsApiRepository.getTaskIntervals(currentState.editedTask.id!)).data ?? []
+        : [];
 
-    int hourCount = -1;
-
-    if (currentState.editedTask.status == TaskStatus.done) {
-      await AppRouter.dialog(
-        (context) => SelectHourCountDialog(
-          onSetHourCount: (value) {
-            hourCount = value;
-          },
-        ),
-      );
-      //TODO: add snack 'add work hour'
-      if (hourCount == -1) {
+    if (currentState.editedTask.status == TaskStatus.closed) {
+      if (intervals.where((element) => element.timeEnd == null).isNotEmpty) {
+        AppSnackBar.show(AppRouter.context, 'Please end all intervals', AppSnackBarType.error);
         return;
       }
-    } else {
-      hourCount = 0;
+      for (final user in currentState.users) {
+        final duration = intervals
+            .where((element) => element.userId == user.id)
+            .map((e) => (e.timeStart.difference(e.timeEnd!)).abs())
+            .fold(const Duration(), (previousValue, element) => previousValue + element);
+        cost = cost + duration.inHours * user.cost;
+      }
     }
+
     final task = currentState.editedTask.copyWith(
-      dueDate: currentState.task?.dueDate ?? DateTime.now(),
-      cost: currentState.assigner != null ? hourCount * currentState.assigner!.cost : 0,
+      description: currentState.editedTask.description.replaceAll(r'\n', r'\\n'),
+      startDate: currentState.task?.startDate ?? DateTime.now(),
+      cost: cost,
     );
 
     if (task.id != null) {
@@ -124,11 +129,12 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(currentState.copyWith(editedTask: task));
   }
 
-  Future<void> _onUserSwap(OnUserSwap event, Emitter emit) async {
+  Future<void> _onUserSwap(OnUserListChange event, Emitter emit) async {
     final currentState = state as TaskDetailState;
+    await _userApiRepository.updateTaskMemberList(currentState.task!.id!, event.users);
 
     emit(TaskDetailState(
-      assigner: event.user,
+      assigners: List.of(event.users),
       state: currentState.state,
       task: currentState.task,
       editedTask: currentState.editedTask,

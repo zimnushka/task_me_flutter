@@ -5,7 +5,7 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class UserCard extends StatefulWidget {
   const UserCard(this.user, this.onRemove, this.tasks, {this.isOwner = false});
-  final List<Task> tasks;
+  final List<TaskUi> tasks;
   final User user;
   final bool isOwner;
   final VoidCallback onRemove;
@@ -19,9 +19,11 @@ class _UserCardState extends State<UserCard> {
   @override
   void initState() {
     for (final status in TaskStatus.values) {
-      final count = widget.tasks
-          .where((element) => element.status == status && element.assignerId == widget.user.id)
-          .length;
+      final tasksWithStatus = widget.tasks.where((element) =>
+          element.task.status == status &&
+          element.users.where((element) => element.id == widget.user.id).isNotEmpty);
+      final count = tasksWithStatus.length;
+
       if (count > 0) {
         final percent = count / widget.tasks.length * 100;
         percents.add(TaskPercent(percent: percent.toDouble(), status: status, taskCount: count));
@@ -45,7 +47,7 @@ class _UserCardState extends State<UserCard> {
             subtitle: SelectableText(widget.user.email),
             trailing: widget.isOwner
                 ? Card(
-                    color: Theme.of(context).backgroundColor,
+                    color: Theme.of(context).colorScheme.background,
                     child: const Padding(
                       padding: EdgeInsets.all(10),
                       child: Text('Owner'),

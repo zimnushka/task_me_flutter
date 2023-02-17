@@ -28,7 +28,7 @@ dependencies:
   google_fonts: 3.0.1
   top_snackbar_flutter: 2.1.1
   go_router: 5.1.10
-  flutter_quill: 6.2.2
+  flutter_quill: 6.3.4
   dynamic_theme:
     git: https://github.com/Norbert515/dynamic_theme.git
 

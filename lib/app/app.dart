@@ -18,7 +18,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 class TaskMyApp extends StatelessWidget {
   TaskMyApp({required this.config, super.key});
   final Config config;
-  late final AppProvider provider;
+  late final AppProvider provider = AppProvider(config);
 
   late final GoRouter _route = GoRouter(
     navigatorKey: navigatorKey,
@@ -61,18 +61,6 @@ class TaskMyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppRouter.init(navigatorKey);
-    String url = config.apiBaseUrl;
-    // try {
-    //   if (config.setUrlFromHTML) {
-    //     final port = window.location.port;
-    //     final origin = window.location.origin;
-    //     url = origin.replaceAll(port, '8080');
-    //   }
-    // } catch (e) {
-    url = config.apiBaseUrl;
-    // }
-
-    provider = AppProvider(config.copyWith(apiBaseUrl: url));
     return MaterialApp.router(
       routeInformationProvider: _route.routeInformationProvider,
       routeInformationParser: _route.routeInformationParser,

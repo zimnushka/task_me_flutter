@@ -50,13 +50,12 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     final tasksData = await taskApiRepository.getByProject(event.projectId);
     final tasks = tasksData.data ?? [];
     tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
-
     emit(
       ProjectLoadedState(
         project: projectData.data!,
         users: users.data ?? [],
         tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, users.data ?? [])))
+            .map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], users.data ?? [])))
             .toList(),
       ),
     );
@@ -83,7 +82,7 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
       tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
       newState = newState.copyWith(
         tasks: tasks
-            .map((task) => TaskUi(task, user: _getUserTask(task.assignerId, currentState.users)))
+            .map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], currentState.users)))
             .toList(),
       );
     }
@@ -141,14 +140,7 @@ class ProjectBloc extends Bloc<ProjectEvent, AppState> {
     emit(currentState.copyWith(pageState: event.page));
   }
 
-  User? _getUserTask(int? id, List<User> users) {
-    if (id == null) {
-      return null;
-    }
-    final usersTask = users.where((element) => element.id == id);
-    if (usersTask.isEmpty) {
-      return null;
-    }
-    return usersTask.first;
+  List<User> _getUserTask(List<int> assignersIds, List<User> users) {
+    return users.where((element) => assignersIds.contains(element.id)).toList();
   }
 }

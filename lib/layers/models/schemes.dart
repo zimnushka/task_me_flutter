@@ -4,6 +4,17 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'schemes.g.dart';
 part 'schemes.freezed.dart';
 
+String? getStringDateTime(Map<dynamic, dynamic> data, String key) {
+  if (data[key] is String) {
+    if ((data[key] as String).isNotEmpty) {
+      if (DateTime.tryParse(data[key]) != null) {
+        return data[key];
+      }
+    }
+  }
+  return null;
+}
+
 @freezed
 class Config with _$Config {
   const factory Config({
@@ -49,6 +60,20 @@ class Project with _$Project {
   factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
 }
 
+@freezed
+class TimeInterval with _$TimeInterval {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  factory TimeInterval({
+    required final int id,
+    required final int taskId,
+    required final int userId,
+    required final DateTime timeStart,
+    @JsonKey(readValue: getStringDateTime) required final DateTime? timeEnd,
+  }) = _TimeInterval;
+
+  factory TimeInterval.fromJson(Map<String, dynamic> json) => _$TimeIntervalFromJson(json);
+}
+
 enum TaskStatus {
   @JsonValue(0)
   open,
@@ -57,7 +82,7 @@ enum TaskStatus {
   @JsonValue(2)
   review,
   @JsonValue(3)
-  done,
+  closed,
 }
 
 extension TaskStatusExt on TaskStatus {
@@ -69,7 +94,7 @@ extension TaskStatusExt on TaskStatus {
         return const Color.fromARGB(255, 2, 127, 190);
       case TaskStatus.review:
         return const Color.fromARGB(255, 99, 1, 192);
-      case TaskStatus.done:
+      case TaskStatus.closed:
         return const Color.fromARGB(255, 44, 186, 1);
     }
   }
@@ -82,8 +107,8 @@ extension TaskStatusExt on TaskStatus {
         return 'In progress';
       case TaskStatus.review:
         return 'Review';
-      case TaskStatus.done:
-        return 'Done';
+      case TaskStatus.closed:
+        return 'Closed';
     }
   }
 }
@@ -94,11 +119,12 @@ class Task with _$Task {
     required final String title,
     required final String description,
     required final int projectId,
-    required final DateTime dueDate,
+    @JsonKey(readValue: getStringDateTime) required final DateTime? stopDate,
+    required final DateTime startDate,
     required final int cost,
     @JsonKey(name: 'statusId') required final TaskStatus status,
-    final int? assignerId,
     final int? id,
+    final List<int>? assigners,
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -106,7 +132,7 @@ class Task with _$Task {
 
 class TaskUi {
   final Task task;
-  final User? user;
+  final List<User> users;
 
-  const TaskUi(this.task, {this.user});
+  const TaskUi(this.task, this.users);
 }

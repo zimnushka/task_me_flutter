@@ -7,6 +7,7 @@ import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
@@ -28,7 +29,8 @@ class _InfoProjectViewState extends State<InfoProjectView> {
       bestUser ??= element;
       final index = widget.state.tasks
           .where((element) =>
-              element.task.assignerId == bestUser?.id && element.task.status == TaskStatus.done)
+              element.users.where((element) => element.id == bestUser?.id).isNotEmpty &&
+              element.task.status == TaskStatus.closed)
           .length;
       if (index > maxCountGetedTasks) {
         bestUser = element;
@@ -61,9 +63,9 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             start: const Offset(1, 0),
             end: Offset.zero,
             child: Card(
-              margin: const EdgeInsets.only(top: 20),
+              margin: const EdgeInsets.only(top: defaultPadding),
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -82,9 +84,9 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             start: const Offset(1, 0),
             end: Offset.zero,
             child: Card(
-              margin: EdgeInsets.only(top: 20),
+              margin: EdgeInsets.only(top: defaultPadding),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -121,9 +123,9 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             start: const Offset(1, 0),
             end: Offset.zero,
             child: Card(
-              margin: const EdgeInsets.only(top: 20),
+              margin: const EdgeInsets.only(top: defaultPadding),
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -139,8 +141,8 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 200,
                           childAspectRatio: 1.5 / 1,
-                          mainAxisSpacing: 20,
-                          crossAxisSpacing: 20),
+                          mainAxisSpacing: defaultPadding,
+                          crossAxisSpacing: defaultPadding),
                       semanticChildCount: TaskStatus.values.length,
                       children: TaskStatus.values
                           .map((e) => Card(
@@ -178,10 +180,10 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Center(
               child: TextButton(
-                style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
+                style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
                 onPressed: () => _bloc(context).add(OnDeleteProject()),
                 child: Text('Delete project'),
               ),

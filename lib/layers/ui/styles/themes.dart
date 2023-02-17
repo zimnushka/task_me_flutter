@@ -36,7 +36,7 @@ ThemeData setPrimaryColor(ThemeData data, Color color) {
       ),
       textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: color)),
       floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: color),
-      backgroundColor: data.scaffoldBackgroundColor,
+      colorScheme: data.colorScheme.copyWith(background: data.scaffoldBackgroundColor),
       scaffoldBackgroundColor: data.scaffoldBackgroundColor,
       listTileTheme: ListTileThemeData(
           selectedColor: color,
@@ -46,3 +46,6 @@ ThemeData setPrimaryColor(ThemeData data, Color color) {
 const defaultPrimaryColor = Color.fromARGB(255, 76, 175, 158);
 
 const radius = Radius.circular(10);
+const double defaultPadding = 20;
+
+const double kSideBarWidth = 250;

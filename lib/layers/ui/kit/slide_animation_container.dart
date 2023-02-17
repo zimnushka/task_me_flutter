@@ -8,6 +8,7 @@ class SlideAnimatedContainer extends StatefulWidget {
     this.repeat = false,
     this.curve = Curves.elasticIn,
     this.duration = const Duration(milliseconds: 300),
+    this.replayInBuild = true,
     Key? key,
   }) : super(key: key);
   final Widget child;
@@ -15,6 +16,7 @@ class SlideAnimatedContainer extends StatefulWidget {
   final Offset end;
   final Duration duration;
   final bool repeat;
+  final bool replayInBuild;
   final Curve curve;
 
   @override
@@ -28,7 +30,6 @@ class _SlideAnimatedContainerState extends State<SlideAnimatedContainer>
 
   @override
   void initState() {
-    super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _offsetAnimation = Tween<Offset>(
       begin: widget.start,
@@ -40,20 +41,23 @@ class _SlideAnimatedContainerState extends State<SlideAnimatedContainer>
       ),
     );
     widget.repeat ? _controller.repeat(reverse: true) : _controller.forward();
+    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_controller.isCompleted) {
-      _controller.reset();
+    if (widget.replayInBuild) {
+      if (_controller.isCompleted) {
+        _controller.reset();
+      }
+      _controller.forward();
     }
-    _controller.forward();
 
     return SlideTransition(
       position: _offsetAnimation,

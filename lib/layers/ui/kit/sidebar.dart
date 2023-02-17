@@ -36,12 +36,12 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: kSideBarWidth,
       height: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(radius),
+        borderRadius: const BorderRadius.horizontal(right: radius),
       ),
       child: Column(
         children: [
@@ -55,7 +55,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                           width: 320,
                           height: 420,
                           child: Padding(
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(defaultPadding),
                               child: ColorSelector(
                                 initColor: Theme.of(context).primaryColor,
                                 onSetColor: (value) {
@@ -79,7 +79,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             height: 40,
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
+              color: Theme.of(context).colorScheme.background,
               borderRadius: const BorderRadius.all(radius),
             ),
             child: TabBar(
@@ -150,7 +150,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                           size: 40,
                         ),
                         Padding(
-                          padding: EdgeInsets.all(20),
+                          padding: EdgeInsets.all(defaultPadding),
                           child: Text(
                             'Click + to add new project, or ask your project member of invite you',
                             textAlign: TextAlign.center,
@@ -165,7 +165,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             child: Divider(),
           ),
           TextButton(
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).errorColor),
+              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
               onPressed: appProvider.deleteToken,
               child: const Text('logout')),
         ],

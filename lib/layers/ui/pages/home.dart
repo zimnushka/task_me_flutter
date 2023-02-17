@@ -89,7 +89,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  padding: const EdgeInsets.all(defaultPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -97,7 +97,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                       const Text('Email', style: TextStyle(color: Colors.white, fontSize: 12)),
                       Text(provider.state.user!.email,
                           style: const TextStyle(color: Colors.white, fontSize: 18)),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: defaultPadding),
                       const Text('Hourly payment',
                           style: TextStyle(color: Colors.white, fontSize: 12)),
                       Text(provider.state.user!.cost.toString(),
@@ -115,7 +115,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                 ),
                 if (widget.state.tasks.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(defaultPadding),
                     child: Container(
                       decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                       width: 200,
@@ -151,7 +151,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                                         .copyWith(color: Theme.of(context).primaryColor)),
                                 Text(
                                     widget.state.tasks
-                                        .where((element) => element.status == TaskStatus.done)
+                                        .where((element) => element.status == TaskStatus.closed)
                                         .length
                                         .toString(),
                                     style: TextStyle(
@@ -189,7 +189,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               ),
             )
           : TasksProjectView(
-              tasks: widget.state.tasks.map(TaskUi.new).toList(),
+              tasks: widget.state.tasks.map((e) => TaskUi(e, [])).toList(),
               onTaskTap: (id) => _bloc(context).add(OnTaskTap(id)),
             ),
     );

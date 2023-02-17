@@ -41,7 +41,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(radius),
+        borderRadius: const BorderRadius.horizontal(right: radius),
       ),
       child: Column(
         children: [

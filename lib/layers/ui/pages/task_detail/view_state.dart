@@ -1,76 +1,24 @@
 part of 'task_detail.dart';
 
-class _TaskView extends StatefulWidget {
+class _TaskView extends StatelessWidget {
   const _TaskView(this.state);
   final TaskDetailState state;
-
-  @override
-  State<_TaskView> createState() => __TaskViewState();
-}
-
-class __TaskViewState extends State<_TaskView> {
-  final nameController = TextEditingController();
-  late final quil.QuillController descController;
-  final scrollController = ScrollController();
-  final focusNode = FocusNode();
-
-  @override
-  void initState() {
-    nameController.text = widget.state.editedTask.title;
-    try {
-      descController = quil.QuillController(
-        document: widget.state.editedTask.description != ''
-            ? quil.Document.fromJson(jsonDecode(widget.state.editedTask.description))
-            : quil.Document(),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
-    } catch (e) {
-      descController = quil.QuillController.basic();
-    }
-    descController.addListener(focusNode.unfocus);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.topCenter,
       child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(radius),
-                    color: Theme.of(context).cardColor,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Task ${widget.state.task!.id!}', style: const TextStyle(fontSize: 20)),
-                      Container(
-                        height: 40,
-                        width: 2,
-                        color: Theme.of(context).colorScheme.background,
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                      ),
-                      GestureDetector(
-                        onTap: () => _bloc(context).add(OnDeleteTask()),
-                        child: Icon(
-                          Icons.close,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _TaskIDCard(state.task?.id),
                 const Expanded(child: SizedBox()),
-                _StatusCard(widget.state.editedTask.status),
+                _TaskStatusSelector(
+                    value: state.editedTask.status, onChanged: (_) {}, readOnly: true),
                 const SizedBox(width: defaultPadding),
                 GestureDetector(
                   onTap: () {
@@ -92,9 +40,9 @@ class __TaskViewState extends State<_TaskView> {
                                       const SizedBox(height: defaultPadding),
                                       Expanded(
                                         child: ListView.builder(
-                                          itemCount: widget.state.assigners.length,
+                                          itemCount: state.assigners.length,
                                           itemBuilder: (context, index) {
-                                            final item = widget.state.assigners[index];
+                                            final item = state.assigners[index];
                                             return _UserCard(item);
                                           },
                                         ),
@@ -107,39 +55,30 @@ class __TaskViewState extends State<_TaskView> {
                           );
                         });
                   },
-                  child: widget.state.assigners.isEmpty
+                  child: state.assigners.isEmpty
                       ? const Text('Without assigner', style: TextStyle(fontSize: 18))
-                      : MultiUserShow(widget.state.assigners, radius: 20),
+                      : MultiUserShow(state.assigners, radius: 20),
                 ),
               ],
             ),
             const SizedBox(height: defaultPadding),
-            const Text('Title'),
-            const SizedBox(height: 10),
-            TextField(
-              readOnly: true,
-              decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
-              controller: nameController,
-            ),
-            const SizedBox(height: defaultPadding),
-            const Text('Description'),
-            const SizedBox(height: 10),
-            Container(
-              height: 300,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(radius), color: Theme.of(context).cardColor),
-              child: quil.QuillEditor(
-                focusNode: focusNode,
-                scrollController: scrollController,
-                scrollable: true,
-                padding: const EdgeInsets.all(15),
-                autoFocus: false,
-                expands: true,
-                controller: descController,
-                readOnly: true, // true for view only mode
+            _TaskTitleEditor(
+              initValue: state.editedTask.title,
+              readOnly: state.task?.status == TaskStatus.closed,
+              onChanged: (value) => _bloc(context).add(
+                OnTitleUpdate(value),
               ),
             ),
+            const SizedBox(height: defaultPadding),
+            _TaskDescriptionEditor(
+              initValue: state.editedTask.description,
+              onChanged: (value) => _bloc(context).add(OnDescriptionUpdate(value)),
+              readOnly: state.task?.status == TaskStatus.closed,
+            ),
+            const SizedBox(height: defaultPadding),
+            const Text('Time intervals'),
+            const SizedBox(height: 10),
+            IntervalView(users: state.users, readOnly: true, taskId: state.editedTask.id!)
           ],
         ),
       ),

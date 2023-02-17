@@ -9,37 +9,7 @@ class _TaskEditView extends StatefulWidget {
 }
 
 class __TaskEditViewState extends State<_TaskEditView> {
-  final nameController = TextEditingController();
-  late final quil.QuillController descController;
-  final scrollController = ScrollController();
-  final focusNode = FocusNode();
   final List<PopupMenuItem<User?>> userWidgets = [];
-  final List<PopupMenuItem<TaskStatus>> statusWidgets = [];
-
-  @override
-  void initState() {
-    nameController.text = widget.state.editedTask.title;
-
-    try {
-      descController = quil.QuillController(
-        document: widget.state.editedTask.description != ''
-            ? quil.Document.fromJson(jsonDecode(widget.state.editedTask.description))
-            : quil.Document(),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
-    } catch (e) {
-      descController = quil.QuillController.basic();
-    }
-    descController.addListener(() {
-      final text = jsonEncode(descController.document.toDelta().toJson());
-      _bloc(context).add(OnDescriptionUpdate(text));
-    });
-
-    statusWidgets.addAll(
-        TaskStatus.values.map((e) => PopupMenuItem(value: e, child: _PopUpStatusCard(e))).toList());
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,63 +25,12 @@ class __TaskEditViewState extends State<_TaskEditView> {
             children: [
               Row(
                 children: [
-                  Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(radius),
-                      color: Theme.of(context).cardColor,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: AppRouter.pop,
-                          child: Container(
-                            height: 40,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    right: BorderSide(
-                                        width: 2,
-                                        color: Theme.of(context).colorScheme.background))),
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text('Task ${widget.state.task!.id!}',
-                              style: const TextStyle(fontSize: 20)),
-                        ),
-                        GestureDetector(
-                          onTap: () => _bloc(context).add(OnDeleteTask()),
-                          child: Container(
-                            height: 40,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    left: BorderSide(
-                                        width: 2,
-                                        color: Theme.of(context).colorScheme.background))),
-                            child: Icon(
-                              Icons.close,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _TaskIDCard(widget.state.task?.id),
                   const Expanded(child: SizedBox()),
-                  PopupMenuButton(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
-                    tooltip: '',
-                    onSelected: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
-                    itemBuilder: (context) => statusWidgets,
-                    child: _StatusCard(widget.state.editedTask.status),
+                  _TaskStatusSelector(
+                    value: widget.state.editedTask.status,
+                    readOnly: false,
+                    onChanged: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
                   ),
                   const SizedBox(width: defaultPadding),
                   GestureDetector(
@@ -142,54 +61,24 @@ class __TaskEditViewState extends State<_TaskEditView> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              const Text('Title'),
-              const SizedBox(height: 10),
-              TextField(
-                onChanged: (value) => _bloc(context).add(OnTitleUpdate(value)),
-                readOnly: widget.state.task?.status == TaskStatus.closed,
-                decoration: InputDecoration(fillColor: Theme.of(context).cardColor),
-                controller: nameController,
+              _TaskTitleEditor(
+                initValue: widget.state.editedTask.title,
+                readOnly: false,
+                onChanged: (value) => _bloc(context).add(
+                  OnTitleUpdate(value),
+                ),
               ),
               const SizedBox(height: defaultPadding),
-              const Text('Description'),
-              const SizedBox(height: 10),
-              quil.QuillToolbar.basic(
-                iconTheme:
-                    quil.QuillIconTheme(iconSelectedFillColor: Theme.of(context).primaryColor),
-                controller: descController,
-                showSearchButton: false,
-                showFontFamily: false,
-                showFontSize: false,
-                showHeaderStyle: false,
-                showRedo: false,
-                showUndo: false,
-              ),
-              const SizedBox(height: 10),
-              Container(
-                height: 300,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(radius),
-                    color: Theme.of(context).cardColor),
-                child: quil.QuillEditor(
-                  focusNode: focusNode,
-                  scrollController: scrollController,
-                  scrollable: true,
-                  padding: const EdgeInsets.all(15),
-                  autoFocus: false,
-                  expands: true,
-                  controller: descController,
-                  readOnly:
-                      widget.state.task?.status == TaskStatus.closed, // true for view only mode
-                ),
+              _TaskDescriptionEditor(
+                initValue: widget.state.editedTask.description,
+                onChanged: (value) => _bloc(context).add(OnDescriptionUpdate(value)),
+                readOnly: false,
               ),
               const SizedBox(height: defaultPadding),
               const Text('Time intervals'),
               const SizedBox(height: 10),
               IntervalView(
-                  users: widget.state.users,
-                  readOnly: widget.state.editedTask.status == TaskStatus.closed,
-                  taskId: widget.state.editedTask.id!)
+                  users: widget.state.users, readOnly: false, taskId: widget.state.editedTask.id!)
             ],
           ),
         ),

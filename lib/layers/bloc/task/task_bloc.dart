@@ -62,6 +62,7 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
         taskUIList.removeWhere((element) => element.task.id == event.taskUi.task.id);
         taskUIList
             .add(event.taskUi.copyWith(task: event.taskUi.task.copyWith(status: event.status)));
+        taskUIList.sort((a, b) => a.task.status.index.compareTo(b.task.status.index));
         emit(
           TaskState(
             tasks: taskUIList,

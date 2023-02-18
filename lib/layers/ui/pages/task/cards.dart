@@ -77,38 +77,41 @@ class TaskBoardStatusHeader extends StatelessWidget {
 }
 
 class TaskListCard extends StatelessWidget {
-  const TaskListCard(this.item, this.onTap);
+  const TaskListCard({required this.item, required this.onTap, required this.onStatusCnange});
   final TaskUi item;
   final VoidCallback onTap;
+  final Function(TaskStatus) onStatusCnange;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
-          child: Row(
-            children: [
-              Container(
-                width: 7,
-                height: 30,
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(radius), color: item.task.status.color),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: Text(item.task.title, maxLines: 2, style: const TextStyle(fontSize: 16))),
-              const SizedBox(width: defaultPadding),
-              MultiUserShow(item.users),
-              const SizedBox(width: defaultPadding),
-              SizedBox(
-                  width: 80,
-                  child: Text(
-                      '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
-            ],
-          ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
+        child: Row(
+          children: [
+            _TaskStatusSelector(
+              value: item.task.status,
+              onChanged: onStatusCnange,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                  onTap: onTap,
+                  child: Row(children: [
+                    Expanded(
+                        child: Text(item.task.title,
+                            maxLines: 2, style: const TextStyle(fontSize: 16))),
+                    const SizedBox(width: defaultPadding),
+                    MultiUserShow(item.users),
+                    const SizedBox(width: defaultPadding),
+                    SizedBox(
+                        width: 80,
+                        child: Text(
+                            '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
+                  ])),
+            ),
+          ],
         ),
       ),
     );
@@ -149,6 +152,65 @@ class TaskBoardCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PopUpStatusCard extends StatelessWidget {
+  const _PopUpStatusCard(this.status);
+  final TaskStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          height: 20,
+          width: 20,
+          decoration:
+              BoxDecoration(borderRadius: const BorderRadius.all(radius), color: status.color),
+        ),
+        const SizedBox(width: 10),
+        Text(status.label),
+      ],
+    );
+  }
+}
+
+class _TaskStatusSelector extends StatefulWidget {
+  const _TaskStatusSelector({
+    required this.value,
+    required this.onChanged,
+  });
+  final Function(TaskStatus) onChanged;
+  final TaskStatus value;
+
+  @override
+  State<_TaskStatusSelector> createState() => __TaskStatusSelectorState();
+}
+
+class __TaskStatusSelectorState extends State<_TaskStatusSelector> {
+  final List<PopupMenuItem<TaskStatus>> statusWidgets = [];
+  @override
+  void initState() {
+    statusWidgets.addAll(
+        TaskStatus.values.map((e) => PopupMenuItem(value: e, child: _PopUpStatusCard(e))).toList());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
+      tooltip: '',
+      onSelected: widget.onChanged,
+      itemBuilder: (context) => statusWidgets,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(5)), color: widget.value.color),
       ),
     );
   }

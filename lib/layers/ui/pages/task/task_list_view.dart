@@ -24,7 +24,11 @@ class _TaskListView extends StatelessWidget {
             status: status,
             onTap: () => _bloc(context).add(OnTaskStatusTap(item.task.status)),
             child: isShow
-                ? TaskListCard(item, () => _bloc(context).add(OnTaskTap(item.task.id!)))
+                ? TaskListCard(
+                    item: item,
+                    onTap: () => _bloc(context).add(OnTaskTap(item.task.id!)),
+                    onStatusCnange: (value) => _bloc(context).add(OnChangeTaskStatus(item, value)),
+                  )
                 : const SizedBox(),
           );
         },

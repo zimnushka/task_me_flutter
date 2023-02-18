@@ -16,18 +16,20 @@ class UserProjectView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: state.users.length,
-      itemBuilder: (context, index) {
-        final item = state.users[index];
-        return SlideAnimatedContainer(
-            duration: Duration(milliseconds: 300 + (index * 100)),
-            curve: Curves.easeOut,
-            start: const Offset(1, 0),
-            end: Offset.zero,
-            child: UserCard(item, () => _bloc(context).add(OnDeleteUser(item.id)), state.tasks,
-                isOwner: state.project.ownerId == item.id));
-      },
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: state.users.length,
+        (context, index) {
+          final item = state.users[index];
+          return SlideAnimatedContainer(
+              duration: Duration(milliseconds: 300 + (index * 100)),
+              curve: Curves.easeOut,
+              start: const Offset(1, 0),
+              end: Offset.zero,
+              child: UserCard(item, () => _bloc(context).add(OnDeleteUser(item.id)), state.tasks,
+                  isOwner: state.project.ownerId == item.id));
+        },
+      ),
     );
   }
 }

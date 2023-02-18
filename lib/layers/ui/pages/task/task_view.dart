@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
@@ -6,58 +8,45 @@ import 'package:task_me_flutter/layers/bloc/task/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/task/cards.dart';
+import 'package:task_me_flutter/layers/ui/styles/text.dart';
+import 'package:task_me_flutter/layers/ui/styles/themes.dart';
+
+part 'task_list_view.dart';
+part 'task_board_view.dart';
+part 'task_view_filter.dart';
 
 TaskBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
-class TasksProjectView extends StatefulWidget {
-  final List<TaskUi> tasks;
-  final Function(int) onTaskTap;
-
-  const TasksProjectView({required this.tasks, required this.onTaskTap});
+class TasksViewProvider extends StatefulWidget {
+  final Widget child;
+  final TaskBloc bloc;
+  const TasksViewProvider({required this.child, required this.bloc});
 
   @override
-  State<TasksProjectView> createState() => _TasksProjectViewState();
+  State<TasksViewProvider> createState() => _TasksViewProviderState();
 }
 
-class _TasksProjectViewState extends State<TasksProjectView> {
+class _TasksViewProviderState extends State<TasksViewProvider> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TaskBloc(widget.onTaskTap, widget.tasks),
-      child: const _Body(),
+    return BlocProvider.value(
+      value: widget.bloc,
+      child: widget.child,
     );
   }
 }
 
-class _Body extends StatelessWidget {
-  const _Body();
+class TaskView extends StatelessWidget {
+  const TaskView();
 
   @override
   Widget build(BuildContext context) {
     return BlocStateBuilder<TaskBloc>(builder: (s, context) {
       final state = s as TaskState;
-      return ListView.builder(
-        itemCount: state.tasks.length,
-        itemBuilder: (context, index) {
-          final item = state.tasks[index];
-          TaskStatus? status;
-          for (final statusElement in TaskStatus.values) {
-            if (index ==
-                state.tasks.indexWhere((element) => element.task.status == statusElement)) {
-              status = statusElement;
-            }
-          }
-          final isShow = state.openedStatuses.contains(item.task.status);
-          return TaskStatusHeader(
-            isShow: isShow,
-            status: status,
-            onTap: () => _bloc(context).add(OnTaskStatusTap(item.task.status)),
-            child: isShow
-                ? TaskCard(item, () => _bloc(context).add(OnTaskTap(item.task.id!)))
-                : const SizedBox(),
-          );
-        },
-      );
+      if (state.state == TaskViewState.list) {
+        return _TaskListView(state);
+      }
+      return _TaskBoardView(state);
     });
   }
 }

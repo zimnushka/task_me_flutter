@@ -52,9 +52,9 @@ class ApiErrorHandler<T> {
       final result = await func();
       return result;
     } on DioError catch (e) {
-      return ApiResponse<T?>(status: e.response?.statusCode ?? 0, error: e);
+      return ApiResponse<T?>(body: null, status: e.response?.statusCode ?? 0, error: e);
     } catch (e) {
-      return ApiResponse<T?>(status: 0, error: e as Exception);
+      return ApiResponse<T?>(body: null, status: 0, error: Exception(e.toString()));
     }
   }
 }

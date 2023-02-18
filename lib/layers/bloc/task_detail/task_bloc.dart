@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
+import 'package:task_me_flutter/app/models/error.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/repositories/api/interval.dart';
-import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
+import 'package:task_me_flutter/layers/service/task.dart';
 
 class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
-  final _taskApiRepository = TaskApiRepository();
+  final _taskService = TaskService();
   final _userApiRepository = UserApiRepository();
-  final _intervalsApiRepository = IntervalApiRepository();
 
   TaskDetailBloc() : super(TaskDetailLoadState()) {
     on<Load>(_load);
@@ -29,18 +28,18 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
     emit(TaskDetailLoadState());
     final usersData = await _userApiRepository.getUserFromProject(event.projectId);
     if (event.taskId != null) {
-      final assignersData = await _userApiRepository.getUserFromTask(event.taskId!);
-      final taskData = await _taskApiRepository.getById(event.taskId!);
-      if (taskData.data != null) {
+      final assigners = await _taskService.getTaskMembers(event.taskId!);
+      final task = await _taskService.getTaskById(event.taskId!);
+      if (task != null) {
         final users = usersData.data ?? [];
-        final assigners = assignersData.data ?? [];
+
         emit(TaskDetailState(
             assigners: assigners,
-            task: taskData.data,
-            editedTask: taskData.data!,
+            task: task,
+            editedTask: task,
             users: users,
             projectId: event.projectId,
-            state: taskData.data!.status == TaskStatus.closed
+            state: task.status == TaskStatus.closed
                 ? TaskDetailPageState.view
                 : TaskDetailPageState.edit));
         return;
@@ -69,57 +68,31 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
   Future<void> _delete(OnDeleteTask event, Emitter emit) async {
     final currentState = state as TaskDetailState;
     if (currentState.task != null) {
-      await _taskApiRepository.delete(currentState.task!.id!);
-      add(Load(projectId: currentState.projectId));
-    } else {
-      AppSnackBar.show(AppRouter.context, 'Task was not save, can`t delete', AppSnackBarType.info);
+      final responce = await _taskService.deleteTask(currentState.task!.id!);
+      if (responce) {
+        add(Load(projectId: currentState.projectId));
+      } else {
+        AppSnackBar.show(AppRouter.context, 'Delete error', AppSnackBarType.error);
+      }
     }
   }
 
   Future<void> _submit(OnSubmit event, Emitter emit) async {
     final currentState = state as TaskDetailState;
-
-    if (currentState.editedTask.status == TaskStatus.closed && currentState.assigners.isEmpty) {
-      AppSnackBar.show(AppRouter.context, 'Add assigner before close task', AppSnackBarType.info);
-      return;
-    }
-    int cost = 0;
-    final List<TimeInterval> intervals = currentState.editedTask.id != null
-        ? (await _intervalsApiRepository.getTaskIntervals(currentState.editedTask.id!)).data ?? []
-        : [];
-
-    if (currentState.editedTask.status == TaskStatus.closed) {
-      if (intervals.where((element) => element.timeEnd == null).isNotEmpty) {
-        AppSnackBar.show(AppRouter.context, 'Please end all intervals', AppSnackBarType.error);
-        return;
-      }
-      for (final user in currentState.users) {
-        final duration = intervals
-            .where((element) => element.userId == user.id)
-            .map((e) => (e.timeStart.difference(e.timeEnd!)).abs())
-            .fold(const Duration(), (previousValue, element) => previousValue + element);
-        cost = cost + duration.inHours * user.cost;
-      }
-    }
-
-    final task = currentState.editedTask.copyWith(
-      description: currentState.editedTask.description.replaceAll(r'\n', r'\\n'),
-      startDate: currentState.task?.startDate ?? DateTime.now(),
-      cost: cost,
-    );
-
-    if (task.id != null) {
-      await _taskApiRepository.edit(task);
-      AppSnackBar.show(AppRouter.context, 'Edited', AppSnackBarType.success);
-      add(Load(projectId: task.projectId, taskId: task.id));
-    } else {
-      final newTask = (await _taskApiRepository.create(task)).data;
-      if (newTask != null) {
+    try {
+      if (currentState.editedTask.id != null) {
+        await _taskService.editTask(currentState.editedTask, currentState.users);
+        AppSnackBar.show(AppRouter.context, 'Edited', AppSnackBarType.success);
+        add(Load(projectId: currentState.editedTask.projectId, taskId: currentState.editedTask.id));
+      } else {
+        final newTask = await _taskService.addTask(currentState.editedTask);
         AppSnackBar.show(AppRouter.context, 'Created', AppSnackBarType.success);
         add(Load(projectId: newTask.projectId, taskId: newTask.id));
-      } else {
-        AppSnackBar.show(AppRouter.context, 'Create error', AppSnackBarType.error);
       }
+    } on LogicalException catch (e) {
+      AppSnackBar.show(AppRouter.context, e.message, AppSnackBarType.error);
+    } catch (e) {
+      AppSnackBar.show(AppRouter.context, e.toString(), AppSnackBarType.error);
     }
   }
 
@@ -131,7 +104,10 @@ class TaskDetailBloc extends Bloc<TaskDetailEvent, AppState> {
 
   Future<void> _onUserSwap(OnUserListChange event, Emitter emit) async {
     final currentState = state as TaskDetailState;
-    await _userApiRepository.updateTaskMemberList(currentState.task!.id!, event.users);
+    try {
+      await _taskService.editTaskMemberList(currentState.task!, event.users);
+      // ignore: empty_catches
+    } catch (e) {}
 
     emit(TaskDetailState(
       assigners: List.of(event.users),

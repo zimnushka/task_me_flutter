@@ -65,6 +65,10 @@ class TaskService {
 
   Future<bool> editTaskStatus(Task task, TaskStatus status, List<User> projectUsers) async {
     final newTask = task.copyWith(status: status);
+    if (task.status == TaskStatus.closed) {
+      throw const LogicalException('This task is closed');
+    }
+
     if (status == TaskStatus.closed) {
       return editTask(newTask, projectUsers);
     } else {

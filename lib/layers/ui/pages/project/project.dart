@@ -40,8 +40,9 @@ class ProjectPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProjectBloc()..add(Load(id)),
+    final bloc = ProjectBloc()..add(Load(id));
+    return BlocProvider.value(
+      value: bloc,
       child: const _ProjectView(),
     );
   }

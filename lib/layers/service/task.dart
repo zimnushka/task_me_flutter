@@ -63,13 +63,17 @@ class TaskService {
     throw Exception(responce.message);
   }
 
-  Future<bool> editTaskStatus(Task task, TaskStatus status) async {
+  Future<bool> editTaskStatus(Task task, TaskStatus status, List<User> projectUsers) async {
     final newTask = task.copyWith(status: status);
-    final responce = await _taskApiRepository.edit(newTask);
-    if (responce.isSuccess) {
-      return responce.data!;
+    if (status == TaskStatus.closed) {
+      return editTask(newTask, projectUsers);
+    } else {
+      final responce = await _taskApiRepository.edit(newTask);
+      if (responce.isSuccess) {
+        return responce.data!;
+      }
+      throw Exception(responce.message);
     }
-    throw Exception(responce.message);
   }
 
   Future<bool> editTaskMemberList(Task task, List<User> assigners) async {

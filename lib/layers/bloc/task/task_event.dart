@@ -13,6 +13,12 @@ class OnChangeViewState extends TaskEvent {
   OnChangeViewState(this.state);
 }
 
+class OnChangeTaskStatus extends TaskEvent {
+  final TaskStatus status;
+  final TaskUi taskUi;
+  OnChangeTaskStatus(this.taskUi, this.status);
+}
+
 class OnTaskStatusTap extends TaskEvent {
   final TaskStatus status;
   OnTaskStatusTap(this.status);

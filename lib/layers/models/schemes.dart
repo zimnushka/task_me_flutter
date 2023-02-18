@@ -1,8 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'schemes.g.dart';
 part 'schemes.freezed.dart';
+part 'schemes.g.dart';
 
 String? getStringDateTime(Map<dynamic, dynamic> data, String key) {
   if (data[key] is String) {
@@ -135,4 +136,14 @@ class TaskUi {
   final List<User> users;
 
   const TaskUi(this.task, this.users);
+
+  TaskUi copyWith({
+    Task? task,
+    List<User>? users,
+  }) {
+    return TaskUi(
+      task ?? this.task,
+      users ?? this.users,
+    );
+  }
 }

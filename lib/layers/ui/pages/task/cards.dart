@@ -116,15 +116,17 @@ class TaskListCard extends StatelessWidget {
 }
 
 class TaskBoardCard extends StatelessWidget {
-  const TaskBoardCard({required this.item, required this.onTap, super.key});
+  const TaskBoardCard({required this.item, required this.onTap, this.color, super.key});
   final TaskUi item;
   final VoidCallback onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        color: color,
         margin: const EdgeInsets.only(bottom: 5),
         child: Padding(
           padding: const EdgeInsets.all(15),

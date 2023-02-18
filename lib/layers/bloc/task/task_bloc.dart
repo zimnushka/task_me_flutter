@@ -1,12 +1,19 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
+import 'package:task_me_flutter/app/models/error.dart';
+import 'package:task_me_flutter/app/service/router.dart';
+import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/repositories/api/user.dart';
+import 'package:task_me_flutter/layers/service/task.dart';
 
 class TaskBloc extends Bloc<TaskEvent, AppState> {
   final Function(int) _onTaskClick;
+  final _taskService = TaskService();
+  final _userApiRepository = UserApiRepository();
 
   TaskBloc(this._onTaskClick, List<TaskUi> tasks)
       : super(TaskState(
@@ -17,6 +24,7 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
     on<OnTaskTap>(_onTaskTap);
     on<OnTaskStatusTap>(_onTaskStatusTap);
     on<OnChangeViewState>(_onChangeViewState);
+    on<OnChangeTaskStatus>(_onChangeTaskStatus);
   }
 
   Future<void> _onTaskTap(OnTaskTap event, Emitter emit) async {
@@ -41,6 +49,31 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
       final statuses = List.of(currentState.openedStatuses);
       statuses.add(event.status);
       emit(currentState.copyWith(openedStatuses: statuses));
+    }
+  }
+
+  Future<void> _onChangeTaskStatus(OnChangeTaskStatus event, Emitter emit) async {
+    final currentState = state as TaskState;
+    try {
+      final projectUsers =
+          (await _userApiRepository.getUserFromProject(event.taskUi.task.projectId)).data ?? [];
+      if (await _taskService.editTaskStatus(event.taskUi.task, event.status, projectUsers)) {
+        final List<TaskUi> taskUIList = List.of(currentState.tasks);
+        taskUIList.removeWhere((element) => element.task.id == event.taskUi.task.id);
+        taskUIList
+            .add(event.taskUi.copyWith(task: event.taskUi.task.copyWith(status: event.status)));
+        emit(
+          TaskState(
+            tasks: taskUIList,
+            openedStatuses: currentState.openedStatuses,
+            state: currentState.state,
+          ),
+        );
+      }
+    } on LogicalException catch (e) {
+      AppSnackBar.show(AppRouter.context, e.message, AppSnackBarType.error);
+    } catch (e) {
+      AppSnackBar.show(AppRouter.context, e.toString(), AppSnackBarType.error);
     }
   }
 }

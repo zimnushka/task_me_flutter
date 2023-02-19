@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
-import 'package:task_me_flutter/layers/repositories/api/user.dart';
-import 'package:task_me_flutter/layers/repositories/local/user.dart';
-import 'package:task_me_flutter/layers/repositories/session/task_me.dart';
 import 'package:task_me_flutter/layers/service/config.dart';
+import 'package:task_me_flutter/layers/service/user.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class AppProviderState {
@@ -40,35 +38,24 @@ class AppProviderState {
 
 class AppProvider extends Cubit<AppProviderState> {
   AppProvider(Config config)
-      : super(
-          AppProviderState(
-            projects: [],
-            theme: lightTheme,
-            config: config,
-          ),
-        ) {
+      : super(AppProviderState(projects: [], theme: lightTheme, config: config)) {
     load();
   }
 
   final _configService = ConfigService();
-  final _userLocalRepository = UserStorage();
-  final _userApiRepository = UserApiRepository();
+  final _userService = UserService();
   final _projectApiRepository = ProjectApiRepository();
 
   Future<void> load() async {
     ApiRepository.url = state.config.apiBaseUrl;
-    final token = await _userLocalRepository.get();
     final List<Project> projects = [];
-    User? user;
-    if (token != null) {
-      ApiRepository.session = TaskMeSession(token: token);
-      final userData = await _userApiRepository.getUserMe();
-      user = userData.data;
-      if (user != null) {
-        final projectData = (await _projectApiRepository.getAll()).data;
-        projects.addAll(projectData ?? []);
-      }
+    final user = await _userService.getUserFromToken();
+
+    if (user != null) {
+      final projectData = (await _projectApiRepository.getAll()).data;
+      projects.addAll(projectData ?? []);
     }
+
     final config = (await _configService.getConfig()) ?? state.config;
 
     final stateWithTheme = state.copyWith(
@@ -88,11 +75,11 @@ class AppProvider extends Cubit<AppProviderState> {
     final config = (await _configService.getConfig()) ?? state.config;
 
     if (color != null) {
-      final userData = await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
+      final user = await _userService.editUser(state.user!.copyWith(color: color.value));
       emit(
         state.copyWith(
-          user: userData.data,
-          theme: setPrimaryColor(config.theme, Color(userData.data?.color ?? state.user!.color)),
+          user: user,
+          theme: setPrimaryColor(config.theme, Color(user?.color ?? state.user!.color)),
           config: config,
         ),
       );
@@ -107,17 +94,17 @@ class AppProvider extends Cubit<AppProviderState> {
   }
 
   Future<void> updateUser(User user) async {
-    await _userApiRepository.editUser(user);
+    await _userService.editUser(user);
     await load();
   }
 
   Future<void> setToken(String token) async {
-    await _userLocalRepository.save(token);
+    await _userService.saveToken(token);
     await load();
   }
 
   Future<void> deleteToken() async {
-    await _userLocalRepository.delete();
+    await _userService.logOut();
     await load();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_me_flutter/layers/repositories/storage.dart';
 
-class UserStorage implements AppStorage<String> {
+class UserTokenStorage implements AppStorage<String> {
   @override
   String get storageKey => 'userToken';
 

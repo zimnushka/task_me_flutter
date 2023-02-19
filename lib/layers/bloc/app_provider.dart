@@ -69,31 +69,41 @@ class AppProvider extends Cubit<AppProviderState> {
         projects.addAll(projectData ?? []);
       }
     }
+    final config = (await _configService.getConfig()) ?? state.config;
 
     final stateWithTheme = state.copyWith(
-      theme: await _generateTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
+      theme: setPrimaryColor(config.theme, user != null ? Color(user.color) : defaultPrimaryColor),
       user: user,
       nullUser: user == null,
       projects: projects,
-      config: await _configService.getConfig(),
+      config: config,
     );
     emit(stateWithTheme);
   }
 
-  Future<void> setTheme({required Color color, bool? isLightTheme}) async {
-    if (state.user != null) {
-      await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
-    }
-    emit(state.copyWith(
-        theme: await _generateTheme(color: color, isLightTheme: isLightTheme),
-        config: state.config.copyWith(isLightTheme: isLightTheme ?? state.config.isLightTheme)));
-  }
-
-  Future<ThemeData> _generateTheme({required Color color, bool? isLightTheme}) async {
+  Future<void> setTheme({Color? color, bool? isLightTheme}) async {
     if (isLightTheme != null) {
       await _configService.setNewBright(isLightTheme);
     }
-    return setPrimaryColor(await _configService.getTheme(), color);
+    final config = (await _configService.getConfig()) ?? state.config;
+
+    if (color != null) {
+      final userData = await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
+      emit(
+        state.copyWith(
+          user: userData.data,
+          theme: setPrimaryColor(config.theme, Color(userData.data?.color ?? state.user!.color)),
+          config: config,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          theme: setPrimaryColor(config.theme, Color(state.user!.color)),
+          config: config,
+        ),
+      );
+    }
   }
 
   Future<void> updateUser(User user) async {

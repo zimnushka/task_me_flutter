@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:task_me_flutter/app/configs.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/local/config.dart';
-import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class ConfigService {
   final _configStorage = ConfigStorage();
 
   Future<ThemeData> getTheme() async {
     final config = await getConfig() ?? defaultConfig;
-    return config.isLightTheme ? lightTheme : darkTheme;
+    return config.theme;
   }
 
   Future<Config> setNewBright(bool isLight) async {

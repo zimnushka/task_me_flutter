@@ -1,6 +1,3 @@
-// ignore: avoid_web_libraries_in_flutter
-// import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +8,6 @@ import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
-import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -67,15 +63,16 @@ class TaskMyApp extends StatelessWidget {
       routerDelegate: _route.routerDelegate,
       debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
-      theme: setPrimaryColor(lightTheme, defaultPrimaryColor),
       builder: (context, child) {
-        return Overlay(initialEntries: [
-          OverlayEntry(
-            builder: (context) {
-              return BlocProvider.value(value: provider, child: child);
-            },
-          )
-        ]);
+        return BlocProvider.value(
+            value: provider,
+            child: Overlay(initialEntries: [
+              OverlayEntry(
+                builder: (context) {
+                  return child ?? const SizedBox();
+                },
+              )
+            ]));
       },
     );
   }

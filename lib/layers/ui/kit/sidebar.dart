@@ -59,8 +59,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                               child: ColorSelector(
                                 initColor: Theme.of(context).primaryColor,
                                 onSetColor: (value) {
-                                  appProvider.setTheme(
-                                      isLightTheme: themeController.index == 0, color: value);
+                                  appProvider.setTheme(color: value);
                                   Navigator.pop(context);
                                 },
                               ))),
@@ -85,8 +84,7 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
             child: TabBar(
                 controller: themeController,
                 onTap: (value) {
-                  appProvider.setTheme(
-                      isLightTheme: value == 0, color: Theme.of(context).primaryColor);
+                  appProvider.setTheme(isLightTheme: value == 0);
                 },
                 indicator: BoxDecoration(
                   color: Theme.of(context).cardColor,

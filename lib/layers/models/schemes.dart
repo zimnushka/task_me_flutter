@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 
 part 'schemes.freezed.dart';
 part 'schemes.g.dart';
@@ -20,7 +21,8 @@ String? getStringDateTime(Map<dynamic, dynamic> data, String key) {
 class Config with _$Config {
   const factory Config({
     required final String apiBaseUrl,
-    required final bool setUrlFromHTML,
+    required final bool isLightTheme,
+    required final TaskViewState taskView,
     required final bool debug,
   }) = _Config;
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);

@@ -4,14 +4,13 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
-import 'package:task_me_flutter/layers/repositories/local/theme.dart';
 import 'package:task_me_flutter/layers/repositories/local/user.dart';
 import 'package:task_me_flutter/layers/repositories/session/task_me.dart';
+import 'package:task_me_flutter/layers/service/config.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class AppProviderState {
   final User? user;
-  final bool isLightTheme;
   final ThemeData theme;
   final Config config;
   final List<Project> projects;
@@ -20,7 +19,6 @@ class AppProviderState {
     required this.theme,
     required this.config,
     required this.projects,
-    this.isLightTheme = false,
     this.user,
   });
 
@@ -29,7 +27,6 @@ class AppProviderState {
     ThemeData? theme,
     bool nullUser = false,
     Config? config,
-    bool? isLightTheme,
     List<Project>? projects,
   }) {
     return AppProviderState(
@@ -37,7 +34,6 @@ class AppProviderState {
       theme: theme ?? this.theme,
       projects: projects ?? this.projects,
       user: nullUser ? null : user ?? this.user,
-      isLightTheme: isLightTheme ?? this.isLightTheme,
     );
   }
 }
@@ -54,14 +50,14 @@ class AppProvider extends Cubit<AppProviderState> {
     load();
   }
 
-  final ThemeLocalRepository _themeLocalRepository = ThemeLocalRepository();
-  final UserLocalRepository _userLocalRepository = UserLocalRepository();
-  final UserApiRepository _userApiRepository = UserApiRepository();
-  final ProjectApiRepository _projectApiRepository = ProjectApiRepository();
+  final _configService = ConfigService();
+  final _userLocalRepository = UserStorage();
+  final _userApiRepository = UserApiRepository();
+  final _projectApiRepository = ProjectApiRepository();
 
   Future<void> load() async {
     ApiRepository.url = state.config.apiBaseUrl;
-    final token = await _userLocalRepository.getUser();
+    final token = await _userLocalRepository.get();
     final List<Project> projects = [];
     User? user;
     if (token != null) {
@@ -79,7 +75,7 @@ class AppProvider extends Cubit<AppProviderState> {
       user: user,
       nullUser: user == null,
       projects: projects,
-      isLightTheme: await _themeLocalRepository.getThemeBool(),
+      config: await _configService.getConfig(),
     );
     emit(stateWithTheme);
   }
@@ -89,16 +85,15 @@ class AppProvider extends Cubit<AppProviderState> {
       await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
     }
     emit(state.copyWith(
-      theme: await _generateTheme(color: color, isLightTheme: isLightTheme),
-      isLightTheme: isLightTheme,
-    ));
+        theme: await _generateTheme(color: color, isLightTheme: isLightTheme),
+        config: state.config.copyWith(isLightTheme: isLightTheme ?? state.config.isLightTheme)));
   }
 
   Future<ThemeData> _generateTheme({required Color color, bool? isLightTheme}) async {
     if (isLightTheme != null) {
-      await _themeLocalRepository.setTheme(isLight: isLightTheme);
+      await _configService.setNewBright(isLightTheme);
     }
-    return setPrimaryColor(await _themeLocalRepository.getTheme(), color);
+    return setPrimaryColor(await _configService.getTheme(), color);
   }
 
   Future<void> updateUser(User user) async {
@@ -107,12 +102,12 @@ class AppProvider extends Cubit<AppProviderState> {
   }
 
   Future<void> setToken(String token) async {
-    await _userLocalRepository.setUser(token);
+    await _userLocalRepository.save(token);
     await load();
   }
 
   Future<void> deleteToken() async {
-    await _userLocalRepository.deleteUser();
+    await _userLocalRepository.delete();
     await load();
   }
 }

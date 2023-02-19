@@ -20,8 +20,8 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
-  late final themeController =
-      TabController(initialIndex: appProvider.state.isLightTheme ? 0 : 1, length: 2, vsync: this);
+  late final themeController = TabController(
+      initialIndex: appProvider.state.config.isLightTheme ? 0 : 1, length: 2, vsync: this);
   late final AppProvider appProvider = context.watch<AppProvider>();
 
   Future<void> showProjectEditor({Project? project}) async {

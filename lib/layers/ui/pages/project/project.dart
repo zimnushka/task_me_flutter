@@ -76,10 +76,11 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> with TickerProviderStateMixin {
-  late final User user = context.read<AppProvider>().state.user!;
+  late final appProvider = context.read<AppProvider>();
+  late final User user = appProvider.state.user!;
   late final TabController tabController;
-  late final TaskBloc _taskBloc =
-      TaskBloc((id) => _bloc(context).add(OnTaskTap(id)), widget.state.tasks);
+  late final TaskBloc _taskBloc = TaskBloc((id) => _bloc(context).add(OnTaskTap(id)),
+      widget.state.tasks, appProvider.state.config.taskView);
   final tabs = [const Tab(text: 'Tasks'), const Tab(text: 'Users')];
   final controller = ScrollController();
 

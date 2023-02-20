@@ -5,7 +5,7 @@ import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/home/home_event.dart';
 import 'package:task_me_flutter/layers/bloc/home/home_state.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/user_editor.dart';
+import 'package:task_me_flutter/layers/ui/pages/settings/settings.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 class HomeBloc extends Bloc<HomeEvent, AppState> {
@@ -29,7 +29,8 @@ class HomeBloc extends Bloc<HomeEvent, AppState> {
   }
 
   Future<void> _onHeaderButtonTap(OnHeaderButtonTap event, Emitter emit) async {
-    await AppRouter.dialog((context) => const UserEditDialog());
+    // await AppRouter.dialog((context) => const UserEditDialog());
+    await AppRouter.goTo(SettingsPage.route());
   }
 
   Future<void> _onTaskTap(OnTaskTap event, Emitter emit) async {

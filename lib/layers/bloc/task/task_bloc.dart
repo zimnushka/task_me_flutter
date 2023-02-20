@@ -15,11 +15,14 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
   final _taskService = TaskService();
   final _userApiRepository = UserApiRepository();
 
-  TaskBloc(this._onTaskClick, List<TaskUi> tasks)
-      : super(TaskState(
+  TaskBloc(
+    this._onTaskClick,
+    List<TaskUi> tasks,
+    TaskViewState state,
+  ) : super(TaskState(
           tasks: tasks,
           openedStatuses: TaskStatus.values,
-          state: TaskViewState.list,
+          state: state,
         )) {
     on<OnTaskTap>(_onTaskTap);
     on<OnTaskStatusTap>(_onTaskStatusTap);

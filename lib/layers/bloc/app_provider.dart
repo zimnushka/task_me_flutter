@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
@@ -106,5 +107,10 @@ class AppProvider extends Cubit<AppProviderState> {
   Future<void> deleteToken() async {
     await _userService.logOut();
     await load();
+  }
+
+  Future<void> changeTaskView(TaskViewState taskViewState) async {
+    final config = await _configService.setNewTaskView(taskViewState);
+    emit(state.copyWith(config: config));
   }
 }

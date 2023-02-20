@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:task_me_flutter/app/configs.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/local/config.dart';
 
@@ -16,6 +17,13 @@ class ConfigService {
   Future<Config> setNewBright(bool isLight) async {
     final config = await getConfig() ?? defaultConfig;
     final newConfig = config.copyWith(isLightTheme: isLight);
+    await setConfig(newConfig);
+    return newConfig;
+  }
+
+  Future<Config> setNewTaskView(TaskViewState state) async {
+    final config = await getConfig() ?? defaultConfig;
+    final newConfig = config.copyWith(taskView: state);
     await setConfig(newConfig);
     return newConfig;
   }

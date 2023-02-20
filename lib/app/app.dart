@@ -7,6 +7,7 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/landing.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
+import 'package:task_me_flutter/layers/ui/pages/settings/settings.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -23,6 +24,11 @@ class TaskMyApp extends StatelessWidget {
         name: 'home',
         path: '/',
         pageBuilder: (context, state) => builder(state, const HomePage()),
+      ),
+      GoRoute(
+        name: 'settings',
+        path: '/settings',
+        pageBuilder: (context, state) => builder(state, const SettingsPage()),
       ),
       GoRoute(
         name: 'project',

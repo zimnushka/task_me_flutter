@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
-import 'package:task_me_flutter/layers/repositories/api/user.dart';
-import 'package:task_me_flutter/layers/repositories/local/theme.dart';
-import 'package:task_me_flutter/layers/repositories/local/user.dart';
-import 'package:task_me_flutter/layers/repositories/session/task_me.dart';
+import 'package:task_me_flutter/layers/service/config.dart';
+import 'package:task_me_flutter/layers/service/user.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class AppProviderState {
   final User? user;
-  final bool isLightTheme;
   final ThemeData theme;
   final Config config;
   final List<Project> projects;
@@ -20,7 +18,6 @@ class AppProviderState {
     required this.theme,
     required this.config,
     required this.projects,
-    this.isLightTheme = false,
     this.user,
   });
 
@@ -29,7 +26,6 @@ class AppProviderState {
     ThemeData? theme,
     bool nullUser = false,
     Config? config,
-    bool? isLightTheme,
     List<Project>? projects,
   }) {
     return AppProviderState(
@@ -37,82 +33,84 @@ class AppProviderState {
       theme: theme ?? this.theme,
       projects: projects ?? this.projects,
       user: nullUser ? null : user ?? this.user,
-      isLightTheme: isLightTheme ?? this.isLightTheme,
     );
   }
 }
 
 class AppProvider extends Cubit<AppProviderState> {
   AppProvider(Config config)
-      : super(
-          AppProviderState(
-            projects: [],
-            theme: lightTheme,
-            config: config,
-          ),
-        ) {
+      : super(AppProviderState(projects: [], theme: lightTheme, config: config)) {
     load();
   }
 
-  final ThemeLocalRepository _themeLocalRepository = ThemeLocalRepository();
-  final UserLocalRepository _userLocalRepository = UserLocalRepository();
-  final UserApiRepository _userApiRepository = UserApiRepository();
-  final ProjectApiRepository _projectApiRepository = ProjectApiRepository();
+  final _configService = ConfigService();
+  final _userService = UserService();
+  final _projectApiRepository = ProjectApiRepository();
 
   Future<void> load() async {
     ApiRepository.url = state.config.apiBaseUrl;
-    final token = await _userLocalRepository.getUser();
     final List<Project> projects = [];
-    User? user;
-    if (token != null) {
-      ApiRepository.session = TaskMeSession(token: token);
-      final userData = await _userApiRepository.getUserMe();
-      user = userData.data;
-      if (user != null) {
-        final projectData = (await _projectApiRepository.getAll()).data;
-        projects.addAll(projectData ?? []);
-      }
+    final user = await _userService.getUserFromToken();
+
+    if (user != null) {
+      final projectData = (await _projectApiRepository.getAll()).data;
+      projects.addAll(projectData ?? []);
     }
 
+    final config = (await _configService.getConfig()) ?? state.config;
+
     final stateWithTheme = state.copyWith(
-      theme: await _generateTheme(color: user != null ? Color(user.color) : defaultPrimaryColor),
+      theme: setPrimaryColor(config.theme, user != null ? Color(user.color) : defaultPrimaryColor),
       user: user,
       nullUser: user == null,
       projects: projects,
-      isLightTheme: await _themeLocalRepository.getThemeBool(),
+      config: config,
     );
     emit(stateWithTheme);
   }
 
-  Future<void> setTheme({required Color color, bool? isLightTheme}) async {
-    if (state.user != null) {
-      await _userApiRepository.editUser(state.user!.copyWith(color: color.value));
-    }
-    emit(state.copyWith(
-      theme: await _generateTheme(color: color, isLightTheme: isLightTheme),
-      isLightTheme: isLightTheme,
-    ));
-  }
-
-  Future<ThemeData> _generateTheme({required Color color, bool? isLightTheme}) async {
+  Future<void> setTheme({Color? color, bool? isLightTheme}) async {
     if (isLightTheme != null) {
-      await _themeLocalRepository.setTheme(isLight: isLightTheme);
+      await _configService.setNewBright(isLightTheme);
     }
-    return setPrimaryColor(await _themeLocalRepository.getTheme(), color);
+    final config = (await _configService.getConfig()) ?? state.config;
+
+    if (color != null) {
+      final user = await _userService.editUser(state.user!.copyWith(color: color.value));
+      emit(
+        state.copyWith(
+          user: user,
+          theme: setPrimaryColor(config.theme, Color(user?.color ?? state.user!.color)),
+          config: config,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          theme: setPrimaryColor(config.theme, Color(state.user!.color)),
+          config: config,
+        ),
+      );
+    }
   }
 
   Future<void> updateUser(User user) async {
-    await _userApiRepository.editUser(user);
+    await _userService.editUser(user);
     await load();
   }
 
   Future<void> setToken(String token) async {
-    await _userLocalRepository.setUser(token);
+    await _userService.saveToken(token);
     await load();
   }
 
   Future<void> deleteToken() async {
-    await _userLocalRepository.deleteUser();
+    await _userService.logOut();
     await load();
+  }
+
+  Future<void> changeTaskView(TaskViewState taskViewState) async {
+    final config = await _configService.setNewTaskView(taskViewState);
+    emit(state.copyWith(config: config));
   }
 }

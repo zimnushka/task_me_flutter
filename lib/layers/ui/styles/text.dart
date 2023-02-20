@@ -37,7 +37,7 @@ class AppTitleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: TextStyle(fontSize: 20, fontWeight: weight, color: color));
+    return Text(text, style: TextStyle(fontSize: 18, fontWeight: weight, color: color));
   }
 }
 

@@ -113,11 +113,8 @@ class _IntervalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: isFirst
-            ? const BorderRadius.vertical(top: radius)
-            : isLast
-                ? const BorderRadius.vertical(bottom: radius)
-                : null,
+        borderRadius: BorderRadius.vertical(
+            top: isFirst ? radius : Radius.zero, bottom: isLast ? radius : Radius.zero),
         color: Theme.of(context).cardColor,
       ),
       child: ListTile(

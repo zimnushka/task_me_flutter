@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/ui/kit/overlays/color_selector.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
 import 'package:task_me_flutter/layers/ui/pages/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
@@ -19,9 +18,7 @@ class SideBar extends StatefulWidget {
   State<SideBar> createState() => _SideBarState();
 }
 
-class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
-  late final themeController =
-      TabController(initialIndex: appProvider.state.isLightTheme ? 0 : 1, length: 2, vsync: this);
+class _SideBarState extends State<SideBar> {
   late final AppProvider appProvider = context.watch<AppProvider>();
 
   Future<void> showProjectEditor({Project? project}) async {
@@ -48,64 +45,10 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
           ListTile(
             onTap: () => AppRouter.goTo(HomePage.route()),
             contentPadding: EdgeInsets.zero,
-            leading: GestureDetector(
-              onTap: () => AppRouter.dialog((context) => Center(
-                    child: Card(
-                      child: SizedBox(
-                          width: 320,
-                          height: 420,
-                          child: Padding(
-                              padding: const EdgeInsets.all(defaultPadding),
-                              child: ColorSelector(
-                                initColor: Theme.of(context).primaryColor,
-                                onSetColor: (value) {
-                                  appProvider.setTheme(
-                                      isLightTheme: themeController.index == 0, color: value);
-                                  Navigator.pop(context);
-                                },
-                              ))),
-                    ),
-                  )),
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+            leading: CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
             minLeadingWidth: 10,
             title: AppText(appProvider.state.user!.name, weight: FontWeight.bold),
             subtitle: Text(appProvider.state.user!.email),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 40,
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
-              borderRadius: const BorderRadius.all(radius),
-            ),
-            child: TabBar(
-                controller: themeController,
-                onTap: (value) {
-                  appProvider.setTheme(
-                      isLightTheme: value == 0, color: Theme.of(context).primaryColor);
-                },
-                indicator: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.all(radius),
-                ),
-                tabs: [
-                  Tab(
-                    child: Text(
-                      'light',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      'dark',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ]),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
@@ -160,14 +103,6 @@ class _SideBarState extends State<SideBar> with TickerProviderStateMixin {
                     ),
                   ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Divider(),
-          ),
-          TextButton(
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-              onPressed: appProvider.deleteToken,
-              child: const Text('logout')),
         ],
       ),
     );
@@ -185,8 +120,7 @@ class ProjectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-        child: ListTile(
+    return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
       leading: DecoratedBox(
@@ -201,6 +135,6 @@ class ProjectButton extends StatelessWidget {
       ),
       minLeadingWidth: 10,
       title: Text(item.title),
-    ));
+    );
   }
 }

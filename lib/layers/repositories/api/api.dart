@@ -23,7 +23,6 @@ abstract class ApiRepository {
   static _updateDio() {
     _dio = Dio(BaseOptions(
       baseUrl: _url ?? '',
-      connectTimeout: 10000,
       headers: _session?.sign(),
       followRedirects: false,
     ))

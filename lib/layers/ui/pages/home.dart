@@ -66,12 +66,12 @@ class _Body extends StatefulWidget {
   State<_Body> createState() => _BodyState();
 }
 
-class _BodyState extends State<_Body> with TickerProviderStateMixin {
-  late final TaskBloc _taskBloc = TaskBloc((id) => _bloc(context).add(OnTaskTap(id)),
-      widget.state.tasks.map((e) => TaskUi(e, [])).toList());
+class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
+    final TaskBloc _taskBloc = TaskBloc((id) => _bloc(context).add(OnTaskTap(id)),
+        widget.state.tasks.map((e) => TaskUi(e, [])).toList(), provider.state.config.taskView);
     return Padding(
       padding: const EdgeInsets.only(top: defaultPadding),
       child: CustomScrollView(
@@ -113,7 +113,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                               backgroundColor: Colors.white,
                               foregroundColor: Theme.of(context).primaryColor),
                           onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
-                          child: const Text('Edit'),
+                          child: const Text('Settings'),
                         )
                       ],
                     ),

@@ -48,4 +48,4 @@ const defaultPrimaryColor = Color.fromARGB(255, 76, 175, 158);
 const radius = Radius.circular(10);
 const double defaultPadding = 20;
 
-const double kSideBarWidth = 250;
+const double kSideBarWidth = 230;

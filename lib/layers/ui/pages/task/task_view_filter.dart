@@ -35,6 +35,12 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
   }
 
   @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = _bloc(context).state;
     if (state is TaskState) {
@@ -77,7 +83,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.sort,
+                            TaskViewState.list.icon,
                             size: 14,
                             color: Theme.of(context).textTheme.bodyMedium!.color,
                           ),
@@ -85,7 +91,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
                             Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: AppText(
-                                'List',
+                                TaskViewState.list.label,
                                 color: Theme.of(context).textTheme.bodyMedium!.color,
                               ),
                             ),
@@ -97,7 +103,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.auto_awesome_mosaic_outlined,
+                            TaskViewState.board.icon,
                             size: 14,
                             color: Theme.of(context).textTheme.bodyMedium!.color,
                           ),
@@ -105,7 +111,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
                             Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: AppText(
-                                'Board',
+                                TaskViewState.board.label,
                                 color: Theme.of(context).textTheme.bodyMedium!.color,
                               ),
                             ),

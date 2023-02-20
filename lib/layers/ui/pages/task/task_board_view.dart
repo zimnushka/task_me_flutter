@@ -57,85 +57,81 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
           width: double.infinity,
           child: Stack(
             children: [
-              Expanded(
-                child: Scrollbar(
+              Scrollbar(
+                controller: controller,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 15),
                   controller: controller,
-                  thumbVisibility: true,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    controller: controller,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: TaskStatus.values.map((e) {
-                        final List<TaskUi> tasks = widget.state.tasks
-                            .where((element) => element.task.status == e)
-                            .toList();
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: DragTarget<TaskUi>(onAccept: (data) {
-                            if (data.task.status != e) {
-                              _bloc(context).add(OnChangeTaskStatus(data, e));
-                            }
-                          }, builder: (context, items, _) {
-                            return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(radius),
-                                  color: e.color.withOpacity(0.1),
-                                ),
-                                width: _widthColumn,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: TaskBoardStatusHeader(
-                                          status: e, tasksCount: tasks.length),
-                                    ),
-                                    if (items.isNotEmpty && items.first?.task.status != e)
-                                      SizedBox(
-                                        width: _widthColumn,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: TaskBoardCard(
-                                              color: Theme.of(context).cardColor.withOpacity(0.8),
-                                              item: items.first!,
-                                              onTap: () {}),
-                                        ),
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: TaskStatus.values.map((e) {
+                      final List<TaskUi> tasks =
+                          widget.state.tasks.where((element) => element.task.status == e).toList();
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: DragTarget<TaskUi>(onAccept: (data) {
+                          if (data.task.status != e) {
+                            _bloc(context).add(OnChangeTaskStatus(data, e));
+                          }
+                        }, builder: (context, items, _) {
+                          return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(radius),
+                                color: e.color.withOpacity(0.1),
+                              ),
+                              width: _widthColumn,
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child:
+                                        TaskBoardStatusHeader(status: e, tasksCount: tasks.length),
+                                  ),
+                                  if (items.isNotEmpty && items.first?.task.status != e)
+                                    SizedBox(
+                                      width: _widthColumn,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: TaskBoardCard(
+                                            color: Theme.of(context).cardColor.withOpacity(0.8),
+                                            item: items.first!,
+                                            onTap: () {}),
                                       ),
-                                    Expanded(
-                                      child: ListView.builder(
-                                          padding: const EdgeInsets.all(10),
-                                          itemCount: tasks.length,
-                                          itemBuilder: (context, index) {
-                                            final item = tasks[index];
-                                            return Draggable<TaskUi>(
-                                              data: item,
-                                              feedback: Theme(
-                                                data: Theme.of(context),
-                                                child: SizedBox(
-                                                    width: _widthColumn,
-                                                    child: TaskBoardCard(item: item, onTap: () {})),
-                                              ),
-                                              childWhenDragging: TaskBoardCard(
-                                                  color:
-                                                      Theme.of(context).cardColor.withOpacity(0.8),
-                                                  item: item,
-                                                  onTap: () {}),
-                                              child: TaskBoardCard(
-                                                item: item,
-                                                onTap: () => _bloc(context).add(
-                                                  OnTaskTap(item.task.id!),
-                                                ),
-                                              ),
-                                            );
-                                          }),
                                     ),
-                                  ],
-                                ));
-                          }),
-                        );
-                      }).toList(),
-                    ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                        padding: const EdgeInsets.all(10),
+                                        itemCount: tasks.length,
+                                        itemBuilder: (context, index) {
+                                          final item = tasks[index];
+                                          return Draggable<TaskUi>(
+                                            data: item,
+                                            feedback: Theme(
+                                              data: Theme.of(context),
+                                              child: SizedBox(
+                                                  width: _widthColumn,
+                                                  child: TaskBoardCard(item: item, onTap: () {})),
+                                            ),
+                                            childWhenDragging: TaskBoardCard(
+                                                color: Theme.of(context).cardColor.withOpacity(0.8),
+                                                item: item,
+                                                onTap: () {}),
+                                            child: TaskBoardCard(
+                                              item: item,
+                                              onTap: () => _bloc(context).add(
+                                                OnTaskTap(item.task.id!),
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                ],
+                              ));
+                        }),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
+import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/color_selector.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/user_editor.dart';
 import 'package:task_me_flutter/layers/ui/pages/settings/theme_previev.dart';
@@ -57,7 +58,14 @@ class __BodyState extends State<_Body> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _MainHeader(title: 'Profile', subTitle: 'This info change for all devices'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  BackButton(),
+                  AppMainTitleText('Settings'),
+                ],
+              ),
+              const SizedBox(height: defaultPadding * 2),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: GridView.count(
@@ -174,6 +182,18 @@ class __BodyState extends State<_Body> {
                 title: 'Task view',
                 subTitle: 'Default task view',
               ),
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  children: TaskViewState.values
+                      .map((e) => _TaskViewCard(
+                            isActive: appProvider.state.config.taskView == e,
+                            onTap: () => appProvider.changeTaskView(e),
+                            state: e,
+                          ))
+                      .toList(),
+                ),
+              ),
               const _Divider(),
               const _Header(
                 title: 'Logout',
@@ -188,29 +208,6 @@ class __BodyState extends State<_Body> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _MainHeader extends StatelessWidget {
-  const _MainHeader({
-    required this.title,
-    required this.subTitle,
-  });
-  final String title;
-  final String subTitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppMainTitleText(title),
-        const SizedBox(height: 5),
-        AppText(subTitle),
-        const SizedBox(height: defaultPadding * 2),
-      ],
     );
   }
 }
@@ -250,6 +247,59 @@ class _Divider extends StatelessWidget {
         Divider(),
         SizedBox(height: defaultPadding),
       ],
+    );
+  }
+}
+
+class _TaskViewCard extends StatelessWidget {
+  const _TaskViewCard({
+    required this.isActive,
+    required this.onTap,
+    required this.state,
+  });
+  final bool isActive;
+  final TaskViewState state;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 10, bottom: 10),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(radius),
+              color: Theme.of(context).colorScheme.background,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  state.icon,
+                ),
+                const SizedBox(
+                  width: defaultPadding,
+                ),
+                AppText(
+                  state.label,
+                  weight: FontWeight.bold,
+                ),
+              ],
+            ),
+          ),
+          if (isActive)
+            const Positioned(
+                top: 0,
+                left: 0,
+                child: Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                ))
+        ],
+      ),
     );
   }
 }

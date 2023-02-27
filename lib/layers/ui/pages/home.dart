@@ -44,13 +44,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => HomeBloc()..add(Load()),
-      child: const _ProjectView(),
+      child: const _HomeView(),
     );
   }
 }
 
-class _ProjectView extends StatelessWidget {
-  const _ProjectView();
+class _HomeView extends StatelessWidget {
+  const _HomeView();
   @override
   Widget build(BuildContext context) {
     return BlocStateBuilder<HomeBloc>(builder: (state, context) {
@@ -98,19 +98,6 @@ class _BodyState extends State<_Body> {
                 sliver: SliverAppBar(
                   automaticallyImplyLeading: false,
                   title: AppMainTitleText(provider.state.user!.name),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 14),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Theme.of(context).primaryColor,
-                        ),
-                        onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
-                        child: const Text('Settings'),
-                      ),
-                    ),
-                  ],
                   centerTitle: false,
                   pinned: true,
                   snap: false,
@@ -119,19 +106,32 @@ class _BodyState extends State<_Body> {
                   backgroundColor: Theme.of(context).primaryColor,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
                   flexibleSpace: FlexibleSpaceBar(
-                      background: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      defaultPadding,
-                      45,
-                      defaultPadding,
-                      defaultPadding,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppText(provider.state.user!.email),
-                        SingleChildScrollView(
+                      background: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(defaultPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 40),
+                              const AppSmallText('Email', color: Colors.white),
+                              AppTitleText(provider.state.user!.email, color: Colors.white),
+                              const SizedBox(height: defaultPadding),
+                              const AppSmallText('Hourly payment', color: Colors.white),
+                              AppTitleText('${provider.state.user!.cost}', color: Colors.white),
+                              const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: SingleChildScrollView(
+                          padding:
+                              const EdgeInsets.only(left: defaultPadding, right: defaultPadding),
                           reverse: true,
                           physics: const NeverScrollableScrollPhysics(),
                           scrollDirection: Axis.horizontal,
@@ -144,7 +144,7 @@ class _BodyState extends State<_Body> {
                             },
                             colorMode: ColorMode.color,
                             textColor: Colors.white,
-                            size: 15,
+                            size: 20,
                             fontSize: 10,
                             borderRadius: 2.5,
                             showText: false,
@@ -160,9 +160,26 @@ class _BodyState extends State<_Body> {
                             },
                           ),
                         ),
+                      ),
+                    ],
+                  )),
+                  bottom: PreferredSize(
+                    preferredSize: const Size(double.infinity, 40),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, bottom: 10),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Theme.of(context).primaryColor),
+                            onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
+                            child: const Text('Settings'),
+                          ),
+                        ),
                       ],
                     ),
-                  )),
+                  ),
                 ),
               ),
               TaskViewFilter(onChangeView: (view) async {

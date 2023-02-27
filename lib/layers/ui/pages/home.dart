@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
@@ -97,6 +98,19 @@ class _BodyState extends State<_Body> {
                 sliver: SliverAppBar(
                   automaticallyImplyLeading: false,
                   title: AppMainTitleText(provider.state.user!.name),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 14),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
+                        child: const Text('Settings'),
+                      ),
+                    ),
+                  ],
                   centerTitle: false,
                   pinned: true,
                   snap: false,
@@ -105,102 +119,50 @@ class _BodyState extends State<_Body> {
                   backgroundColor: Theme.of(context).primaryColor,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
                   flexibleSpace: FlexibleSpaceBar(
-                      background: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(defaultPadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Expanded(child: SizedBox()),
-                            const Text('Email',
-                                style: TextStyle(color: Colors.white, fontSize: 12)),
-                            Text(provider.state.user!.email,
-                                style: const TextStyle(color: Colors.white, fontSize: 18)),
-                            const SizedBox(height: defaultPadding),
-                            const Text('Hourly payment',
-                                style: TextStyle(color: Colors.white, fontSize: 12)),
-                            Text(provider.state.user!.cost.toString(),
-                                style: const TextStyle(color: Colors.white, fontSize: 18)),
-                            const Expanded(child: SizedBox()),
-                          ],
-                        ),
-                      ),
-                      if (widget.state.tasks.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(defaultPadding),
-                          child: Container(
-                            decoration:
-                                const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                            width: 200,
-                            height: 200,
-                            child: Stack(
-                              children: [
-                                SfCircularChart(
-                                  borderWidth: 0,
-                                  series: <CircularSeries>[
-                                    DoughnutSeries<TaskStatus, String>(
-                                      radius: '100%',
-                                      innerRadius: '80%',
-                                      dataSource: TaskStatus.values,
-                                      pointColorMapper: (data, index) => data.color,
-                                      xValueMapper: (data, _) => data.label,
-                                      yValueMapper: (data, _) =>
-                                          widget.state.tasks
-                                              .where((element) => element.status == data)
-                                              .length /
-                                          widget.state.tasks.length *
-                                          100,
-                                    )
-                                  ],
-                                ),
-                                Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('closed tasks',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall!
-                                              .copyWith(color: Theme.of(context).primaryColor)),
-                                      Text(
-                                          widget.state.tasks
-                                              .where(
-                                                  (element) => element.status == TaskStatus.closed)
-                                              .length
-                                              .toString(),
-                                          style: TextStyle(
-                                              fontSize: 40, color: Theme.of(context).primaryColor)),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      else
-                        const SizedBox()
-                    ],
-                  )),
-                  bottom: PreferredSize(
-                    preferredSize: const Size(double.infinity, 40),
-                    child: Row(
+                      background: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      defaultPadding,
+                      45,
+                      defaultPadding,
+                      defaultPadding,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: defaultPadding, bottom: defaultPadding),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Theme.of(context).primaryColor),
-                            onPressed: () => _bloc(context).add(OnHeaderButtonTap()),
-                            child: const Text('Settings'),
+                        AppText(provider.state.user!.email),
+                        SingleChildScrollView(
+                          reverse: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          child: HeatMap(
+                            datasets: {
+                              DateTime(2023, 2, 8): 1,
+                              DateTime(2023, 2, 9): 2,
+                              DateTime(2023, 2, 10): 3,
+                              DateTime(2023, 2, 11): 4,
+                            },
+                            colorMode: ColorMode.color,
+                            textColor: Colors.white,
+                            size: 15,
+                            fontSize: 10,
+                            borderRadius: 2.5,
+                            showText: false,
+                            scrollable: false,
+                            showColorTip: false,
+                            defaultColor: Colors.white,
+                            colorTipCount: 4,
+                            colorsets: {
+                              1: Theme.of(context).primaryColor.withOpacity(0.2),
+                              2: Theme.of(context).primaryColor.withOpacity(0.4),
+                              3: Theme.of(context).primaryColor.withOpacity(0.6),
+                              4: Theme.of(context).primaryColor.withOpacity(0.8),
+                            },
                           ),
                         ),
                       ],
                     ),
-                  ),
+                  )),
                 ),
               ),
               TaskViewFilter(onChangeView: (view) async {

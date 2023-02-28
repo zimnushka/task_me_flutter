@@ -53,7 +53,7 @@ class _SideBarState extends State<SideBar> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTitleText(appProvider.state.user!.name),
+                        AppText(appProvider.state.user!.name, weight: FontWeight.bold),
                         AppSmallText(appProvider.state.user!.email),
                       ],
                     ),

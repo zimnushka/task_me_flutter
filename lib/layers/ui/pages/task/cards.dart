@@ -99,15 +99,13 @@ class TaskListCard extends StatelessWidget {
               child: GestureDetector(
                   onTap: onTap,
                   child: Row(children: [
-                    Expanded(
-                        child: Text(item.task.title,
-                            maxLines: 2, style: const TextStyle(fontSize: 16))),
+                    Expanded(child: AppText(item.task.title)),
                     const SizedBox(width: defaultPadding),
                     MultiUserShow(item.users),
                     const SizedBox(width: defaultPadding),
                     SizedBox(
                         width: 80,
-                        child: Text(
+                        child: AppText(
                             '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
                   ])),
             ),

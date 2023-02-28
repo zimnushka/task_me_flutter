@@ -147,7 +147,7 @@ class _TaskTitleEditorState extends State<_TaskTitleEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text('Title'),
+        const AppText('Title'),
         const SizedBox(height: 10),
         TextField(
           onChanged: widget.onChanged,
@@ -208,7 +208,7 @@ class __TaskDescriptionEditorState extends State<_TaskDescriptionEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text('Description'),
+        const AppText('Description'),
         if (!widget.readOnly)
           Padding(
             padding: const EdgeInsets.only(top: 10),

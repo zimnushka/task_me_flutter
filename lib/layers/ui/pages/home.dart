@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';

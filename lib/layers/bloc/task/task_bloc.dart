@@ -76,10 +76,11 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
         taskUIList
             .add(event.taskUi.copyWith(task: event.taskUi.task.copyWith(status: event.status)));
         taskUIList.sort((a, b) => a.task.status.index.compareTo(b.task.status.index));
+        final filteredTasks = currentState.filter.getTaskByFilter(taskUIList);
         emit(
           TaskState(
             tasks: taskUIList,
-            filteredTasks: currentState.filteredTasks,
+            filteredTasks: filteredTasks,
             state: currentState.state,
             filter: currentState.filter,
           ),
@@ -94,14 +95,13 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
 
   Future<void> _onTaskFilterChange(OnTaskFilterChange event, Emitter emit) async {
     final currentState = state as TaskState;
-    if (event.filter != currentState.filter) {
-      final filteredTasks = event.filter.getTaskByFilter(currentState.tasks);
-      emit(
-        currentState.copyWith(
-          filteredTasks: filteredTasks,
-          filter: event.filter,
-        ),
-      );
-    }
+
+    final filteredTasks = event.filter.getTaskByFilter(currentState.tasks);
+    emit(
+      currentState.copyWith(
+        filteredTasks: filteredTasks,
+        filter: event.filter,
+      ),
+    );
   }
 }

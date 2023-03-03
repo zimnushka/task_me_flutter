@@ -34,6 +34,33 @@ class Config with _$Config {
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 }
 
+@Freezed(makeCollectionsUnmodifiable: false)
+class TaskViewFilterModel with _$TaskViewFilterModel {
+  const factory TaskViewFilterModel({
+    required final List<TaskStatus> openedStatuses,
+    final String? text,
+  }) = _TaskViewFilterModel;
+
+  const TaskViewFilterModel._();
+
+  List<TaskUi> getTaskByFilter(List<TaskUi> tasks) {
+    List<TaskUi> filteredTasks = List.of(tasks);
+    if (text != null) {
+      filteredTasks = filteredTasks
+          .where(
+            (element) => element.task.title.toUpperCase().contains(
+                  text!.toUpperCase(),
+                ),
+          )
+          .toList();
+    }
+    return filteredTasks;
+  }
+
+  factory TaskViewFilterModel.fromJson(Map<String, dynamic> json) =>
+      _$TaskViewFilterModelFromJson(json);
+}
+
 @freezed
 class User with _$User {
   factory User({

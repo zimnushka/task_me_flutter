@@ -58,6 +58,10 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
           children: [
             Expanded(
               child: TextField(
+                  onChanged: (text) {
+                    final filter = (_bloc(context).state as TaskState).filter;
+                    _bloc(context).add(OnTaskFilterChange(filter.copyWith(text: text)));
+                  },
                   decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       hintText: 'Search',

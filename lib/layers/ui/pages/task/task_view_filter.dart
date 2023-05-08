@@ -1,8 +1,9 @@
 part of 'task_view.dart';
 
 class TaskViewFilter extends StatefulWidget {
-  const TaskViewFilter({required this.onChangeView});
+  const TaskViewFilter({required this.onChangeView, this.taskViewStateSwitch = true});
   final Function(TaskViewState) onChangeView;
+  final bool taskViewStateSwitch;
 
   @override
   State<TaskViewFilter> createState() => TaskViewFilterState();
@@ -67,65 +68,69 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
                       hintText: 'Search',
                       fillColor: Theme.of(context).cardColor)),
             ),
-            const SizedBox(width: 10),
-            Container(
-              height: 40,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(radius), color: Theme.of(context).cardColor),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: TabBar(
-                  isScrollable: true,
-                  controller: tabController,
-                  indicator: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
-                    borderRadius: const BorderRadius.all(radius),
+            if (widget.taskViewStateSwitch)
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(radius),
+                      color: Theme.of(context).cardColor),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: TabBar(
+                      isScrollable: true,
+                      controller: tabController,
+                      indicator: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        borderRadius: const BorderRadius.all(radius),
+                      ),
+                      tabs: [
+                        Tab(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                TaskViewState.list.icon,
+                                size: 14,
+                                color: Theme.of(context).textTheme.bodyMedium!.color,
+                              ),
+                              if (tabController.index == 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: AppText(
+                                    TaskViewState.list.label,
+                                    color: Theme.of(context).textTheme.bodyMedium!.color,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                TaskViewState.board.icon,
+                                size: 14,
+                                color: Theme.of(context).textTheme.bodyMedium!.color,
+                              ),
+                              if (tabController.index == 1)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: AppText(
+                                    TaskViewState.board.label,
+                                    color: Theme.of(context).textTheme.bodyMedium!.color,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  tabs: [
-                    Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            TaskViewState.list.icon,
-                            size: 14,
-                            color: Theme.of(context).textTheme.bodyMedium!.color,
-                          ),
-                          if (tabController.index == 0)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: AppText(
-                                TaskViewState.list.label,
-                                color: Theme.of(context).textTheme.bodyMedium!.color,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            TaskViewState.board.icon,
-                            size: 14,
-                            color: Theme.of(context).textTheme.bodyMedium!.color,
-                          ),
-                          if (tabController.index == 1)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: AppText(
-                                TaskViewState.board.label,
-                                color: Theme.of(context).textTheme.bodyMedium!.color,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            )
+              )
           ],
         ),
       ),

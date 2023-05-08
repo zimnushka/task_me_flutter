@@ -16,7 +16,7 @@ const defaultConfig = Config(
 
 const debugConfig = Config(
   apiBaseUrl: 'http://localhost:8080',
-  debug: false,
+  debug: true,
   isLightTheme: true,
   taskView: TaskViewState.list,
 );

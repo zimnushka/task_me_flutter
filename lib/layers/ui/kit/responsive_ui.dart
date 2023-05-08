@@ -31,62 +31,57 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
         padding: const EdgeInsets.all(10),
         child: widget.sideBar,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: double.infinity, maxWidth: 1500),
-          child: LayoutBuilder(builder: (context, constraint) {
-            ResponsiveUiController._widthSize = constraint.maxWidth < widget.widthExpand;
-            final scaffold = Scaffold.of(context);
-            if (scaffold.isDrawerOpen) {
-              scaffold.closeDrawer();
-            }
-            return Stack(
+      body: LayoutBuilder(builder: (context, constraint) {
+        ResponsiveUiController._widthSize = constraint.maxWidth < widget.widthExpand;
+        final scaffold = Scaffold.of(context);
+        if (scaffold.isDrawerOpen) {
+          scaffold.closeDrawer();
+        }
+        return Stack(
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              defaultPadding, defaultPadding, 0, defaultPadding),
-                          child: widget.sideBar,
-                        ),
-                      ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                          defaultPadding, defaultPadding, 0, defaultPadding),
+                      child: widget.sideBar,
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 0),
-                        child: widget.child,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                if (ResponsiveUiController._widthSize)
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.horizontal(right: radius)),
-                        child: GestureDetector(
-                          onTap: scaffold.openDrawer,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 8, 5, 8),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                      ))
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 0),
+                    child: widget.child,
+                  ),
+                ),
               ],
-            );
-          }),
-        ),
-      ),
+            ),
+            if (ResponsiveUiController._widthSize)
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: const BorderRadius.horizontal(right: radius)),
+                    child: GestureDetector(
+                      onTap: scaffold.openDrawer,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 8, 5, 8),
+                        child: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                  ))
+          ],
+        );
+      }),
     );
   }
 }

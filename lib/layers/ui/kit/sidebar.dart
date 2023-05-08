@@ -4,7 +4,7 @@ import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
-import 'package:task_me_flutter/layers/ui/pages/home.dart';
+import 'package:task_me_flutter/layers/ui/pages/home/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
@@ -54,6 +54,7 @@ class _SideBarState extends State<SideBar> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText(appProvider.state.user!.name, weight: FontWeight.bold),
+                        const SizedBox(height: 5),
                         AppSmallText(appProvider.state.user!.email),
                       ],
                     ),

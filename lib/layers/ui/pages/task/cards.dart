@@ -84,32 +84,33 @@ class TaskListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
-        child: Row(
-          children: [
-            _TaskStatusSelector(
-              value: item.task.status,
-              onChanged: onStatusCnange,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: GestureDetector(
-                  onTap: onTap,
-                  child: Row(children: [
-                    Expanded(child: AppText(item.task.title)),
-                    const SizedBox(width: defaultPadding),
-                    MultiUserShow(item.users),
-                    const SizedBox(width: defaultPadding),
-                    SizedBox(
-                        width: 80,
-                        child: AppText(
-                            '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
-                  ])),
-            ),
-          ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
+          child: Row(
+            children: [
+              _TaskStatusSelector(
+                value: item.task.status,
+                onChanged: onStatusCnange,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Row(children: [
+                  Expanded(child: AppText(item.task.title)),
+                  const SizedBox(width: defaultPadding),
+                  MultiUserShow(item.users),
+                  const SizedBox(width: defaultPadding),
+                  SizedBox(
+                      width: 80,
+                      child: AppText(
+                          '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
+                ]),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -77,8 +77,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
               const SizedBox(height: defaultPadding),
               const AppText('Time intervals'),
               const SizedBox(height: 10),
-              IntervalView(
-                  users: widget.state.users, readOnly: false, taskId: widget.state.editedTask.id!)
+              TaskIntervalsView(readOnly: false, taskId: widget.state.editedTask.id!)
             ],
           ),
         ),

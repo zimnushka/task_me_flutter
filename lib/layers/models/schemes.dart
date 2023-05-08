@@ -85,6 +85,28 @@ class User with _$User {
 }
 
 @freezed
+class UserDTO with _$UserDTO {
+  factory UserDTO({
+    required final int id,
+    required final String name,
+    required final String email,
+    required final int color,
+  }) = _UserDTO;
+
+  const UserDTO._();
+
+  factory UserDTO.fromJson(Map<String, dynamic> json) => _$UserDTOFromJson(json);
+
+  String get initials {
+    final words = name.split(' ');
+    if (words.length > 1) {
+      words.removeRange(1, words.length);
+    }
+    return words.fold('', (previousValue, element) => previousValue + element.characters.first);
+  }
+}
+
+@freezed
 class Project with _$Project {
   factory Project({
     required final String title,
@@ -101,8 +123,8 @@ class TimeInterval with _$TimeInterval {
   @JsonSerializable(fieldRename: FieldRename.snake)
   factory TimeInterval({
     required final int id,
-    required final int taskId,
-    required final int userId,
+    required final TaskDTO task,
+    required final UserDTO user,
     required final DateTime timeStart,
     @JsonKey(readValue: getStringDateTime) required final DateTime? timeEnd,
   }) = _TimeInterval;
@@ -181,4 +203,19 @@ class TaskUi {
       users ?? this.users,
     );
   }
+}
+
+@freezed
+class TaskDTO with _$TaskDTO {
+  factory TaskDTO({
+    required final int id,
+    required final int projectId,
+    required final String title,
+    @JsonKey(name: 'statusId') required final TaskStatus status,
+    required final DateTime startDate,
+    @JsonKey(readValue: getStringDateTime) required final DateTime? stopDate,
+    required final int cost,
+  }) = _TaskDTO;
+
+  factory TaskDTO.fromJson(Map<String, dynamic> json) => _$TaskDTOFromJson(json);
 }

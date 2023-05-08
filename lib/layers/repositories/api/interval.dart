@@ -17,7 +17,7 @@ class IntervalApiRepository extends ApiRepository {
 
   Future<ApiResponse<List<TimeInterval>?>> getTaskIntervals(int id) async {
     return ApiErrorHandler(() async {
-      final data = await client.get('/timeIntervals/$id');
+      final data = await client.get('/timeIntervals/task/$id');
       return ApiResponse(
         body: (data.data as List).map((e) => TimeInterval.fromJson(e)).toList(),
         status: data.statusCode!,

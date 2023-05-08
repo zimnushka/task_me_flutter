@@ -1,14 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:task_me_flutter/layers/models/api_response.dart';
+import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/session/session.dart';
 
 abstract class ApiRepository {
   static Session? _session;
   static String? _url;
+  static bool _debug = false;
   static Dio _dio = Dio();
 
   static set session(Session value) => _setSession(value);
   static set url(String value) => _setUrl(value);
+
+  static void setConfig(Config value) {
+    _url = value.apiBaseUrl;
+    _debug = value.debug;
+    _updateDio();
+  }
 
   static _setUrl(String value) {
     _url = value;
@@ -28,11 +36,11 @@ abstract class ApiRepository {
     ))
       ..interceptors.add(
         LogInterceptor(
-          requestHeader: true,
-          responseHeader: true,
-          requestBody: true,
-          responseBody: true,
-          error: false,
+          requestHeader: false,
+          responseHeader: false,
+          requestBody: _debug,
+          responseBody: _debug,
+          error: _debug,
         ),
       );
   }

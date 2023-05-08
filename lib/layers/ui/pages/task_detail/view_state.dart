@@ -78,7 +78,7 @@ class _TaskView extends StatelessWidget {
             const SizedBox(height: defaultPadding),
             const AppText('Time intervals'),
             const SizedBox(height: 10),
-            IntervalView(users: state.users, readOnly: true, taskId: state.editedTask.id!)
+            TaskIntervalsView(readOnly: true, taskId: state.editedTask.id!)
           ],
         ),
       ),

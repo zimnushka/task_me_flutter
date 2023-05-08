@@ -10,11 +10,12 @@ import 'package:task_me_flutter/layers/bloc/home/home_event.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/pages/home/interval.dart';
 import 'package:task_me_flutter/layers/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-import '../../bloc/home/home_state.dart';
+import '../../../bloc/home/home_state.dart';
 
 HomeBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
@@ -71,15 +72,13 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> {
   late final provider = context.watch<AppProvider>();
-  late final _taskBloc = TaskBloc((id) => _bloc(context).add(OnTaskTap(id)),
-      widget.state.tasks.map((e) => TaskUi(e, [])).toList(), provider.state.config.taskView);
+  late final _taskBloc = TaskBloc(
+    (id) => _bloc(context).add(OnTaskTap(id)),
+    widget.state.tasks.map((e) => TaskUi(e, [])).toList(),
+    TaskViewState.list,
+  );
 
   final controller = ScrollController();
-
-  bool isBoardOpen() {
-    return _taskBloc.state is TaskState &&
-        (_taskBloc.state as TaskState).state == TaskViewState.board;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +89,6 @@ class _BodyState extends State<_Body> {
         child: BlocBuilder<TaskBloc, AppState>(builder: (context, state) {
           return CustomScrollView(
             controller: controller,
-            physics: isBoardOpen() ? const NeverScrollableScrollPhysics() : null,
             slivers: [
               SliverPadding(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -128,35 +126,55 @@ class _BodyState extends State<_Body> {
                       ),
                       Expanded(
                         flex: 3,
-                        child: SingleChildScrollView(
-                          padding:
-                              const EdgeInsets.only(left: defaultPadding, right: defaultPadding),
-                          reverse: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          child: HeatMap(
-                            datasets: {
-                              DateTime(2023, 2, 8): 1,
-                              DateTime(2023, 2, 9): 2,
-                              DateTime(2023, 2, 10): 3,
-                              DateTime(2023, 2, 11): 4,
-                            },
-                            colorMode: ColorMode.color,
-                            textColor: Colors.white,
-                            size: 20,
-                            fontSize: 10,
-                            borderRadius: 2.5,
-                            showText: false,
-                            scrollable: false,
-                            showColorTip: false,
-                            defaultColor: Colors.white,
-                            colorTipCount: 4,
-                            colorsets: {
-                              1: Theme.of(context).primaryColor.withOpacity(0.2),
-                              2: Theme.of(context).primaryColor.withOpacity(0.4),
-                              3: Theme.of(context).primaryColor.withOpacity(0.6),
-                              4: Theme.of(context).primaryColor.withOpacity(0.8),
-                            },
+                        child: SizedBox(
+                          height: 200,
+                          child: Stack(
+                            children: [
+                              SingleChildScrollView(
+                                padding: const EdgeInsets.only(
+                                    left: defaultPadding, right: defaultPadding),
+                                reverse: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                child: HeatMap(
+                                  datasets: {
+                                    DateTime(2023, 2, 8): 1,
+                                    DateTime(2023, 2, 9): 2,
+                                    DateTime(2023, 2, 10): 3,
+                                    DateTime(2023, 2, 11): 4,
+                                  },
+                                  colorMode: ColorMode.color,
+                                  textColor: Colors.white,
+                                  size: 20,
+                                  fontSize: 10,
+                                  borderRadius: 2.5,
+                                  showText: false,
+                                  scrollable: false,
+                                  showColorTip: false,
+                                  defaultColor: Colors.white,
+                                  colorTipCount: 4,
+                                  colorsets: {
+                                    1: Theme.of(context).primaryColor.withOpacity(0.2),
+                                    2: Theme.of(context).primaryColor.withOpacity(0.4),
+                                    3: Theme.of(context).primaryColor.withOpacity(0.6),
+                                    4: Theme.of(context).primaryColor.withOpacity(0.8),
+                                  },
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Theme.of(context).primaryColor,
+                                      Theme.of(context).primaryColor.withOpacity(0),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    stops: const [0, 0.5],
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -181,13 +199,7 @@ class _BodyState extends State<_Body> {
                   ),
                 ),
               ),
-              TaskViewFilter(onChangeView: (view) async {
-                await Future.delayed(const Duration(milliseconds: 200));
-                if (view == TaskViewState.board) {
-                  await controller.animateTo(controller.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 200), curve: Curves.linear);
-                }
-              }),
+              const HomeIntervalsView(),
               const TaskView(),
             ],
           );

@@ -33,6 +33,9 @@ class UserService {
   }
 
   Future<bool> saveToken(String token) async {
+    if (token.isEmpty) {
+      return false;
+    }
     try {
       return _userTokenStorage.save(token);
     } catch (e) {

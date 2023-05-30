@@ -124,60 +124,59 @@ class _BodyState extends State<_Body> {
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: SizedBox(
-                          height: 200,
-                          child: Stack(
-                            children: [
-                              SingleChildScrollView(
-                                padding: const EdgeInsets.only(
-                                    left: defaultPadding, right: defaultPadding),
-                                reverse: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                child: HeatMap(
-                                  datasets: {
-                                    DateTime(2023, 2, 8): 1,
-                                    DateTime(2023, 2, 9): 2,
-                                    DateTime(2023, 2, 10): 3,
-                                    DateTime(2023, 2, 11): 4,
-                                  },
-                                  colorMode: ColorMode.color,
-                                  textColor: Colors.white,
-                                  size: 20,
-                                  fontSize: 10,
-                                  borderRadius: 2.5,
-                                  showText: false,
-                                  scrollable: false,
-                                  showColorTip: false,
-                                  defaultColor: Colors.white,
-                                  colorTipCount: 4,
-                                  colorsets: {
-                                    1: Theme.of(context).primaryColor.withOpacity(0.2),
-                                    2: Theme.of(context).primaryColor.withOpacity(0.4),
-                                    3: Theme.of(context).primaryColor.withOpacity(0.6),
-                                    4: Theme.of(context).primaryColor.withOpacity(0.8),
-                                  },
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Theme.of(context).primaryColor,
-                                      Theme.of(context).primaryColor.withOpacity(0),
-                                    ],
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    stops: const [0, 0.5],
-                                  ),
-                                ),
-                              )
-                            ],
+                      const Expanded(flex: 3, child: SizedBox()
+                          // SizedBox(
+                          //   height: 200,
+                          //   child: Stack(
+                          //     children: [
+                          //       SingleChildScrollView(
+                          //         padding: const EdgeInsets.only(
+                          //             left: defaultPadding, right: defaultPadding),
+                          //         reverse: true,
+                          //         physics: const NeverScrollableScrollPhysics(),
+                          //         scrollDirection: Axis.horizontal,
+                          //         child: HeatMap(
+                          //           datasets: {
+                          //             DateTime(2023, 2, 8): 1,
+                          //             DateTime(2023, 2, 9): 2,
+                          //             DateTime(2023, 2, 10): 3,
+                          //             DateTime(2023, 2, 11): 4,
+                          //           },
+                          //           colorMode: ColorMode.color,
+                          //           textColor: Colors.white,
+                          //           size: 20,
+                          //           fontSize: 10,
+                          //           borderRadius: 2.5,
+                          //           showText: false,
+                          //           scrollable: false,
+                          //           showColorTip: false,
+                          //           defaultColor: Colors.white,
+                          //           colorTipCount: 4,
+                          //           colorsets: {
+                          //             1: Theme.of(context).primaryColor.withOpacity(0.2),
+                          //             2: Theme.of(context).primaryColor.withOpacity(0.4),
+                          //             3: Theme.of(context).primaryColor.withOpacity(0.6),
+                          //             4: Theme.of(context).primaryColor.withOpacity(0.8),
+                          //           },
+                          //         ),
+                          //       ),
+                          //       Container(
+                          //         decoration: BoxDecoration(
+                          //           gradient: LinearGradient(
+                          //             colors: [
+                          //               Theme.of(context).primaryColor,
+                          //               Theme.of(context).primaryColor.withOpacity(0),
+                          //             ],
+                          //             begin: Alignment.centerLeft,
+                          //             end: Alignment.centerRight,
+                          //             stops: const [0, 0.5],
+                          //           ),
+                          //         ),
+                          //       )
+                          //     ],
+                          //   ),
+                          // ),
                           ),
-                        ),
-                      ),
                     ],
                   )),
                   bottom: PreferredSize(

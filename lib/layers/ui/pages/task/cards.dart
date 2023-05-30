@@ -104,7 +104,7 @@ class TaskListCard extends StatelessWidget {
                   MultiUserShow(item.users),
                   const SizedBox(width: defaultPadding),
                   SizedBox(
-                      width: 80,
+                      width: 90,
                       child: AppText(
                           '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
                 ]),

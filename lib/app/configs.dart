@@ -8,11 +8,12 @@ const defaultConfig = Config(
   taskView: TaskViewState.list,
 );
 
-// const releaseWebConfig = Config(
-//   apiBaseUrl: 'http://192.168.81.199:8080',
-//   setUrlFromHTML: false,
-//   debug: false,
-// );
+const releaseWebConfig = Config(
+  apiBaseUrl: 'http://192.168.17.9:8080',
+  debug: false,
+  isLightTheme: true,
+  taskView: TaskViewState.list,
+);
 
 const debugConfig = Config(
   apiBaseUrl: 'http://localhost:8080',

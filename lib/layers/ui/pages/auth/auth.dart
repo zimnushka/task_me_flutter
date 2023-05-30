@@ -29,23 +29,34 @@ class AuthPage extends StatelessWidget {
                   Container(
                       color: Theme.of(context).cardColor,
                       width: 300,
-                      child: Padding(
-                        padding: const EdgeInsets.all(defaultPadding),
-                        child: state.pageState == AuthPageState.login
-                            ? const SlideAnimatedContainer(
-                                duration: Duration(milliseconds: 400),
-                                start: Offset(1, 0),
-                                end: Offset.zero,
-                                curve: Curves.easeOut,
-                                child: _AuthLoginPage(),
-                              )
-                            : const SlideAnimatedContainer(
-                                duration: Duration(milliseconds: 400),
-                                start: Offset(1, 0),
-                                end: Offset.zero,
-                                curve: Curves.easeOut,
-                                child: _AuthRegistrPage(),
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            onPressed: () => _bloc(context).setConfig(),
+                            icon: const Icon(Icons.settings_outlined),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(defaultPadding),
+                              child: state.pageState == AuthPageState.login
+                                  ? const SlideAnimatedContainer(
+                                      duration: Duration(milliseconds: 600),
+                                      start: Offset(1, 0),
+                                      end: Offset.zero,
+                                      curve: Curves.easeOut,
+                                      child: _AuthLoginPage(),
+                                    )
+                                  : const SlideAnimatedContainer(
+                                      duration: Duration(milliseconds: 600),
+                                      start: Offset(1, 0),
+                                      end: Offset.zero,
+                                      curve: Curves.easeOut,
+                                      child: _AuthRegistrPage(),
+                                    ),
+                            ),
+                          ),
+                        ],
                       )),
                 ],
               );

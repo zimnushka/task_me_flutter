@@ -58,9 +58,9 @@ class __BodyState extends State<_Body> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   BackButton(),
                   AppMainTitleText('Settings'),
                 ],
@@ -240,9 +240,9 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
-      children: const [
+      children: [
         SizedBox(height: defaultPadding),
         Divider(),
         SizedBox(height: defaultPadding),

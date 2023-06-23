@@ -13,18 +13,16 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 IntervalBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
-class IntervalView extends StatelessWidget {
-  const IntervalView(
-      {required this.users, required this.readOnly, required this.taskId, super.key});
+class TaskIntervalsView extends StatelessWidget {
+  const TaskIntervalsView({required this.readOnly, required this.taskId, super.key});
   final bool readOnly;
-  final List<User> users;
   final int taskId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_context) => IntervalBloc()
-        ..add(Load(taskId, readOnly, users, _context.read<AppProvider>().state.user!)),
+      create: (_context) =>
+          IntervalBloc()..add(Load(taskId, readOnly, _context.read<AppProvider>().state.user!)),
       child: const _Body(),
     );
   }
@@ -59,19 +57,18 @@ class _Button extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<IntervalBloc, AppState>(builder: (context, state) {
       state as IntervalLoadedState;
-      final hasNotClosedInterval = state.notClosedInterval != null;
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 300),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
           onPressed: () {
-            if (hasNotClosedInterval) {
-              _bloc(context).add(OnTapStop());
+            if (state.notClosedInterval.isNotEmpty) {
+              _bloc(context).add(OnTapStop(state.taskId!));
             } else {
-              _bloc(context).add(OnTapStart());
+              _bloc(context).add(OnTapStart(state.taskId!));
             }
           },
-          child: Text(hasNotClosedInterval ? 'stop' : 'start'),
+          child: Text(state.notClosedInterval.isNotEmpty ? 'stop' : 'start'),
         ),
       );
     });
@@ -80,7 +77,7 @@ class _Button extends StatelessWidget {
 
 class _IntervalsList extends StatelessWidget {
   const _IntervalsList(this.intervals);
-  final List<TimeIntervalUi> intervals;
+  final List<TimeInterval> intervals;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +102,7 @@ class _IntervalsList extends StatelessWidget {
 
 class _IntervalCard extends StatelessWidget {
   const _IntervalCard(this.item, {this.isFirst = false, this.isLast = false});
-  final TimeIntervalUi item;
+  final TimeInterval item;
   final bool isLast;
   final bool isFirst;
 
@@ -123,11 +120,11 @@ class _IntervalCard extends StatelessWidget {
         subtitle: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _DateText(item.interval.timeStart),
-            if (item.interval.timeEnd != null)
+            _DateText(item.timeStart),
+            if (item.timeEnd != null)
               Padding(
                 padding: const EdgeInsets.only(left: defaultPadding),
-                child: _DateText(item.interval.timeEnd!),
+                child: _DateText(item.timeEnd!),
               )
           ],
         ),

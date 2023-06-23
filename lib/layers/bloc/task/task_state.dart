@@ -33,17 +33,28 @@ extension TaskViewStateInfo on TaskViewState {
 
 class TaskState extends AppLoadedState {
   final List<TaskUi> tasks;
-  final List<TaskStatus> openedStatuses;
+  final List<TaskUi> filteredTasks;
+  final TaskViewFilterModel filter;
   final TaskViewState state;
 
-  TaskState({required this.tasks, required this.openedStatuses, required this.state});
+  TaskState({
+    required this.tasks,
+    required this.state,
+    required this.filteredTasks,
+    required this.filter,
+  });
 
-  TaskState copyWith(
-      {List<TaskUi>? tasks, List<TaskStatus>? openedStatuses, TaskViewState? state}) {
+  TaskState copyWith({
+    List<TaskUi>? tasks,
+    TaskViewState? state,
+    List<TaskUi>? filteredTasks,
+    TaskViewFilterModel? filter,
+  }) {
     return TaskState(
       state: state ?? this.state,
       tasks: tasks ?? this.tasks,
-      openedStatuses: openedStatuses ?? this.openedStatuses,
+      filter: filter ?? this.filter,
+      filteredTasks: filteredTasks ?? this.filteredTasks,
     );
   }
 }

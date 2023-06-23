@@ -21,13 +21,15 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
     TaskViewState state,
   ) : super(TaskState(
           tasks: tasks,
-          openedStatuses: TaskStatus.values,
+          filteredTasks: tasks,
+          filter: const TaskViewFilterModel(openedStatuses: TaskStatus.values),
           state: state,
         )) {
     on<OnTaskTap>(_onTaskTap);
     on<OnTaskStatusTap>(_onTaskStatusTap);
     on<OnChangeViewState>(_onChangeViewState);
     on<OnChangeTaskStatus>(_onChangeTaskStatus);
+    on<OnTaskFilterChange>(_onTaskFilterChange);
   }
 
   Future<void> _onTaskTap(OnTaskTap event, Emitter emit) async {
@@ -44,14 +46,22 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
   Future<void> _onTaskStatusTap(OnTaskStatusTap event, Emitter emit) async {
     final currentState = state as TaskState;
 
-    if (currentState.openedStatuses.contains(event.status)) {
-      final statuses = List.of(currentState.openedStatuses);
+    if (currentState.filter.openedStatuses.contains(event.status)) {
+      final statuses = List.of(currentState.filter.openedStatuses);
       statuses.remove(event.status);
-      emit(currentState.copyWith(openedStatuses: statuses));
+      emit(
+        currentState.copyWith(
+          filter: currentState.filter.copyWith(openedStatuses: statuses),
+        ),
+      );
     } else {
-      final statuses = List.of(currentState.openedStatuses);
+      final statuses = List.of(currentState.filter.openedStatuses);
       statuses.add(event.status);
-      emit(currentState.copyWith(openedStatuses: statuses));
+      emit(
+        currentState.copyWith(
+          filter: currentState.filter.copyWith(openedStatuses: statuses),
+        ),
+      );
     }
   }
 
@@ -66,11 +76,13 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
         taskUIList
             .add(event.taskUi.copyWith(task: event.taskUi.task.copyWith(status: event.status)));
         taskUIList.sort((a, b) => a.task.status.index.compareTo(b.task.status.index));
+        final filteredTasks = currentState.filter.getTaskByFilter(taskUIList);
         emit(
           TaskState(
             tasks: taskUIList,
-            openedStatuses: currentState.openedStatuses,
+            filteredTasks: filteredTasks,
             state: currentState.state,
+            filter: currentState.filter,
           ),
         );
       }
@@ -79,5 +91,17 @@ class TaskBloc extends Bloc<TaskEvent, AppState> {
     } catch (e) {
       AppSnackBar.show(AppRouter.context, e.toString(), AppSnackBarType.error);
     }
+  }
+
+  Future<void> _onTaskFilterChange(OnTaskFilterChange event, Emitter emit) async {
+    final currentState = state as TaskState;
+
+    final filteredTasks = event.filter.getTaskByFilter(currentState.tasks);
+    emit(
+      currentState.copyWith(
+        filteredTasks: filteredTasks,
+        filter: event.filter,
+      ),
+    );
   }
 }

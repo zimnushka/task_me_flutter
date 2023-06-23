@@ -45,8 +45,8 @@ class TaskService {
       }
       for (final user in projectUsers) {
         final duration = intervals
-            .where((element) => element.userId == user.id)
-            .map((e) => (e.timeStart.difference(e.timeEnd!)).abs())
+            .where((element) => element.user.id == user.id)
+            .map((e) => e.timeStart.difference(e.timeEnd!).abs())
             .fold(const Duration(), (previousValue, element) => previousValue + element);
         cost = cost + duration.inHours * user.cost;
       }

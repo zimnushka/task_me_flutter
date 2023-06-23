@@ -8,7 +8,7 @@ class UserApiRepository extends ApiRepository {
     return ApiErrorHandler(() async {
       final data = await client.get('/user/me');
       return ApiResponse(
-        body: User.fromJson(jsonDecode(data.data as String)),
+        body: User.fromJson(data.data),
         status: data.statusCode!,
       );
     }).result;
@@ -16,29 +16,28 @@ class UserApiRepository extends ApiRepository {
 
   Future<ApiResponse<List<User>?>> getUserFromProject(int projectId) async {
     return ApiErrorHandler(() async {
-      final data = await client.get('/projectMembers/$projectId');
-      final jsonData = jsonDecode(data.data);
+      final data = await client.get('/project/member/$projectId');
+
       return ApiResponse(
           // ignore: unnecessary_lambdas
-          body: (jsonData as List).map((e) => User.fromJson(e)).toList(),
+          body: (data.data as List).map((e) => User.fromJson(e)).toList(),
           status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<List<User>?>> getUserFromTask(int taskId) async {
     return ApiErrorHandler(() async {
-      final data = await client.get('/taskMembers/$taskId');
-      final jsonData = jsonDecode(data.data);
+      final data = await client.get('/task/member/$taskId');
       return ApiResponse(
           // ignore: unnecessary_lambdas
-          body: (jsonData as List).map((e) => User.fromJson(e)).toList(),
+          body: (data.data as List).map((e) => User.fromJson(e)).toList(),
           status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<User?>> editUser(User user) async {
     return ApiErrorHandler(() async {
-      final data = await client.put('/user/', data: user.toJson());
+      final data = await client.put('/user', data: user.toJson());
       return ApiResponse(body: user, status: data.statusCode!);
     }).result;
   }
@@ -46,21 +45,21 @@ class UserApiRepository extends ApiRepository {
   Future<ApiResponse<bool?>> updateTaskMemberList(int taskId, List<User> users) async {
     return ApiErrorHandler(() async {
       final jsonData = users.map((e) => e.toJson()).toList();
-      final data = await client.post('/taskMembers/$taskId', data: jsonEncode(jsonData));
+      final data = await client.post('/task/member/$taskId', data: jsonEncode(jsonData));
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<bool?>> addMemberToProject(String email, int projectId) async {
     return ApiErrorHandler(() async {
-      final data = await client.put('/projectMembers/$projectId?email=$email');
+      final data = await client.put('/project/member/$projectId?email=$email');
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<bool?>> deleteMemberFromProject(int userId, int projectId) async {
     return ApiErrorHandler(() async {
-      final data = await client.delete('/projectMembers/$projectId?userId=$userId');
+      final data = await client.delete('/project/member/$projectId?userId=$userId');
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }

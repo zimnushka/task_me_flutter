@@ -14,6 +14,7 @@ import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/info_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/user_view.dart';
+import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
@@ -137,8 +138,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                 padding: const EdgeInsets.only(bottom: 10),
                 sliver: SliverAppBar(
                   automaticallyImplyLeading: false,
-                  title: Text(widget.state.project.title),
-                  titleTextStyle: const TextStyle(fontSize: 25, color: Colors.white),
+                  title: AppMainTitleText(widget.state.project.title),
                   centerTitle: false,
                   pinned: true,
                   snap: false,

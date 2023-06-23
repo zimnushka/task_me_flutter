@@ -21,6 +21,7 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
   @override
   void initState() {
     subStream = stream.listen((event) {
+      // TODO(kirill): swap 20 pixels to percents % of screen
       switch (derection) {
         case _ScrollDerection.none:
           break;
@@ -67,8 +68,9 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: TaskStatus.values.map((e) {
-                      final List<TaskUi> tasks =
-                          widget.state.tasks.where((element) => element.task.status == e).toList();
+                      final List<TaskUi> tasks = widget.state.filteredTasks
+                          .where((element) => element.task.status == e)
+                          .toList();
                       return Padding(
                         padding: const EdgeInsets.only(right: 10),
                         child: DragTarget<TaskUi>(onAccept: (data) {

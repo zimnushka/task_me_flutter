@@ -1,6 +1,4 @@
 // ignore_for_file: unnecessary_lambdas
-
-import 'dart:convert';
 import 'package:task_me_flutter/layers/models/api_response.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
@@ -9,16 +7,15 @@ class TaskApiRepository extends ApiRepository {
   Future<ApiResponse<Task?>> getById(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.get('/task/$id');
-      return ApiResponse(body: Task.fromJson(jsonDecode(data.data!)), status: data.statusCode!);
+      return ApiResponse(body: Task.fromJson(data.data!), status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<List<Task>?>> getAll() async {
     return ApiErrorHandler(() async {
-      final data = await client.get('/task/');
-      final jsonData = jsonDecode(data.data);
+      final data = await client.get('/task');
       return ApiResponse(
-        body: (jsonData as List).map((e) => Task.fromJson(e)).toList(),
+        body: (data.data as List).map((e) => Task.fromJson(e)).toList(),
         status: data.statusCode!,
       );
     }).result;
@@ -26,10 +23,10 @@ class TaskApiRepository extends ApiRepository {
 
   Future<ApiResponse<List<Task>?>> getByProject(int projectId) async {
     return ApiErrorHandler(() async {
-      final data = await client.get('/taskProject/$projectId');
-      final jsonData = jsonDecode(data.data);
+      final data = await client.get('/task/project/$projectId');
+
       return ApiResponse(
-        body: (jsonData as List).map((e) => Task.fromJson(e)).toList(),
+        body: (data.data as List).map((e) => Task.fromJson(e)).toList(),
         status: data.statusCode!,
       );
     }).result;
@@ -37,14 +34,14 @@ class TaskApiRepository extends ApiRepository {
 
   Future<ApiResponse<Task?>> create(Task item) async {
     return ApiErrorHandler(() async {
-      final data = await client.post('/task/', data: item.toJson());
-      return ApiResponse(body: Task.fromJson(jsonDecode(data.data)), status: data.statusCode!);
+      final data = await client.post('/task', data: item.toJson());
+      return ApiResponse(body: Task.fromJson(data.data), status: data.statusCode!);
     }).result;
   }
 
   Future<ApiResponse<bool?>> edit(Task item) async {
     return ApiErrorHandler(() async {
-      final data = await client.put('/task/', data: item.toJson());
+      final data = await client.put('/task', data: item.toJson());
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }

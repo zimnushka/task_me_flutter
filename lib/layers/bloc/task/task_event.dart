@@ -23,3 +23,8 @@ class OnTaskStatusTap extends TaskEvent {
   final TaskStatus status;
   OnTaskStatusTap(this.status);
 }
+
+class OnTaskFilterChange extends TaskEvent {
+  final TaskViewFilterModel filter;
+  OnTaskFilterChange(this.filter);
+}

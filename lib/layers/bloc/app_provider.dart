@@ -48,7 +48,9 @@ class AppProvider extends Cubit<AppProviderState> {
   final _projectApiRepository = ProjectApiRepository();
 
   Future<void> load() async {
-    ApiRepository.url = state.config.apiBaseUrl;
+    // Set config value
+    ApiRepository.setConfig(state.config);
+
     final List<Project> projects = [];
     final user = await _userService.getUserFromToken();
 

@@ -8,17 +8,17 @@ class _TaskListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        childCount: state.tasks.length,
+        childCount: state.filteredTasks.length,
         (context, index) {
-          final item = state.tasks[index];
+          final item = state.filteredTasks[index];
           TaskStatus? status;
           for (final statusElement in TaskStatus.values) {
             if (index ==
-                state.tasks.indexWhere((element) => element.task.status == statusElement)) {
+                state.filteredTasks.indexWhere((element) => element.task.status == statusElement)) {
               status = statusElement;
             }
           }
-          final isShow = state.openedStatuses.contains(item.task.status);
+          final isShow = state.filter.openedStatuses.contains(item.task.status);
           return TaskListStatusHeader(
             isShow: isShow,
             status: status,

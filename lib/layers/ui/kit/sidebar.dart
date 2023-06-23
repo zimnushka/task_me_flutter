@@ -4,7 +4,7 @@ import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
-import 'package:task_me_flutter/layers/ui/pages/home.dart';
+import 'package:task_me_flutter/layers/ui/pages/home/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/project/project.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
@@ -35,27 +35,40 @@ class _SideBarState extends State<SideBar> {
     return Container(
       width: kSideBarWidth,
       height: double.infinity,
-      padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.all(radius),
       ),
       child: Column(
         children: [
-          ListTile(
-            onTap: () => AppRouter.goTo(HomePage.route()),
-            contentPadding: EdgeInsets.zero,
-            leading: CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
-            minLeadingWidth: 10,
-            title: AppText(appProvider.state.user!.name, weight: FontWeight.bold),
-            subtitle: Text(appProvider.state.user!.email),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(defaultPadding, defaultPadding, defaultPadding, 0),
+            child: GestureDetector(
+              onTap: () => AppRouter.goTo(HomePage.route()),
+              child: Row(
+                children: [
+                  CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(appProvider.state.user!.name, weight: FontWeight.bold),
+                        const SizedBox(height: 5),
+                        AppSmallText(appProvider.state.user!.email),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: defaultPadding),
             child: Divider(),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -84,10 +97,10 @@ class _SideBarState extends State<SideBar> {
                       },
                     ),
                   )
-                : Center(
+                : const Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.live_help_outlined,
                           size: 40,
@@ -122,19 +135,17 @@ class ProjectButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-      leading: DecoratedBox(
+      contentPadding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      leading: Container(
+        height: 20,
+        width: 20,
         decoration: BoxDecoration(
           color: Color(item.color),
           borderRadius: const BorderRadius.all(Radius.circular(5)),
         ),
-        child: const SizedBox(
-          height: 20,
-          width: 20,
-        ),
       ),
       minLeadingWidth: 10,
-      title: Text(item.title),
+      title: AppText(item.title),
     );
   }
 }

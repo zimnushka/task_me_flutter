@@ -16,6 +16,7 @@ class ResponsiveUi extends StatefulWidget {
   final Widget sideBar;
   final Widget child;
   final int widthExpand;
+  // ignore: avoid_positional_boolean_parameters
   final Function(bool)? onUIChange;
 
   @override

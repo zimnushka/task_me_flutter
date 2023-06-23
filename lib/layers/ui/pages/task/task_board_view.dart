@@ -21,6 +21,7 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
   @override
   void initState() {
     subStream = stream.listen((event) {
+      // TODO(kirill): swap 20 pixels to percents % of screen
       switch (derection) {
         case _ScrollDerection.none:
           break;

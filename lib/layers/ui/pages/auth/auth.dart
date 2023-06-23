@@ -4,18 +4,22 @@ import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/ui/error_page.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
-import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/pages/auth/poster.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
-class AuthPage extends StatelessWidget {
+class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
 
   @override
+  State<AuthPage> createState() => _AuthPageState();
+}
+
+class _AuthPageState extends State<AuthPage> {
+  final cubit = AuthCubit();
+  @override
   Widget build(BuildContext context) {
-    final cubit = AuthCubit();
     return Scaffold(
       body: BlocProvider.value(
         value: cubit,
@@ -23,43 +27,45 @@ class AuthPage extends StatelessWidget {
           bloc: cubit,
           builder: (context, state) {
             if (state is AuthState) {
-              return Row(
-                children: [
-                  const AuthPoster(),
-                  Container(
-                      color: Theme.of(context).cardColor,
-                      width: 300,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            onPressed: () => _bloc(context).setConfig(),
-                            icon: const Icon(Icons.settings_outlined),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(defaultPadding),
-                              child: state.pageState == AuthPageState.login
-                                  ? const SlideAnimatedContainer(
-                                      duration: Duration(milliseconds: 600),
-                                      start: Offset(1, 0),
-                                      end: Offset.zero,
-                                      curve: Curves.easeOut,
-                                      child: _AuthLoginPage(),
-                                    )
-                                  : const SlideAnimatedContainer(
-                                      duration: Duration(milliseconds: 600),
-                                      start: Offset(1, 0),
-                                      end: Offset.zero,
-                                      curve: Curves.easeOut,
-                                      child: _AuthRegistrPage(),
-                                    ),
+              return state.pageState == AuthPageState.none
+                  ? const AuthPoster()
+                  : Center(
+                      child: Container(
+                        margin: const EdgeInsets.all(defaultPadding),
+                        padding: const EdgeInsets.all(defaultPadding),
+                        width: 300,
+                        height: 400,
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: const BorderRadius.all(radius)),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  onPressed: () => _bloc(context).setConfig(),
+                                  icon: const Icon(Icons.settings_outlined),
+                                ),
+                                IconButton(
+                                  onPressed: () => _bloc(context).setNewState(AuthPageState.none),
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      )),
-                ],
-              );
+                            const SizedBox(height: defaultPadding),
+                            Expanded(
+                              child: Center(
+                                child: cubit.state is AuthState &&
+                                        (cubit.state as AuthState).pageState == AuthPageState.login
+                                    ? const _AuthLoginPage()
+                                    : const _AuthRegistrPage(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
             } else if (state is AppErrorState) {
               return AppErrorPage(state.error);
             }

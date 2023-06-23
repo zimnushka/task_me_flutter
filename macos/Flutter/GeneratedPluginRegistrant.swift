@@ -7,7 +7,7 @@ import Foundation
 
 import device_info_plus
 import pasteboard
-import path_provider_macos
+import path_provider_foundation
 import shared_preferences_macos
 import url_launcher_macos
 

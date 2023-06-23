@@ -97,10 +97,10 @@ class _SideBarState extends State<SideBar> {
                       },
                     ),
                   )
-                : Center(
+                : const Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.live_help_outlined,
                           size: 40,

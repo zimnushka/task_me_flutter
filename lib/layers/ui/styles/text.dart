@@ -17,6 +17,20 @@ const _month = [
   'Dec',
 ];
 
+class AppLabelTitleText extends StatelessWidget {
+  const AppLabelTitleText(this.text, {this.color, this.weight, this.maxLines});
+  final String text;
+  final Color? color;
+  final FontWeight? weight;
+  final int? maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text,
+        maxLines: maxLines, style: TextStyle(fontSize: 30, fontWeight: weight, color: color));
+  }
+}
+
 class AppMainTitleText extends StatelessWidget {
   const AppMainTitleText(this.text, {this.color, this.weight, this.maxLines});
   final String text;

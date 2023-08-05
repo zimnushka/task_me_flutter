@@ -15,26 +15,26 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
   static const double _widthColumn = 350;
   _ScrollDerection derection = _ScrollDerection.none;
 
-  final Stream stream = Stream.periodic(const Duration(milliseconds: 15));
+  final Stream stream = Stream.periodic(const Duration(milliseconds: 30));
   late StreamSubscription subStream;
+  late double width = MediaQuery.of(context).size.width;
 
   @override
   void initState() {
     subStream = stream.listen((event) {
-      // TODO(kirill): swap 20 pixels to percents % of screen
       switch (derection) {
         case _ScrollDerection.none:
           break;
         case _ScrollDerection.left:
           if (controller.offset > 0) {
-            controller.animateTo(controller.offset - 20,
-                duration: const Duration(milliseconds: 10), curve: Curves.linear);
+            controller.animateTo(controller.offset - width * 0.01,
+                duration: const Duration(milliseconds: 20), curve: Curves.linear);
           }
           break;
         case _ScrollDerection.right:
           if (controller.offset < controller.position.maxScrollExtent) {
-            controller.animateTo(controller.offset + 20,
-                duration: const Duration(milliseconds: 10), curve: Curves.linear);
+            controller.animateTo(controller.offset + width * 0.01,
+                duration: const Duration(milliseconds: 20), curve: Curves.linear);
           }
           break;
       }

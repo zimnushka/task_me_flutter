@@ -136,6 +136,8 @@ class TaskBoardCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AppSmallText('#${item.task.id}'),
+              const SizedBox(height: 5),
               AppText(
                 item.task.title,
                 weight: FontWeight.bold,

@@ -36,7 +36,7 @@ class _ConfigEditorDialogState extends State<ConfigEditorDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Select hours count', style: Theme.of(context).textTheme.titleLarge),
+                Text('Set url', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: defaultPadding),
                 TextField(controller: urlBaseApiController),
                 const SizedBox(height: 30),

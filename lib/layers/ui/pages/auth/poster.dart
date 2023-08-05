@@ -211,9 +211,7 @@ class _InfoCard extends StatelessWidget {
                         const SizedBox(width: defaultPadding),
                         ClipRRect(
                           borderRadius: const BorderRadius.all(radius),
-                          child: Expanded(
-                            child: image,
-                          ),
+                          child: image,
                         ),
                       ],
                     )
@@ -221,9 +219,7 @@ class _InfoCard extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: const BorderRadius.all(radius),
-                          child: Expanded(
-                            child: image,
-                          ),
+                          child: image,
                         ),
                         const SizedBox(width: defaultPadding),
                         Expanded(

@@ -4,16 +4,11 @@ analyzer:
     - forms/lib/l10n/**
     - drivers/lib/l10n/**
     - lib/**.g.dart
-    - serdes_json/lib/generator.dart
     - localization/lib/generated/**
     - drivers/**.mocks.dart
 
   errors:
-    # allow having TODOs in the code
     todo: ignore
-    # allow self-reference to deprecated members (we do this because otherwise we have
-    # to annotate every member in every test, assert, etc, when we deprecate something)
-#    deprecated_member_use_from_same_package: ignore
     sort_pub_dependencies: ignore
     invalid_annotation_target: ignore
     invalid_dependency: ignore

@@ -106,7 +106,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                             contentPadding: EdgeInsets.zero,
                             title: Text(bestUser!.name),
                             subtitle: Text(bestUser!.email),
-                            leading: CircleAvatar(backgroundColor: Color(bestUser!.color)),
+                            leading: CircleAvatar(backgroundColor: bestUser!.color),
                           ),
                         ],
                       )

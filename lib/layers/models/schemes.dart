@@ -67,7 +67,7 @@ class User with _$User {
     required final int id,
     required final String name,
     required final String email,
-    required final int color,
+    @JsonKey(name: 'color') required final int colorInt,
     required final int cost,
   }) = _User;
 
@@ -82,6 +82,8 @@ class User with _$User {
     }
     return words.fold('', (previousValue, element) => previousValue + element.characters.first);
   }
+
+  Color get color => Color(colorInt);
 }
 
 @freezed
@@ -90,7 +92,7 @@ class UserDTO with _$UserDTO {
     required final int id,
     required final String name,
     required final String email,
-    required final int color,
+    @JsonKey(name: 'color') required final int colorInt,
   }) = _UserDTO;
 
   const UserDTO._();
@@ -104,6 +106,8 @@ class UserDTO with _$UserDTO {
     }
     return words.fold('', (previousValue, element) => previousValue + element.characters.first);
   }
+
+  Color get color => Color(colorInt);
 }
 
 @freezed
@@ -123,6 +127,7 @@ class TimeInterval with _$TimeInterval {
   @JsonSerializable(fieldRename: FieldRename.snake)
   factory TimeInterval({
     required final int id,
+    required final String description,
     required final TaskDTO task,
     required final UserDTO user,
     required final DateTime timeStart,

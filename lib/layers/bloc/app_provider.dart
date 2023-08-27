@@ -62,7 +62,7 @@ class AppProvider extends Cubit<AppProviderState> {
     final config = (await _configService.getConfig()) ?? state.config;
 
     final stateWithTheme = state.copyWith(
-      theme: setPrimaryColor(config.theme, user != null ? Color(user.color) : defaultPrimaryColor),
+      theme: setPrimaryColor(config.theme, user != null ? user.color : defaultPrimaryColor),
       user: user,
       nullUser: user == null,
       projects: projects,
@@ -78,18 +78,18 @@ class AppProvider extends Cubit<AppProviderState> {
     final config = (await _configService.getConfig()) ?? state.config;
 
     if (color != null) {
-      final user = await _userService.editUser(state.user!.copyWith(color: color.value));
+      final user = await _userService.editUser(state.user!.copyWith(colorInt: color.value));
       emit(
         state.copyWith(
           user: user,
-          theme: setPrimaryColor(config.theme, Color(user?.color ?? state.user!.color)),
+          theme: setPrimaryColor(config.theme, user?.color ?? state.user!.color),
           config: config,
         ),
       );
     } else {
       emit(
         state.copyWith(
-          theme: setPrimaryColor(config.theme, Color(state.user!.color)),
+          theme: setPrimaryColor(config.theme, state.user!.color),
           config: config,
         ),
       );

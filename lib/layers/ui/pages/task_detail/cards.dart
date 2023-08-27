@@ -52,7 +52,7 @@ class _UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(backgroundColor: Color(user.color)),
+      leading: CircleAvatar(backgroundColor: user.color),
       title: Text(user.name),
       subtitle: Text(user.email),
     );

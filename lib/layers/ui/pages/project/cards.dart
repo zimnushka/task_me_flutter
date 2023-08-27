@@ -41,7 +41,7 @@ class _UserCardState extends State<UserCard> {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-            leading: CircleAvatar(backgroundColor: Color(widget.user.color)),
+            leading: CircleAvatar(backgroundColor: widget.user.color),
             minLeadingWidth: 10,
             title: SelectableText(widget.user.name),
             subtitle: SelectableText(widget.user.email),

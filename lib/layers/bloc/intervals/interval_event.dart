@@ -23,6 +23,5 @@ class OpenTask extends IntervalEvent {
 }
 
 class OnTapStop extends IntervalEvent {
-  final int taskId;
-  OnTapStop(this.taskId);
+  OnTapStop();
 }

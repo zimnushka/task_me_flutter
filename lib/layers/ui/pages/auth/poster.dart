@@ -208,7 +208,7 @@ class _InfoCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: defaultPadding),
+                        const SizedBox(width: 40),
                         ClipRRect(
                           borderRadius: const BorderRadius.all(radius),
                           child: image,
@@ -221,7 +221,7 @@ class _InfoCard extends StatelessWidget {
                           borderRadius: const BorderRadius.all(radius),
                           child: image,
                         ),
-                        const SizedBox(width: defaultPadding),
+                        const SizedBox(width: 40),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

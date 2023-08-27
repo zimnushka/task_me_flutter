@@ -32,9 +32,14 @@ class IntervalApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<bool?>> stop(int id) async {
+  Future<ApiResponse<bool?>> stop(String? desc) async {
     return ApiErrorHandler(() async {
-      final data = await client.put('/timeIntervals/$id');
+      final data = await client.put(
+        '/timeIntervals',
+        data: {
+          'description': desc ?? '',
+        },
+      );
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }

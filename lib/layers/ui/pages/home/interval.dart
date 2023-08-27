@@ -52,7 +52,7 @@ class _Body extends StatelessWidget {
             return _ItemCard(
               item,
               () => _bloc(context).add(OpenTask(item.task.id, item.task.projectId)),
-              () => _bloc(context).add(OnTapStop(item.task.id)),
+              () => _bloc(context).add(OnTapStop()),
             );
           },
           separatorBuilder: (_, __) => const SizedBox(

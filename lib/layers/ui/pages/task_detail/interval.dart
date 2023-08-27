@@ -63,7 +63,7 @@ class _Button extends StatelessWidget {
           style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
           onPressed: () {
             if (state.notClosedInterval.isNotEmpty) {
-              _bloc(context).add(OnTapStop(state.taskId!));
+              _bloc(context).add(OnTapStop());
             } else {
               _bloc(context).add(OnTapStart(state.taskId!));
             }
@@ -124,9 +124,9 @@ class _IntervalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CircleAvatar(backgroundColor: item.user.color),
+              const SizedBox(width: 10),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,20 +137,12 @@ class _IntervalCard extends StatelessWidget {
                       '${_dateToText(item.timeStart)}${item.timeEnd != null ? '  -  ${_dateToText(item.timeEnd!)}' : ''}')
                 ],
               ),
+              const Expanded(child: SizedBox()),
               if (item.timeEnd != null) _DurationInterval(item),
             ],
           ),
           const SizedBox(height: 10),
-          if (item.description.isEmpty)
-            InkWell(
-              onTap: () {},
-              child: AppText(
-                'Add description',
-                color: Theme.of(context).primaryColor,
-              ),
-            )
-          else
-            AppText(item.description)
+          AppText(item.description)
         ],
       ),
     );

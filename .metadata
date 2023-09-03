@@ -7,6 +7,7 @@ version:
   revision: "efbf63d9c66b9f6ec30e9ad4611189aa80003d31"
   channel: "stable"
 
+
 project_type: app
 
 # Tracks metadata for the flutter migrate command
@@ -18,7 +19,6 @@ migration:
     - platform: macos
       create_revision: efbf63d9c66b9f6ec30e9ad4611189aa80003d31
       base_revision: efbf63d9c66b9f6ec30e9ad4611189aa80003d31
-
   # User provided section
 
   # List of Local paths (relative to this file) that should be

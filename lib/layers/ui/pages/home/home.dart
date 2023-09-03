@@ -9,7 +9,6 @@ import 'package:task_me_flutter/layers/bloc/home/home_event.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
-import 'package:task_me_flutter/layers/ui/pages/home/interval.dart';
 import 'package:task_me_flutter/layers/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
@@ -81,16 +80,18 @@ class _BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: defaultPadding),
-      child: TasksViewProvider(
-        bloc: _taskBloc,
-        child: BlocBuilder<TaskBloc, AppState>(builder: (context, state) {
-          return CustomScrollView(
+    final projects = context.read<AppProvider>().state.projects;
+    return TasksViewProvider(
+      bloc: _taskBloc,
+      child: BlocBuilder<TaskBloc, AppState>(builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.only(top: defaultPadding),
+          child: CustomScrollView(
             controller: controller,
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding:
+                    const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, defaultPadding),
                 sliver: SliverAppBar(
                   automaticallyImplyLeading: false,
                   title: AppMainTitleText(provider.state.user!.name),
@@ -123,59 +124,7 @@ class _BodyState extends State<_Body> {
                           ),
                         ),
                       ),
-                      const Expanded(flex: 3, child: SizedBox()
-                          // SizedBox(
-                          //   height: 200,
-                          //   child: Stack(
-                          //     children: [
-                          //       SingleChildScrollView(
-                          //         padding: const EdgeInsets.only(
-                          //             left: defaultPadding, right: defaultPadding),
-                          //         reverse: true,
-                          //         physics: const NeverScrollableScrollPhysics(),
-                          //         scrollDirection: Axis.horizontal,
-                          //         child: HeatMap(
-                          //           datasets: {
-                          //             DateTime(2023, 2, 8): 1,
-                          //             DateTime(2023, 2, 9): 2,
-                          //             DateTime(2023, 2, 10): 3,
-                          //             DateTime(2023, 2, 11): 4,
-                          //           },
-                          //           colorMode: ColorMode.color,
-                          //           textColor: Colors.white,
-                          //           size: 20,
-                          //           fontSize: 10,
-                          //           borderRadius: 2.5,
-                          //           showText: false,
-                          //           scrollable: false,
-                          //           showColorTip: false,
-                          //           defaultColor: Colors.white,
-                          //           colorTipCount: 4,
-                          //           colorsets: {
-                          //             1: Theme.of(context).primaryColor.withOpacity(0.2),
-                          //             2: Theme.of(context).primaryColor.withOpacity(0.4),
-                          //             3: Theme.of(context).primaryColor.withOpacity(0.6),
-                          //             4: Theme.of(context).primaryColor.withOpacity(0.8),
-                          //           },
-                          //         ),
-                          //       ),
-                          //       Container(
-                          //         decoration: BoxDecoration(
-                          //           gradient: LinearGradient(
-                          //             colors: [
-                          //               Theme.of(context).primaryColor,
-                          //               Theme.of(context).primaryColor.withOpacity(0),
-                          //             ],
-                          //             begin: Alignment.centerLeft,
-                          //             end: Alignment.centerRight,
-                          //             stops: const [0, 0.5],
-                          //           ),
-                          //         ),
-                          //       )
-                          //     ],
-                          //   ),
-                          // ),
-                          ),
+                      const Expanded(flex: 3, child: SizedBox()),
                     ],
                   )),
                   bottom: PreferredSize(
@@ -197,12 +146,37 @@ class _BodyState extends State<_Body> {
                   ),
                 ),
               ),
-              const HomeIntervalsView(),
-              const TaskView(),
+              SliverPadding(
+                padding:
+                    const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, defaultPadding),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 300,
+                    crossAxisSpacing: defaultPadding,
+                    mainAxisSpacing: defaultPadding,
+                    childAspectRatio: 2 / 1,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: projects.length,
+                    (context, index) {
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Color(projects[index].color),
+                          borderRadius: const BorderRadius.all(radius),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(defaultPadding),
+                          child: AppTitleText(projects[index].title),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 }

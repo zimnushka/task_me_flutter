@@ -15,7 +15,7 @@ class AppIcon extends StatelessWidget {
       'assets/${_icon.name}.png',
       width: size ?? 20,
       height: size ?? 20,
-      color: color ?? Theme.of(context).iconTheme.color,
+      colorFilter: ColorFilter.mode(color ?? Theme.of(context).iconTheme.color!, BlendMode.srcIn),
     );
   }
 }

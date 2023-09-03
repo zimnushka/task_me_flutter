@@ -27,7 +27,6 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // drawerScrimColor: Colors.transparent,
       drawer: Padding(
         padding: const EdgeInsets.all(10),
         child: widget.sideBar,
@@ -47,11 +46,7 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
                   width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                          defaultPadding, defaultPadding, 0, defaultPadding),
-                      child: widget.sideBar,
-                    ),
+                    child: widget.sideBar,
                   ),
                 ),
                 Expanded(

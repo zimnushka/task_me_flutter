@@ -63,7 +63,7 @@ class _Button extends StatelessWidget {
           style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
           onPressed: () {
             if (state.notClosedInterval.isNotEmpty) {
-              _bloc(context).add(OnTapStop(state.taskId!));
+              _bloc(context).add(OnTapStop());
             } else {
               _bloc(context).add(OnTapStart(state.taskId!));
             }
@@ -106,39 +106,58 @@ class _IntervalCard extends StatelessWidget {
   final bool isLast;
   final bool isFirst;
 
+  String _dateToText(DateTime date) {
+    return '${date.day} ${monthLabel(date.month)} ${DateFormat('HH:mm').format(date)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(
             top: isFirst ? radius : Radius.zero, bottom: isLast ? radius : Radius.zero),
         color: Theme.of(context).cardColor,
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-        title: Text(item.user.name),
-        subtitle: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _DateText(item.timeStart),
-            if (item.timeEnd != null)
-              Padding(
-                padding: const EdgeInsets.only(left: defaultPadding),
-                child: _DateText(item.timeEnd!),
-              )
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(backgroundColor: item.user.color),
+              const SizedBox(width: 10),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppText(item.user.name, weight: FontWeight.w600),
+                  const SizedBox(height: 5),
+                  AppText(
+                      '${_dateToText(item.timeStart)}${item.timeEnd != null ? '  -  ${_dateToText(item.timeEnd!)}' : ''}')
+                ],
+              ),
+              const Expanded(child: SizedBox()),
+              if (item.timeEnd != null) _DurationInterval(item),
+            ],
+          ),
+          const SizedBox(height: 10),
+          AppText(item.description)
+        ],
       ),
     );
   }
 }
 
-class _DateText extends StatelessWidget {
-  const _DateText(this.date);
-  final DateTime date;
+class _DurationInterval extends StatelessWidget {
+  const _DurationInterval(this.item);
+
+  final TimeInterval item;
 
   @override
   Widget build(BuildContext context) {
-    return Text('${date.day} ${monthLabel(date.month)} ${DateFormat('HH:mm').format(date)}');
+    final duration = item.timeStart.difference(item.timeEnd!).abs();
+    return AppText(
+        '${duration.inHours > 0 ? '${duration.inHours}h ' : ''}${duration.inMinutes - duration.inHours * 60}min');
   }
 }

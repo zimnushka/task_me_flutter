@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
+import 'package:task_me_flutter/app/service/snackbar.dart';
 import 'package:task_me_flutter/layers/bloc/intervals/interval_event.dart';
 import 'package:task_me_flutter/layers/bloc/intervals/interval_state.dart';
 import 'package:task_me_flutter/layers/repositories/api/interval.dart';
+import 'package:task_me_flutter/layers/ui/kit/overlays/interval_description_editor.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 class IntervalBloc extends Bloc<IntervalEvent, AppState> {
@@ -35,7 +37,11 @@ class IntervalBloc extends Bloc<IntervalEvent, AppState> {
 
   Future<void> _stop(OnTapStop event, Emitter emit) async {
     final currentState = state as IntervalLoadedState;
-    final result = await _intervalRepository.stop(event.taskId);
+    String? desc;
+    await AppRouter.dialog((context) {
+      return IntervalDescriptionEditorDialog(initValue: '', onEdit: (val) => desc = val);
+    });
+    final result = await _intervalRepository.stop(desc);
     if (result.data ?? false) {
       add(Load(currentState.taskId, currentState.readOnly, currentState.me));
     }
@@ -48,6 +54,9 @@ class IntervalBloc extends Bloc<IntervalEvent, AppState> {
   Future<void> _start(OnTapStart event, Emitter emit) async {
     final currentState = state as IntervalLoadedState;
     final result = await _intervalRepository.start(event.taskId);
+    if (!result.isSuccess) {
+      AppSnackBar.show(AppRouter.context, result.message!, AppSnackBarType.error);
+    }
     if (result.data != null) {
       add(Load(currentState.taskId, currentState.readOnly, currentState.me));
     }

@@ -148,7 +148,7 @@ class __BodyState extends State<_Body> {
                       children: [
                         ThemePreview(
                           onTap: () => appProvider.setTheme(isLightTheme: true),
-                          theme: setPrimaryColor(lightTheme, Color(appProvider.state.user!.color)),
+                          theme: setPrimaryColor(lightTheme, appProvider.state.user!.color),
                           height: double.infinity,
                           width: double.infinity,
                         ),
@@ -163,7 +163,7 @@ class __BodyState extends State<_Body> {
                       children: [
                         ThemePreview(
                           onTap: () => appProvider.setTheme(isLightTheme: false),
-                          theme: setPrimaryColor(darkTheme, Color(appProvider.state.user!.color)),
+                          theme: setPrimaryColor(darkTheme, appProvider.state.user!.color),
                           height: double.infinity,
                           width: double.infinity,
                         ),

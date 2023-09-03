@@ -69,7 +69,7 @@ class _UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Positioned(
       left: index * (radius * _positionFromLeftIndex),
-      child: _Circle(radius, Color(user.color), user.initials));
+      child: _Circle(radius, user.color, user.initials));
 }
 
 class _Circle extends StatelessWidget {

@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/repositories/api/auth.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/config_editor.dart';
 
 enum AuthPageState { login, registration, none }
 
-class AuthState extends AppState {
+class AuthState {
   final AuthPageState pageState;
   final String? authErrorMessage;
 
@@ -18,7 +17,7 @@ class AuthState extends AppState {
   });
 }
 
-class AuthCubit extends Cubit<AppState> {
+class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthState(AuthPageState.none));
   final AuthApiRepository _authApiRepository = AuthApiRepository();
 

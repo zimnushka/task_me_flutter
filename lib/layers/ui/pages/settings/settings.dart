@@ -48,7 +48,7 @@ class __BodyState extends State<_Body> {
     return SizedBox(
       height: double.infinity,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Container(
           padding: const EdgeInsets.all(defaultPadding),
           decoration: BoxDecoration(

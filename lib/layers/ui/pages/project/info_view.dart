@@ -1,33 +1,37 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-ProjectBloc _bloc(BuildContext context) => BlocProvider.of(context);
-
 class InfoProjectView extends StatefulWidget {
-  const InfoProjectView(this.state);
-  final ProjectLoadedState state;
+  const InfoProjectView({super.key});
 
   @override
   State<InfoProjectView> createState() => _InfoProjectViewState();
 }
 
 class _InfoProjectViewState extends State<InfoProjectView> {
-  User? bestUser;
-  int maxCountGetedTasks = 0;
-  int cost = 0;
+  @override
+  Widget build(BuildContext context) {
+    final tasks = context.select((ProjectVM vm) => vm.tasks);
+    final users = context.select((ProjectVM vm) => vm.users);
+    final project = context.select((ProjectVM vm) => vm.project);
 
-  User? getBestUser() {
-    for (final element in widget.state.users) {
+    int maxCountGetedTasks = 0;
+
+    int cost = 0;
+    for (final element in tasks) {
+      cost = cost + element.task.cost;
+    }
+
+    User? bestUser;
+
+    for (final element in users) {
       bestUser ??= element;
-      final index = widget.state.tasks
+      final index = tasks
           .where((element) =>
               element.users.where((element) => element.id == bestUser?.id).isNotEmpty &&
               element.task.status == TaskStatus.closed)
@@ -37,28 +41,14 @@ class _InfoProjectViewState extends State<InfoProjectView> {
         maxCountGetedTasks = index;
       }
     }
-    return bestUser;
-  }
 
-  @override
-  void initState() {
-    for (final element in widget.state.tasks) {
-      cost = cost + element.task.cost;
-    }
-
-    getBestUser();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SlideAnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
             start: const Offset(1, 0),
             end: Offset.zero,
@@ -79,21 +69,21 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             ),
           ),
           SlideAnimatedContainer(
-            duration: Duration(milliseconds: 400),
+            duration: const Duration(milliseconds: 400),
             curve: Curves.easeOut,
             start: const Offset(1, 0),
             end: Offset.zero,
             child: Card(
-              margin: EdgeInsets.only(top: defaultPadding),
+              margin: const EdgeInsets.only(top: defaultPadding),
               child: Padding(
-                padding: EdgeInsets.all(defaultPadding),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Users count'),
+                    const Text('Users count'),
                     const SizedBox(height: 10),
-                    Text(widget.state.users.length.toString(), style: TextStyle(fontSize: 30)),
+                    Text(users.length.toString(), style: const TextStyle(fontSize: 30)),
                     if (bestUser != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,9 +94,9 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                           ListTile(
                             minLeadingWidth: 10,
                             contentPadding: EdgeInsets.zero,
-                            title: Text(bestUser!.name),
-                            subtitle: Text(bestUser!.email),
-                            leading: CircleAvatar(backgroundColor: bestUser!.color),
+                            title: Text(bestUser.name),
+                            subtitle: Text(bestUser.email),
+                            leading: CircleAvatar(backgroundColor: bestUser.color),
                           ),
                         ],
                       )
@@ -118,7 +108,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             ),
           ),
           SlideAnimatedContainer(
-            duration: Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeOut,
             start: const Offset(1, 0),
             end: Offset.zero,
@@ -132,8 +122,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                   children: [
                     const Text('Tasks count'),
                     const SizedBox(height: 10),
-                    Text(widget.state.tasks.length.toString(),
-                        style: const TextStyle(fontSize: 30)),
+                    Text(tasks.length.toString(), style: const TextStyle(fontSize: 30)),
                     const SizedBox(height: 30),
                     GridView(
                       primary: true,
@@ -154,12 +143,12 @@ class _InfoProjectViewState extends State<InfoProjectView> {
                                     children: [
                                       Text(
                                         e.label,
-                                        style: TextStyle(color: Colors.white),
+                                        style: const TextStyle(color: Colors.white),
                                       ),
                                       Expanded(
                                         child: Center(
                                           child: Text(
-                                            widget.state.tasks
+                                            tasks
                                                 .where((element) => element.task.status == e)
                                                 .length
                                                 .toString(),
@@ -184,8 +173,8 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             child: Center(
               child: TextButton(
                 style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-                onPressed: () => _bloc(context).add(OnDeleteProject()),
-                child: Text('Delete project'),
+                onPressed: () => context.read<AppProvider>().deleteProject(project.id!),
+                child: const Text('Delete project'),
               ),
             ),
           )

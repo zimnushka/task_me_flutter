@@ -210,7 +210,7 @@ packages:
     source: hosted
     version: "4.0.6"
   equatable:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: equatable
       sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
@@ -270,14 +270,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
-  flutter_heatmap_calendar:
-    dependency: "direct main"
-    description:
-      name: flutter_heatmap_calendar
-      sha256: "0933071844cd604b938e38358984244292ba1ba8f4b4b6f0f091f5927a23e958"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.5"
   flutter_keyboard_visibility:
     dependency: transitive
     description:

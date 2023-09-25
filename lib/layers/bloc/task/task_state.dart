@@ -1,7 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
 enum TaskViewState {
@@ -31,7 +29,7 @@ extension TaskViewStateInfo on TaskViewState {
   }
 }
 
-class TaskState extends AppLoadedState {
+class TaskState {
   final List<TaskUi> tasks;
   final List<TaskUi> filteredTasks;
   final TaskViewFilterModel filter;

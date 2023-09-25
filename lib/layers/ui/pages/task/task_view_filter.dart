@@ -1,7 +1,11 @@
 part of 'task_view.dart';
 
 class TaskViewFilter extends StatefulWidget {
-  const TaskViewFilter({required this.onChangeView, this.taskViewStateSwitch = true});
+  const TaskViewFilter({
+    required this.onChangeView,
+    this.taskViewStateSwitch = true,
+    super.key,
+  });
   final Function(TaskViewState) onChangeView;
   final bool taskViewStateSwitch;
 
@@ -44,14 +48,14 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
   @override
   Widget build(BuildContext context) {
     final state = _bloc(context).state;
-    if (state is TaskState) {
-      if (state.state == TaskViewState.list && tabController.index == 1) {
-        tabController.animateTo(0);
-      }
-      if (state.state == TaskViewState.board && tabController.index == 0) {
-        tabController.animateTo(1);
-      }
+
+    if (state.state == TaskViewState.list && tabController.index == 1) {
+      tabController.animateTo(0);
     }
+    if (state.state == TaskViewState.board && tabController.index == 0) {
+      tabController.animateTo(1);
+    }
+
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 40,

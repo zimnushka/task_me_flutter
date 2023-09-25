@@ -1,24 +1,25 @@
 part of 'task_view.dart';
 
 class _TaskListView extends StatelessWidget {
-  const _TaskListView(this.state);
-  final TaskState state;
+  const _TaskListView();
 
   @override
   Widget build(BuildContext context) {
+    final filteredTasks = context.select((TaskBloc bloc) => bloc.state.filteredTasks);
+    final filter = context.select((TaskBloc bloc) => bloc.state.filter);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        childCount: state.filteredTasks.length,
+        childCount: filteredTasks.length,
         (context, index) {
-          final item = state.filteredTasks[index];
+          final item = filteredTasks[index];
           TaskStatus? status;
           for (final statusElement in TaskStatus.values) {
             if (index ==
-                state.filteredTasks.indexWhere((element) => element.task.status == statusElement)) {
+                filteredTasks.indexWhere((element) => element.task.status == statusElement)) {
               status = statusElement;
             }
           }
-          final isShow = state.filter.openedStatuses.contains(item.task.status);
+          final isShow = filter.openedStatuses.contains(item.task.status);
           return TaskListStatusHeader(
             isShow: isShow,
             status: status,

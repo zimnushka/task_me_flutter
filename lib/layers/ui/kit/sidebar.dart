@@ -38,91 +38,94 @@ class _SideBarState extends State<SideBar> {
     final projects = context.read<AppProvider>().state.projects;
     return ResponsiveUi(
       widthExpand: 800,
-      sideBar: Container(
+      sideBar: SizedBox(
         width: kSideBarWidth,
         height: double.infinity,
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.all(radius),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(defaultPadding, defaultPadding, defaultPadding, 0),
-              child: GestureDetector(
-                onTap: () => AppRouter.goTo(HomePage.route()),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(radius),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(defaultPadding, defaultPadding, defaultPadding, 0),
+                child: GestureDetector(
+                  onTap: () => AppRouter.goTo(HomePage.route()),
+                  child: Row(
+                    children: [
+                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppText(appProvider.state.user!.name, weight: FontWeight.bold),
+                            const SizedBox(height: 5),
+                            AppSmallText(appProvider.state.user!.email),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: defaultPadding),
+                child: Divider(),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 10),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(appProvider.state.user!.name, weight: FontWeight.bold),
-                          const SizedBox(height: 5),
-                          AppSmallText(appProvider.state.user!.email),
-                        ],
-                      ),
-                    )
+                    const AppText('Projects', weight: FontWeight.bold),
+                    GestureDetector(
+                        onTap: showProjectEditor,
+                        child: const Icon(
+                          Icons.add,
+                          size: 18,
+                        ))
                   ],
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: defaultPadding),
-              child: Divider(),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const AppText('Projects', weight: FontWeight.bold),
-                  GestureDetector(
-                      onTap: showProjectEditor,
-                      child: const Icon(
-                        Icons.add,
-                        size: 18,
-                      ))
-                ],
-              ),
-            ),
-            Expanded(
-              child: projects.isNotEmpty
-                  ? Material(
-                      type: MaterialType.transparency,
-                      child: ListView.builder(
-                        itemCount: projects.length,
-                        itemBuilder: (context, index) {
-                          final item = projects[index];
-                          return ProjectButton(
-                            item: item,
-                            onTap: () => AppRouter.goTo(ProjectPage.route(item.id!)),
-                          );
-                        },
-                      ),
-                    )
-                  : const Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.live_help_outlined,
-                            size: 40,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(defaultPadding),
-                            child: Text(
-                              'Click + to add new project, or ask your project member of invite you',
-                              textAlign: TextAlign.center,
+              Expanded(
+                child: projects.isNotEmpty
+                    ? Material(
+                        type: MaterialType.transparency,
+                        child: ListView.builder(
+                          itemCount: projects.length,
+                          itemBuilder: (context, index) {
+                            final item = projects[index];
+                            return ProjectButton(
+                              item: item,
+                              onTap: () => AppRouter.goTo(ProjectPage.route(item.id!)),
+                            );
+                          },
+                        ),
+                      )
+                    : const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.live_help_outlined,
+                              size: 40,
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Text(
+                                'Click + to add new project, or ask your project member of invite you',
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
       child: widget.child,

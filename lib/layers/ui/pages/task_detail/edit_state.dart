@@ -1,8 +1,7 @@
 part of 'task_detail.dart';
 
 class _TaskEditView extends StatefulWidget {
-  const _TaskEditView(this.state);
-  final TaskDetailState state;
+  const _TaskEditView();
 
   @override
   State<_TaskEditView> createState() => __TaskEditViewState();
@@ -13,24 +12,30 @@ class __TaskEditViewState extends State<_TaskEditView> {
 
   @override
   Widget build(BuildContext context) {
-    final hasUpdate = widget.state.task != widget.state.editedTask;
+    final vm = context.read<TaskDetailVM>();
+    final task = context.select((TaskDetailVM vm) => vm.task);
+    final editedTask = context.select((TaskDetailVM vm) => vm.editedTask);
+    final assigners = context.select((TaskDetailVM vm) => vm.assigners);
+    final users = context.select((TaskDetailVM vm) => vm.users);
+
+    final hasUpdate = task != editedTask;
 
     return Scaffold(
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+          padding: const EdgeInsets.all(defaultPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  _TaskIDCard(widget.state.task?.id),
+                  _TaskIDCard(task?.id),
                   const Expanded(child: SizedBox()),
                   _TaskStatusSelector(
-                    value: widget.state.editedTask.status,
+                    value: editedTask.status,
                     readOnly: false,
-                    onChanged: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
+                    onChanged: vm.onTaskStatusSwap,
                   ),
                   const SizedBox(width: defaultPadding),
                   GestureDetector(
@@ -43,42 +48,39 @@ class __TaskEditViewState extends State<_TaskEditView> {
                                 onChange: (newList) {
                                   final activeUsers =
                                       newList.where((e) => e.isActive).map((e) => e.value).toList();
-                                  _bloc(context).add(OnUserListChange(activeUsers));
+                                  vm.onUserSwap(activeUsers);
                                   Navigator.pop(_context);
                                 },
-                                items: widget.state.users.map((e) {
+                                items: users.map((e) {
                                   return MultiSelectItem(
-                                      isActive: widget.state.assigners.contains(e),
+                                      isActive: assigners.contains(e),
                                       value: e,
                                       child: _UserCard(e));
                                 }).toList());
                           });
                     },
-                    child: widget.state.assigners.isEmpty
+                    child: assigners.isEmpty
                         ? const Text('Without assigner', style: TextStyle(fontSize: 18))
-                        : MultiUserShow(widget.state.assigners, radius: 20),
+                        : MultiUserShow(assigners, radius: 20),
                   ),
                 ],
               ),
               const SizedBox(height: defaultPadding),
               _TaskTitleEditor(
-                initValue: widget.state.editedTask.title,
+                initValue: editedTask.title,
                 readOnly: false,
-                onChanged: (value) => _bloc(context).add(
-                  OnTitleUpdate(value),
-                ),
+                onChanged: vm.onTitleUpdate,
               ),
               const SizedBox(height: defaultPadding),
               _TaskDescriptionEditor(
-                initValue: widget.state.editedTask.description,
-                onChanged: (value) => _bloc(context).add(OnDescriptionUpdate(value)),
+                initValue: editedTask.description,
+                onChanged: vm.onDescriptionUpdate,
                 readOnly: false,
               ),
               const SizedBox(height: defaultPadding),
               if (!hasUpdate) const AppText('Time intervals'),
               const SizedBox(height: 10),
-              if (!hasUpdate)
-                TaskIntervalsView(readOnly: false, taskId: widget.state.editedTask.id!)
+              if (!hasUpdate) TaskIntervalsView(readOnly: false, taskId: editedTask.id!)
             ],
           ),
         ),
@@ -116,7 +118,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
                             ),
                             onPressed: () {
                               if (hasUpdate) {
-                                _bloc(context).add(OnSubmit());
+                                vm.save();
                               }
                             },
                             child: const Padding(

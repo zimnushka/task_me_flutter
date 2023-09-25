@@ -65,6 +65,7 @@ class _TaskIDCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<TaskDetailVM>();
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -96,7 +97,7 @@ class _TaskIDCard extends StatelessWidget {
           ),
           if (taskId != null)
             GestureDetector(
-              onTap: () => _bloc(context).add(OnDeleteTask()),
+              onTap: vm.delete,
               child: Container(
                 height: 40,
                 padding: const EdgeInsets.symmetric(horizontal: 10),

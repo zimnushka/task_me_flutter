@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_event.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
@@ -17,36 +16,15 @@ part 'task_view_filter.dart';
 
 TaskBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
-class TasksViewProvider extends StatefulWidget {
-  final Widget child;
-  final TaskBloc bloc;
-  const TasksViewProvider({required this.child, required this.bloc});
-
-  @override
-  State<TasksViewProvider> createState() => _TasksViewProviderState();
-}
-
-class _TasksViewProviderState extends State<TasksViewProvider> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: widget.bloc,
-      child: widget.child,
-    );
-  }
-}
-
 class TaskView extends StatelessWidget {
-  const TaskView();
+  const TaskView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocStateBuilder<TaskBloc>(builder: (s, context) {
-      final state = s as TaskState;
-      if (state.state == TaskViewState.list) {
-        return _TaskListView(state);
-      }
-      return _TaskBoardView(state);
-    });
+    final state = context.select((TaskBloc bloc) => bloc.state.state);
+    if (state == TaskViewState.list) {
+      return const _TaskListView();
+    }
+    return const _TaskBoardView();
   }
 }

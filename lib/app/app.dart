@@ -71,14 +71,17 @@ class TaskMyApp extends StatelessWidget {
       title: 'Task Me',
       builder: (context, child) {
         return BlocProvider.value(
-            value: provider,
-            child: Overlay(initialEntries: [
+          value: provider,
+          child: Overlay(
+            initialEntries: [
               OverlayEntry(
                 builder: (context) {
                   return child ?? const SizedBox();
                 },
               )
-            ]));
+            ],
+          ),
+        );
       },
     );
   }

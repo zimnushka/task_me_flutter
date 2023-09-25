@@ -1,31 +1,29 @@
 part of 'task_detail.dart';
 
-class _TaskCreateView extends StatefulWidget {
-  const _TaskCreateView(this.state);
-  final TaskDetailState state;
+class _TaskCreateView extends StatelessWidget {
+  const _TaskCreateView();
 
-  @override
-  State<_TaskCreateView> createState() => __TaskCreateViewState();
-}
-
-class __TaskCreateViewState extends State<_TaskCreateView> {
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<TaskDetailVM>();
+    final task = context.select((TaskDetailVM vm) => vm.task);
+    final editedTask = context.select((TaskDetailVM vm) => vm.editedTask);
+
     return Align(
       alignment: Alignment.topCenter,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                _TaskIDCard(widget.state.task?.id),
+                _TaskIDCard(task?.id),
                 const Expanded(child: SizedBox()),
                 _TaskStatusSelector(
-                  value: widget.state.editedTask.status,
+                  value: editedTask.status,
                   readOnly: false,
-                  onChanged: (value) => _bloc(context).add(OnTaskStatusSwap(value)),
+                  onChanged: vm.onTaskStatusSwap,
                 ),
                 // const SizedBox(width: defaultPadding),
                 // GestureDetector(
@@ -41,33 +39,31 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
                 //                 _bloc(context).add(OnUserListChange(activeUsers));
                 //                 Navigator.pop(_context);
                 //               },
-                //               items: widget.state.users.map((e) {
+                //               items: users.map((e) {
                 //                 return MultiSelectItem(
-                //                     isActive: widget.state.assigners.contains(e),
+                //                     isActive: assigners.contains(e),
                 //                     value: e,
                 //                     child: _UserCard(e));
                 //               }).toList());
                 //         });
                 //   },
-                //   child: widget.state.assigners.isEmpty
+                //   child: assigners.isEmpty
                 //       ? const Text('Without assigner', style: TextStyle(fontSize: 18))
-                //       : MultiUserShow(widget.state.assigners, radius: 20),
+                //       : MultiUserShow(assigners, radius: 20),
                 // ),
               ],
             ),
             const SizedBox(height: defaultPadding),
             _TaskTitleEditor(
-              initValue: widget.state.editedTask.title,
-              readOnly: widget.state.task?.status == TaskStatus.closed,
-              onChanged: (value) => _bloc(context).add(
-                OnTitleUpdate(value),
-              ),
+              initValue: editedTask.title,
+              readOnly: task?.status == TaskStatus.closed,
+              onChanged: vm.onTitleUpdate,
             ),
             const SizedBox(height: defaultPadding),
             _TaskDescriptionEditor(
-              initValue: widget.state.editedTask.description,
-              onChanged: (value) => _bloc(context).add(OnDescriptionUpdate(value)),
-              readOnly: widget.state.task?.status == TaskStatus.closed,
+              initValue: editedTask.description,
+              onChanged: vm.onDescriptionUpdate,
+              readOnly: task?.status == TaskStatus.closed,
             ),
             const SizedBox(height: defaultPadding),
             ConstrainedBox(
@@ -76,7 +72,7 @@ class __TaskCreateViewState extends State<_TaskCreateView> {
                   style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 40),
                       backgroundColor: Theme.of(context).primaryColor),
-                  onPressed: () => _bloc(context).add(OnSubmit()),
+                  onPressed: vm.save,
                   child: const Padding(
                     padding: EdgeInsets.all(10),
                     child: Text('Create'),

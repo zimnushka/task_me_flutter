@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/api.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/service/config.dart';
 import 'package:task_me_flutter/layers/service/user.dart';
+import 'package:task_me_flutter/layers/ui/pages/home/home.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class AppProviderState {
   final User? user;
+  final TimeInterval? currentTimeInterval;
   final ThemeData theme;
   final Config config;
   final List<Project> projects;
@@ -18,6 +21,7 @@ class AppProviderState {
     required this.theme,
     required this.config,
     required this.projects,
+    this.currentTimeInterval,
     this.user,
   });
 
@@ -27,12 +31,14 @@ class AppProviderState {
     bool nullUser = false,
     Config? config,
     List<Project>? projects,
+    TimeInterval? currentTimeInterval,
   }) {
     return AppProviderState(
       config: config ?? this.config,
       theme: theme ?? this.theme,
       projects: projects ?? this.projects,
       user: nullUser ? null : user ?? this.user,
+      currentTimeInterval: currentTimeInterval ?? this.currentTimeInterval,
     );
   }
 }
@@ -109,6 +115,12 @@ class AppProvider extends Cubit<AppProviderState> {
   Future<void> deleteToken() async {
     await _userService.logOut();
     await load();
+  }
+
+  Future<void> deleteProject(int projectId) async {
+    await _projectApiRepository.delete(projectId);
+    await load();
+    await AppRouter.goTo(HomePage.route());
   }
 
   Future<void> changeTaskView(TaskViewState taskViewState) async {

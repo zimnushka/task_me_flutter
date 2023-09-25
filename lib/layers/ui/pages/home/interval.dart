@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
+import 'package:provider/provider.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/intervals/interval_bloc.dart';
-import 'package:task_me_flutter/layers/bloc/intervals/interval_event.dart';
-import 'package:task_me_flutter/layers/bloc/intervals/interval_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
+import 'package:task_me_flutter/layers/ui/pages/home/circle_animation.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
-
-IntervalBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class HomeIntervalsView extends StatefulWidget {
   const HomeIntervalsView({super.key});
@@ -21,12 +17,13 @@ class HomeIntervalsView extends StatefulWidget {
 class _HomeIntervalsViewState extends State<HomeIntervalsView> {
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: BlocProvider(
-        create: (_context) =>
-            IntervalBloc()..add(Load(null, false, _context.read<AppProvider>().state.user!)),
-        child: const _Body(),
+    return ChangeNotifierProvider(
+      create: (context) => IntervalVM(
+        taskId: null,
+        readOnly: false,
+        me: context.read<AppProvider>().state.user!,
       ),
+      child: const _Body(),
     );
   }
 }
@@ -36,31 +33,20 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocStateBuilder<IntervalBloc>(builder: (state, context) {
-      state as IntervalLoadedState;
-      if (state.notClosedInterval.isEmpty) {
-        return const SizedBox();
-      }
-      return SizedBox(
-        height: 130,
-        width: double.infinity,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: state.notClosedInterval.length,
-          itemBuilder: (context, index) {
-            final item = state.notClosedInterval[index];
-            return _ItemCard(
-              item,
-              () => _bloc(context).add(OpenTask(item.task.id, item.task.projectId)),
-              () => _bloc(context).add(OnTapStop()),
-            );
-          },
-          separatorBuilder: (_, __) => const SizedBox(
-            width: 10,
-          ),
-        ),
+    final notClosedInterval = context.select((IntervalVM vm) => vm.notClosedIntervals);
+    final vm = context.read<IntervalVM>();
+    if (notClosedInterval.isEmpty) {
+      return const SizedBox();
+    }
+    if (notClosedInterval.isNotEmpty) {
+      final item = notClosedInterval.first;
+      return _ItemCard(
+        item,
+        () => vm.openTask(item.task.id, item.task.projectId),
+        () => vm.stopInterval(),
       );
-    });
+    }
+    return const SizedBox();
   }
 }
 
@@ -73,33 +59,53 @@ class _ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final time = DateTime.now().difference(item.timeStart);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 130,
-        width: 200,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(radius),
-          color: Theme.of(context).cardColor,
-        ),
-        child: Column(
-          children: [
-            AppText(item.task.title, maxLines: 2),
-            const Expanded(child: SizedBox()),
-            AppText('${time.inHours}h ${time.inMinutes - time.inHours * 60}m'),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.error,
+    return Padding(
+      padding: const EdgeInsets.all(defaultPadding),
+      child: GestureDetector(
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(radius),
+            color: Theme.of(context).cardColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(defaultPadding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppSmallText('Current time interval'),
+                    AppTitleText(item.task.title, maxLines: 2),
+                    const Expanded(child: SizedBox()),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      onPressed: onStop,
+                      child: const AppText('stop'),
+                    ),
+                  ],
                 ),
-              ),
-              onPressed: onStop,
-              child: const AppText('stop'),
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Stack(
+                    children: [
+                      const CircleAnimation(),
+                      Center(
+                        child: AppText('${time.inHours}h ${time.inMinutes - time.inHours * 60}m'),
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

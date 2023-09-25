@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:task_me_flutter/app/bloc/states.dart';
-import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
+import 'package:provider/provider.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/intervals/interval_bloc.dart';
-import 'package:task_me_flutter/layers/bloc/intervals/interval_event.dart';
-import 'package:task_me_flutter/layers/bloc/intervals/interval_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
-
-IntervalBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class TaskIntervalsView extends StatelessWidget {
   const TaskIntervalsView({required this.readOnly, required this.taskId, super.key});
@@ -20,9 +14,12 @@ class TaskIntervalsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_context) =>
-          IntervalBloc()..add(Load(taskId, readOnly, _context.read<AppProvider>().state.user!)),
+    return ChangeNotifierProvider(
+      create: (context) => IntervalVM(
+        taskId: taskId,
+        readOnly: readOnly,
+        me: context.read<AppProvider>().state.user!,
+      ),
       child: const _Body(),
     );
   }
@@ -33,20 +30,19 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocStateBuilder<IntervalBloc>(builder: (state, context) {
-      state as IntervalLoadedState;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!state.readOnly)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 10),
-              child: _Button(),
-            ),
-          _IntervalsList(state.intervals),
-        ],
-      );
-    });
+    final readOnly = context.select((IntervalVM vm) => vm.readOnly);
+    final intervals = context.select((IntervalVM vm) => vm.intervals);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!readOnly)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: _Button(),
+          ),
+        _IntervalsList(intervals),
+      ],
+    );
   }
 }
 
@@ -55,23 +51,23 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<IntervalBloc, AppState>(builder: (context, state) {
-      state as IntervalLoadedState;
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 300),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
-          onPressed: () {
-            if (state.notClosedInterval.isNotEmpty) {
-              _bloc(context).add(OnTapStop());
-            } else {
-              _bloc(context).add(OnTapStart(state.taskId!));
-            }
-          },
-          child: Text(state.notClosedInterval.isNotEmpty ? 'stop' : 'start'),
-        ),
-      );
-    });
+    final vm = context.read<IntervalVM>();
+    final notClosedInterval = context.select((IntervalVM vm) => vm.notClosedIntervals);
+    final taskId = context.select((IntervalVM vm) => vm.taskId);
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
+        onPressed: () {
+          if (notClosedInterval.isNotEmpty) {
+            vm.stopInterval();
+          } else {
+            vm.startInterval(taskId!);
+          }
+        },
+        child: Text(notClosedInterval.isNotEmpty ? 'stop' : 'start'),
+      ),
+    );
   }
 }
 

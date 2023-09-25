@@ -1,13 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quil;
+import 'package:provider/provider.dart';
 import 'package:task_me_flutter/app/service/router.dart';
-import 'package:task_me_flutter/app/ui/bloc_state_builder.dart';
 import 'package:task_me_flutter/layers/bloc/task_detail/task_bloc.dart';
-import 'package:task_me_flutter/layers/bloc/task_detail/task_event.dart';
-import 'package:task_me_flutter/layers/bloc/task_detail/task_state.dart';
+
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/multi_user_show.dart';
 import 'package:task_me_flutter/layers/ui/kit/multiselector.dart';
@@ -20,8 +17,6 @@ part 'create_state.dart';
 part 'edit_state.dart';
 part 'cards.dart';
 part 'view_state.dart';
-
-TaskDetailBloc _bloc(BuildContext context) => BlocProvider.of(context);
 
 class TaskRoute implements AppPage {
   final int projectId;
@@ -52,8 +47,8 @@ class TaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<TaskDetailBloc>(
-      create: (_) => TaskDetailBloc()..add(Load(projectId: projectId, taskId: taskId)),
+    return ChangeNotifierProvider(
+      create: (_) => TaskDetailVM(initProjectId: projectId, taskId: taskId),
       child: const _Body(),
     );
   }
@@ -64,16 +59,14 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocStateBuilder<TaskDetailBloc>(builder: (state, context) {
-      state as TaskDetailState;
-      switch (state.state) {
-        case TaskDetailPageState.view:
-          return _TaskView(state);
-        case TaskDetailPageState.edit:
-          return _TaskEditView(state);
-        case TaskDetailPageState.creation:
-          return _TaskCreateView(state);
-      }
-    });
+    final state = context.select((TaskDetailVM vm) => vm.state);
+    switch (state) {
+      case TaskDetailPageState.view:
+        return const _TaskView();
+      case TaskDetailPageState.edit:
+        return const _TaskEditView();
+      case TaskDetailPageState.creation:
+        return const _TaskCreateView();
+    }
   }
 }

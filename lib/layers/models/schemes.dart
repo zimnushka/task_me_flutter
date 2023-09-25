@@ -112,6 +112,8 @@ class UserDTO with _$UserDTO {
 
 @freezed
 class Project with _$Project {
+  const Project._();
+
   factory Project({
     required final String title,
     required final int color,
@@ -120,6 +122,8 @@ class Project with _$Project {
   }) = _Project;
 
   factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
+
+  factory Project.empty() => Project(title: '', color: -1);
 }
 
 @freezed
@@ -178,6 +182,8 @@ extension TaskStatusExt on TaskStatus {
 
 @freezed
 class Task with _$Task {
+  const Task._();
+
   factory Task({
     required final String title,
     required final String description,
@@ -191,6 +197,16 @@ class Task with _$Task {
   }) = _Task;
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+
+  factory Task.empt() => Task(
+        stopDate: null,
+        title: '',
+        description: '',
+        projectId: 0,
+        startDate: DateTime.now(),
+        cost: 0,
+        status: TaskStatus.open,
+      );
 }
 
 class TaskUi {

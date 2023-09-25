@@ -43,15 +43,19 @@ class _ResponsiveUiState extends State<ResponsiveUi> {
               children: [
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding,
+                  width: ResponsiveUiController._widthSize ? 0 : kSideBarWidth + defaultPadding * 2,
                   child: SingleChildScrollView(
+                    reverse: true,
                     scrollDirection: Axis.horizontal,
-                    child: widget.sideBar,
+                    child: Padding(
+                      padding: const EdgeInsets.all(defaultPadding),
+                      child: widget.sideBar,
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, 0),
+                    padding: const EdgeInsets.only(top: defaultPadding),
                     child: widget.child,
                   ),
                 ),

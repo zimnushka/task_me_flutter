@@ -1,17 +1,14 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/app/bloc/states.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_event.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/repositories/api/project.dart';
 import 'package:task_me_flutter/layers/repositories/api/task.dart';
 import 'package:task_me_flutter/layers/repositories/api/user.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/invite_member.dart';
 import 'package:task_me_flutter/layers/ui/kit/overlays/project_dialog.dart';
-import 'package:task_me_flutter/layers/ui/pages/home/home.dart';
 import 'package:task_me_flutter/layers/ui/pages/task_detail/task_detail.dart';
 
 enum ProjectPageState { tasks, users, info }
@@ -29,115 +26,112 @@ extension ProjectPageStateExt on ProjectPageState {
   }
 }
 
-class ProjectBloc extends Bloc<ProjectEvent, AppState> {
-  final ProjectApiRepository projectApiRepository = ProjectApiRepository();
-  final UserApiRepository userApiRepository = UserApiRepository();
-  final TaskApiRepository taskApiRepository = TaskApiRepository();
+class ProjectVM extends ChangeNotifier {
+  final projectApiRepository = ProjectApiRepository();
+  final userApiRepository = UserApiRepository();
+  final taskApiRepository = TaskApiRepository();
 
-  ProjectBloc() : super(ProjectLoadingState()) {
-    on<Load>(_load);
-    on<OnHeaderButtonTap>(_onHeaderButtonTap);
-    on<OnTabTap>(_onTabTap);
-    on<OnTaskTap>(_onTaskTap);
-    on<Refresh>(_refresh);
-    on<OnDeleteProject>(_onDeleteProject);
-    on<OnDeleteUser>(_onDeleteUser);
+  ProjectVM({required this.projectId}) {
+    _init();
   }
 
-  Future<void> _load(Load event, Emitter emit) async {
-    final projectData = await projectApiRepository.getById(event.projectId);
-    final users = await userApiRepository.getUserFromProject(event.projectId);
-    final tasksData = await taskApiRepository.getByProject(event.projectId);
+  final int projectId;
+
+  Project _project = Project.empty();
+  Project get project => _project;
+
+  List<User> _users = [];
+  List<User> get users => _users;
+
+  List<TaskUi> _tasks = [];
+  List<TaskUi> get tasks => _tasks;
+
+  ProjectPageState _pageState = ProjectPageState.tasks;
+  ProjectPageState get pageState => _pageState;
+
+  bool _isLoading = true;
+  bool get isLoading => _isLoading;
+
+  Future<void> _init() async {
+    _isLoading = true;
+    notifyListeners();
+
+    final projectData = await projectApiRepository.getById(projectId);
+    final users = await userApiRepository.getUserFromProject(projectId);
+    final tasksData = await taskApiRepository.getByProject(projectId);
     final tasks = tasksData.data ?? [];
     tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
-    emit(
-      ProjectLoadedState(
-        project: projectData.data!,
-        users: users.data ?? [],
-        tasks: tasks
-            .map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], users.data ?? [])))
-            .toList(),
-      ),
-    );
+
+    _project = projectData.data!;
+    _users = users.data ?? [];
+    _tasks = tasks
+        .map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], users.data ?? [])))
+        .toList();
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> _refresh(Refresh event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-
-    ProjectLoadedState newState = currentState;
-
-    if (event.user) {
-      final users = await userApiRepository.getUserFromProject(currentState.project.id!);
-      newState = newState.copyWith(users: users.data);
+  Future<void> refresh({bool user = false, bool project = false, bool tasks = false}) async {
+    if (user) {
+      final users = await userApiRepository.getUserFromProject(projectId);
+      _users = users.data ?? [];
     }
-    if (event.project) {
-      final projectData = await projectApiRepository.getById(currentState.project.id!);
+    if (project) {
+      final projectData = await projectApiRepository.getById(projectId);
       final provider = AppRouter.context.read<AppProvider>();
       await provider.load();
-      newState = newState.copyWith(project: projectData.data);
+      if (projectData.data != null) {
+        _project = projectData.data!;
+      }
     }
-    if (event.tasks) {
-      final tasksData = await taskApiRepository.getByProject(currentState.project.id!);
+    if (tasks) {
+      final tasksData = await taskApiRepository.getByProject(projectId);
       final tasks = tasksData.data ?? [];
       tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
-      newState = newState.copyWith(
-        tasks: tasks
-            .map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], currentState.users)))
-            .toList(),
-      );
+      _tasks =
+          tasks.map((task) => TaskUi(task, _getUserTask(task.assigners ?? [], users))).toList();
     }
 
-    emit(newState);
+    notifyListeners();
   }
 
-  Future<void> _onDeleteUser(OnDeleteUser event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-    await userApiRepository.deleteMemberFromProject(event.userId, currentState.project.id!);
-    add(Refresh(user: true));
+  Future<void> onDeleteUser(int userId) async {
+    await userApiRepository.deleteMemberFromProject(userId, projectId);
+    refresh(user: true);
   }
 
-  Future<void> _onDeleteProject(OnDeleteProject event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-    await projectApiRepository.delete(currentState.project.id!);
-    final provider = AppRouter.context.read<AppProvider>();
-    await provider.load();
-    await AppRouter.goTo(HomePage.route());
-  }
-
-  Future<void> _onHeaderButtonTap(OnHeaderButtonTap event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-    switch (currentState.pageState) {
+  Future<void> onHeaderButtonTap() async {
+    switch (pageState) {
       case ProjectPageState.tasks:
-        await AppRouter.goTo(TaskPage.route(currentState.project.id!));
+        await AppRouter.goTo(TaskPage.route(projectId));
         break;
       case ProjectPageState.users:
         await AppRouter.dialog(
           (context) => InviteMemberDialog(
-            projectId: currentState.project.id!,
-            onInvite: () => add(Refresh(user: true)),
+            projectId: projectId,
+            onInvite: () => refresh(user: true),
           ),
         );
         break;
       case ProjectPageState.info:
         await AppRouter.dialog((context) => ProjectDialog(
-              project: currentState.project,
-              onUpdate: () => add(Refresh(project: true)),
+              project: project,
+              onUpdate: () => refresh(project: true),
             ));
         break;
     }
   }
 
-  Future<void> _onTaskTap(OnTaskTap event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-    await AppRouter.goTo(TaskPage.route(currentState.project.id!, taskId: event.taskId));
+  Future<void> onTaskTap(int taskId) async {
+    await AppRouter.goTo(TaskPage.route(projectId, taskId: taskId));
   }
 
-  Future<void> _onTabTap(OnTabTap event, Emitter emit) async {
-    final currentState = state as ProjectLoadedState;
-    if (event.page == currentState.pageState) {
-      return;
+  Future<void> onTabTap(ProjectPageState page) async {
+    if (page != pageState) {
+      _pageState = page;
+      notifyListeners();
     }
-    emit(currentState.copyWith(pageState: event.page));
   }
 
   List<User> _getUserTask(List<int> assignersIds, List<User> users) {

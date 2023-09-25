@@ -3,8 +3,7 @@ part of 'task_view.dart';
 enum _ScrollDerection { none, left, right }
 
 class _TaskBoardView extends StatefulWidget {
-  const _TaskBoardView(this.state);
-  final TaskState state;
+  const _TaskBoardView();
 
   @override
   State<_TaskBoardView> createState() => _TaskBoardViewState();
@@ -50,6 +49,7 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
 
   @override
   Widget build(BuildContext context) {
+    final filteredTasks = context.select((TaskBloc bloc) => bloc.state.filteredTasks);
     return SliverPadding(
       padding: const EdgeInsets.only(top: defaultPadding, bottom: defaultPadding),
       sliver: SliverToBoxAdapter(
@@ -68,9 +68,8 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: TaskStatus.values.map((e) {
-                      final List<TaskUi> tasks = widget.state.filteredTasks
-                          .where((element) => element.task.status == e)
-                          .toList();
+                      final List<TaskUi> tasks =
+                          filteredTasks.where((element) => element.task.status == e).toList();
                       return Padding(
                         padding: const EdgeInsets.only(right: 10),
                         child: DragTarget<TaskUi>(onAccept: (data) {

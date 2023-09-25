@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/app/bloc/states.dart';
-import 'package:task_me_flutter/app/ui/error_page.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
 import 'package:task_me_flutter/layers/ui/pages/auth/poster.dart';
@@ -23,53 +21,47 @@ class _AuthPageState extends State<AuthPage> {
     return Scaffold(
       body: BlocProvider.value(
         value: cubit,
-        child: BlocBuilder<AuthCubit, AppState>(
+        child: BlocBuilder<AuthCubit, AuthState>(
           bloc: cubit,
           builder: (context, state) {
-            if (state is AuthState) {
-              return state.pageState == AuthPageState.none
-                  ? const AuthPoster()
-                  : Center(
-                      child: Container(
-                        margin: const EdgeInsets.all(defaultPadding),
-                        padding: const EdgeInsets.all(defaultPadding),
-                        width: 300,
-                        height: 400,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(radius)),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () => _bloc(context).setConfig(),
-                                  icon: const Icon(Icons.settings_outlined),
-                                ),
-                                IconButton(
-                                  onPressed: () => _bloc(context).setNewState(AuthPageState.none),
-                                  icon: const Icon(Icons.close),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: defaultPadding),
-                            Expanded(
-                              child: Center(
-                                child: cubit.state is AuthState &&
-                                        (cubit.state as AuthState).pageState == AuthPageState.login
-                                    ? const _AuthLoginPage()
-                                    : const _AuthRegistrPage(),
+            return state.pageState == AuthPageState.none
+                ? const AuthPoster()
+                : Center(
+                    child: Container(
+                      margin: const EdgeInsets.all(defaultPadding),
+                      padding: const EdgeInsets.all(defaultPadding),
+                      width: 300,
+                      height: 400,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: const BorderRadius.all(radius)),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                onPressed: () => _bloc(context).setConfig(),
+                                icon: const Icon(Icons.settings_outlined),
                               ),
+                              IconButton(
+                                onPressed: () => _bloc(context).setNewState(AuthPageState.none),
+                                icon: const Icon(Icons.close),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: defaultPadding),
+                          Expanded(
+                            child: Center(
+                              child: cubit.state.pageState == AuthPageState.login
+                                  ? const _AuthLoginPage()
+                                  : const _AuthRegistrPage(),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-            } else if (state is AppErrorState) {
-              return AppErrorPage(state.error);
-            }
-            return const SizedBox();
+                    ),
+                  );
           },
         ),
       ),
@@ -89,15 +81,16 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
   final passwordController = TextEditingController();
 
   Future<void> confirm() async {
+    final provider = context.read<AppProvider>();
     final token = await _bloc(context).confirm(emailController.text, passwordController.text);
     if (token != null) {
-      await context.read<AppProvider>().setToken(token);
+      await provider.setToken(token);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final errMess = (context.watch<AuthCubit>().state as AuthState).authErrorMessage;
+    final errMess = context.select((AuthCubit cubit) => cubit.state.authErrorMessage);
     return SizedBox(
       width: 300,
       child: Column(
@@ -163,10 +156,11 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
   final passwordController = TextEditingController();
 
   Future<void> confirm() async {
+    final provider = context.read<AppProvider>();
     final token = await _bloc(context)
         .confirm(emailController.text, passwordController.text, name: nameController.text);
     if (token != null) {
-      await context.read<AppProvider>().setToken(token);
+      await provider.setToken(token);
     }
   }
 

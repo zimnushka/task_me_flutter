@@ -1,24 +1,27 @@
 part of 'task_detail.dart';
 
 class _TaskView extends StatelessWidget {
-  const _TaskView(this.state);
-  final TaskDetailState state;
+  const _TaskView();
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<TaskDetailVM>();
+    final task = context.select((TaskDetailVM vm) => vm.task);
+    final editedTask = context.select((TaskDetailVM vm) => vm.editedTask);
+    final assigners = context.select((TaskDetailVM vm) => vm.assigners);
+
     return Align(
       alignment: Alignment.topCenter,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                _TaskIDCard(state.task?.id),
+                _TaskIDCard(task?.id),
                 const Expanded(child: SizedBox()),
-                _TaskStatusSelector(
-                    value: state.editedTask.status, onChanged: (_) {}, readOnly: true),
+                _TaskStatusSelector(value: editedTask.status, onChanged: (_) {}, readOnly: true),
                 const SizedBox(width: defaultPadding),
                 GestureDetector(
                   onTap: () {
@@ -40,9 +43,9 @@ class _TaskView extends StatelessWidget {
                                       const SizedBox(height: defaultPadding),
                                       Expanded(
                                         child: ListView.builder(
-                                          itemCount: state.assigners.length,
+                                          itemCount: assigners.length,
                                           itemBuilder: (context, index) {
-                                            final item = state.assigners[index];
+                                            final item = assigners[index];
                                             return _UserCard(item);
                                           },
                                         ),
@@ -55,30 +58,28 @@ class _TaskView extends StatelessWidget {
                           );
                         });
                   },
-                  child: state.assigners.isEmpty
+                  child: assigners.isEmpty
                       ? const Text('Without assigner', style: TextStyle(fontSize: 18))
-                      : MultiUserShow(state.assigners, radius: 20),
+                      : MultiUserShow(assigners, radius: 20),
                 ),
               ],
             ),
             const SizedBox(height: defaultPadding),
             _TaskTitleEditor(
-              initValue: state.editedTask.title,
-              readOnly: state.task?.status == TaskStatus.closed,
-              onChanged: (value) => _bloc(context).add(
-                OnTitleUpdate(value),
-              ),
+              initValue: editedTask.title,
+              readOnly: task?.status == TaskStatus.closed,
+              onChanged: vm.onTitleUpdate,
             ),
             const SizedBox(height: defaultPadding),
             _TaskDescriptionEditor(
-              initValue: state.editedTask.description,
-              onChanged: (value) => _bloc(context).add(OnDescriptionUpdate(value)),
-              readOnly: state.task?.status == TaskStatus.closed,
+              initValue: editedTask.description,
+              onChanged: vm.onDescriptionUpdate,
+              readOnly: task?.status == TaskStatus.closed,
             ),
             const SizedBox(height: defaultPadding),
             const AppText('Time intervals'),
             const SizedBox(height: 10),
-            TaskIntervalsView(readOnly: true, taskId: state.editedTask.id!)
+            TaskIntervalsView(readOnly: true, taskId: editedTask.id!)
           ],
         ),
       ),

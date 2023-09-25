@@ -20,7 +20,11 @@ class _LandingState extends State<Landing> {
           data: state.theme,
           child: ColoredBox(
             color: state.theme.colorScheme.background,
-            child: state.user != null ? Scaffold(body: widget.child) : const AuthPage(),
+            child: state.user != null
+                ? Scaffold(
+                    body: widget.child,
+                  )
+                : const AuthPage(),
           ),
         );
       },

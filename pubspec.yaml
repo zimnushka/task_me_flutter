@@ -19,6 +19,7 @@ dependencies:
   # models
   json_annotation: any
   freezed_annotation: any
+  equatable: 2.0.5
 
   # state manager
   flutter_bloc: 8.1.1
@@ -27,7 +28,6 @@ dependencies:
 
   # ui
   syncfusion_flutter_charts: 22.2.10
-  flutter_heatmap_calendar: 1.0.5
   top_snackbar_flutter: 2.1.1
   flutter_quill: 7.4.3
   intl: 0.18.0

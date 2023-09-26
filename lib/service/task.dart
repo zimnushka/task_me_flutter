@@ -36,6 +36,7 @@ class TaskService {
   }
 
   Future<bool> editTask(Task task, List<User> projectUsers) async {
+    // TODO: optimize on backend
     int cost = 0;
     final List<TimeInterval> intervals =
         (await _intervalsApiRepository.getTaskIntervals(task.id!)).data ?? [];

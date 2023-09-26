@@ -1,10 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:task_me_flutter/bloc/task/task_state.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:equatable/equatable.dart';
 
 DateTime? _dateTimeFromString(String? value) {
   if (value == null || value.isEmpty) return null;
   return DateTime.tryParse(value);
+}
+
+enum TaskViewState {
+  board,
+  list;
+
+  static TaskViewState fromInt(int value) {
+    if (value == 1) {
+      return TaskViewState.list;
+    }
+    return TaskViewState.board;
+  }
+
+  int toInt() {
+    switch (this) {
+      case TaskViewState.board:
+        return 0;
+      case TaskViewState.list:
+        return 1;
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case TaskViewState.board:
+        return 'Board';
+      case TaskViewState.list:
+        return 'List';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case TaskViewState.board:
+        return Icons.auto_awesome_mosaic_outlined;
+      case TaskViewState.list:
+        return Icons.sort;
+    }
+  }
 }
 
 class Config {
@@ -55,7 +94,7 @@ class Config {
   }
 }
 
-class TaskViewFilterModel {
+class TaskViewFilterModel extends Equatable {
   final List<TaskStatus> openedStatuses;
   final String? text;
 
@@ -87,6 +126,9 @@ class TaskViewFilterModel {
       text: text ?? this.text,
     );
   }
+
+  @override
+  List<Object?> get props => [openedStatuses, text];
 }
 
 class User {

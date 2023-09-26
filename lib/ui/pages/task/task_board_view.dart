@@ -49,7 +49,8 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTasks = context.select((TaskBloc bloc) => bloc.state.filteredTasks);
+    final filteredTasks = context.select((TaskVM vm) => vm.filteredTasks);
+    final vm = context.read<TaskVM>();
     return SliverPadding(
       padding: const EdgeInsets.only(top: defaultPadding, bottom: defaultPadding),
       sliver: SliverToBoxAdapter(
@@ -74,7 +75,7 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
                         padding: const EdgeInsets.only(right: 10),
                         child: DragTarget<TaskUi>(onAccept: (data) {
                           if (data.task.status != e) {
-                            _bloc(context).add(OnChangeTaskStatus(data, e));
+                            vm.onChangeTaskStatus(data, e);
                           }
                         }, builder: (context, items, _) {
                           return Container(
@@ -121,9 +122,9 @@ class _TaskBoardViewState extends State<_TaskBoardView> {
                                                 onTap: () {}),
                                             child: TaskBoardCard(
                                               item: item,
-                                              onTap: () => _bloc(context).add(
-                                                OnTaskTap(item.task.id!),
-                                              ),
+                                              onTap: () {
+                                                vm.onTaskTap(item.task.id!);
+                                              },
                                             ),
                                           );
                                         }),

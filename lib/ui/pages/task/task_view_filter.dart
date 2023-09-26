@@ -20,17 +20,18 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
   void initState() {
     tabController = TabController(length: 2, vsync: this)
       ..addListener(() {
+        final vm = context.read<TaskVM>();
         switch (tabController.index) {
           case 0:
             widget.onChangeView(TaskViewState.list);
-            _bloc(context).add(OnChangeViewState(TaskViewState.list));
+            vm.onChangeViewState(TaskViewState.list);
             break;
           case 1:
             widget.onChangeView(TaskViewState.board);
-            _bloc(context).add(OnChangeViewState(TaskViewState.board));
+            vm.onChangeViewState(TaskViewState.board);
             break;
           default:
-            _bloc(context).add(OnChangeViewState(TaskViewState.list));
+            vm.onChangeViewState(TaskViewState.list);
         }
 
         setState(() {});
@@ -47,12 +48,14 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    final state = _bloc(context).state;
+    final vm = context.read<TaskVM>();
+    final taskView = context.select((TaskVM vm) => vm.state);
+    final filter = context.select((TaskVM vm) => vm.filter);
 
-    if (state.state == TaskViewState.list && tabController.index == 1) {
+    if (taskView == TaskViewState.list && tabController.index == 1) {
       tabController.animateTo(0);
     }
-    if (state.state == TaskViewState.board && tabController.index == 0) {
+    if (taskView == TaskViewState.board && tabController.index == 0) {
       tabController.animateTo(1);
     }
 
@@ -64,8 +67,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
             Expanded(
               child: TextField(
                   onChanged: (text) {
-                    final filter = (_bloc(context).state).filter;
-                    _bloc(context).add(OnTaskFilterChange(filter.copyWith(text: text)));
+                    vm.onTaskFilterChange(filter.copyWith(text: text));
                   },
                   decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

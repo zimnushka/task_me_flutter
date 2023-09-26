@@ -1,4 +1,3 @@
-import 'package:task_me_flutter/bloc/task/task_state.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 
 const defaultConfig = Config(

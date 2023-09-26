@@ -5,8 +5,10 @@ class _TaskListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTasks = context.select((TaskBloc bloc) => bloc.state.filteredTasks);
-    final filter = context.select((TaskBloc bloc) => bloc.state.filter);
+    final filteredTasks = context.select((TaskVM vm) => vm.filteredTasks);
+    final filter = context.select((TaskVM vm) => vm.filter);
+    final vm = context.read<TaskVM>();
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: filteredTasks.length,
@@ -23,12 +25,12 @@ class _TaskListView extends StatelessWidget {
           return TaskListStatusHeader(
             isShow: isShow,
             status: status,
-            onTap: () => _bloc(context).add(OnTaskStatusTap(item.task.status)),
+            onTap: () => vm.onTaskStatusTap(item.task.status),
             child: isShow
                 ? TaskListCard(
                     item: item,
-                    onTap: () => _bloc(context).add(OnTaskTap(item.task.id!)),
-                    onStatusCnange: (value) => _bloc(context).add(OnChangeTaskStatus(item, value)),
+                    onTap: () => vm.onTaskTap(item.task.id!),
+                    onStatusCnange: (value) => vm.onChangeTaskStatus(item, value),
                   )
                 : const SizedBox(),
           );

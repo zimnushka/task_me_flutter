@@ -5,8 +5,7 @@ import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/domain/service/router.dart';
 import 'package:task_me_flutter/bloc/app_provider.dart';
 import 'package:task_me_flutter/ui/pages/home/home_vm.dart';
-import 'package:task_me_flutter/bloc/task/task_bloc.dart';
-import 'package:task_me_flutter/bloc/task/task_state.dart';
+import 'package:task_me_flutter/bloc/task_vm.dart';
 import 'package:task_me_flutter/ui/pages/home/widgets/interval.dart';
 import 'package:task_me_flutter/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
@@ -50,8 +49,11 @@ class _HomeView extends StatelessWidget {
     final user = context.select((AppProvider vm) => vm.state.user!);
     final homeVM = context.read<HomeVM>();
     final tasks = context.select((HomeVM vm) => vm.tasks);
-    final taskBloc =
-        TaskBloc(homeVM.onTaskTap, tasks.map((e) => TaskUi(e, [])).toList(), TaskViewState.list);
+    final taskBloc = TaskVM(
+      onTaskClick: homeVM.onTaskTap,
+      tasks: tasks.map((e) => TaskUi(e, [])).toList(),
+      state: TaskViewState.list,
+    );
     return SideBar(
       child: CustomScrollView(
         slivers: [
@@ -112,7 +114,7 @@ class _HomeView extends StatelessWidget {
               ),
             ),
           ),
-          BlocProvider.value(
+          ChangeNotifierProvider.value(
             value: taskBloc,
             child: const _HomeTaskView(),
           ),

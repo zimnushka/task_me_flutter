@@ -1,8 +1,5 @@
-// ignore_for_file: avoid_positional_boolean_parameters
-
 import 'package:flutter/material.dart';
 import 'package:task_me_flutter/domain/configs.dart';
-import 'package:task_me_flutter/bloc/task/task_state.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/repositories/local/config.dart';
 

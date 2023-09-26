@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/domain/service/router.dart';
 import 'package:task_me_flutter/bloc/app_provider.dart';
-import 'package:task_me_flutter/bloc/task/task_state.dart';
 import 'package:task_me_flutter/ui/pages/settings/theme_previev.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';

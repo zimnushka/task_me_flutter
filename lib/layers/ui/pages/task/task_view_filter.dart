@@ -64,7 +64,7 @@ class TaskViewFilterState extends State<TaskViewFilter> with TickerProviderState
             Expanded(
               child: TextField(
                   onChanged: (text) {
-                    final filter = (_bloc(context).state as TaskState).filter;
+                    final filter = (_bloc(context).state).filter;
                     _bloc(context).add(OnTaskFilterChange(filter.copyWith(text: text)));
                   },
                   decoration: InputDecoration(

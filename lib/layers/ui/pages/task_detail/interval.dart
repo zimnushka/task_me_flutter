@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/bloc/intervals/interval_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/interval_vm.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/styles/text.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';

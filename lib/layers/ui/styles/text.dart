@@ -18,7 +18,7 @@ const _month = [
 ];
 
 class AppLabelTitleText extends StatelessWidget {
-  const AppLabelTitleText(this.text, {this.color, this.weight, this.maxLines});
+  const AppLabelTitleText(this.text, {super.key, this.color, this.weight, this.maxLines});
   final String text;
   final Color? color;
   final FontWeight? weight;
@@ -32,7 +32,7 @@ class AppLabelTitleText extends StatelessWidget {
 }
 
 class AppMainTitleText extends StatelessWidget {
-  const AppMainTitleText(this.text, {this.color, this.weight, this.maxLines});
+  const AppMainTitleText(this.text, {super.key, this.color, this.weight, this.maxLines});
   final String text;
   final Color? color;
   final FontWeight? weight;
@@ -46,7 +46,7 @@ class AppMainTitleText extends StatelessWidget {
 }
 
 class AppTitleText extends StatelessWidget {
-  const AppTitleText(this.text, {this.color, this.weight, this.maxLines});
+  const AppTitleText(this.text, {super.key, this.color, this.weight, this.maxLines});
   final String text;
   final Color? color;
   final FontWeight? weight;
@@ -60,7 +60,7 @@ class AppTitleText extends StatelessWidget {
 }
 
 class AppText extends StatelessWidget {
-  const AppText(this.text, {this.color, this.weight, this.maxLines});
+  const AppText(this.text, {super.key, this.color, this.weight, this.maxLines});
   final String text;
   final Color? color;
   final FontWeight? weight;
@@ -74,7 +74,7 @@ class AppText extends StatelessWidget {
 }
 
 class AppSmallText extends StatelessWidget {
-  const AppSmallText(this.text, {this.color, this.weight, this.maxLines});
+  const AppSmallText(this.text, {super.key, this.color, this.weight, this.maxLines});
   final String text;
   final Color? color;
   final FontWeight? weight;

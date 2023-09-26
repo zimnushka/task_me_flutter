@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/project_vm.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
@@ -44,8 +44,9 @@ class ProjectPage extends StatelessWidget {
         final tasks = context.select((ProjectVM vm) => vm.tasks);
         final vm = context.read<ProjectVM>();
         final taskView = context.read<AppProvider>().state.config.taskView;
-        return BlocProvider(
-          create: (context) => TaskBloc(vm.onTaskTap, tasks, taskView),
+        final taskBloc = TaskBloc(vm.onTaskTap, tasks, taskView);
+        return BlocProvider.value(
+          value: taskBloc,
           child: const _ProjectView(),
         );
       }),
@@ -101,6 +102,7 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                 right: defaultPadding,
               ),
               sliver: SliverAppBar(
+                elevation: 0,
                 automaticallyImplyLeading: false,
                 title: AppMainTitleText(project.title),
                 centerTitle: false,
@@ -172,9 +174,9 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                       Container(
                         height: 40,
                         padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).disabledColor,
-                          borderRadius: const BorderRadius.only(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10),
                             topRight: Radius.circular(10),
                             bottomLeft: Radius.circular(10),
@@ -268,7 +270,7 @@ class _Tab extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(label),
+            child: AppText(label, color: isActive ? Colors.white : Theme.of(context).primaryColor),
           ),
         ),
       ),

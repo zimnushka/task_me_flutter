@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/bloc/project/project_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/project_vm.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/slide_animation_container.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';

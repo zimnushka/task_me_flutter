@@ -4,7 +4,7 @@ import 'package:task_me_flutter/layers/models/task_percent.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class UserCard extends StatefulWidget {
-  const UserCard(this.user, this.onRemove, this.tasks, {this.isOwner = false});
+  const UserCard(this.user, this.onRemove, this.tasks, {super.key, this.isOwner = false});
   final List<TaskUi> tasks;
   final User user;
   final bool isOwner;

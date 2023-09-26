@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:task_me_flutter/app/service/router.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
-import 'package:task_me_flutter/layers/bloc/home/home_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/home_vm.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
@@ -50,13 +50,15 @@ class _HomeView extends StatelessWidget {
     final user = context.select((AppProvider vm) => vm.state.user!);
     final homeVM = context.read<HomeVM>();
     final tasks = context.select((HomeVM vm) => vm.tasks);
-
+    final taskBloc =
+        TaskBloc(homeVM.onTaskTap, tasks.map((e) => TaskUi(e, [])).toList(), TaskViewState.list);
     return SideBar(
       child: CustomScrollView(
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.only(bottom: 10, right: defaultPadding),
             sliver: SliverAppBar(
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: AppMainTitleText(user.name),
               centerTitle: false,
@@ -110,12 +112,8 @@ class _HomeView extends StatelessWidget {
               ),
             ),
           ),
-          BlocProvider(
-            create: (context) => TaskBloc(
-              homeVM.onTaskTap,
-              tasks.map((e) => TaskUi(e, [])).toList(),
-              TaskViewState.list,
-            ),
+          BlocProvider.value(
+            value: taskBloc,
             child: const _HomeTaskView(),
           ),
         ],

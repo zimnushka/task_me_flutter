@@ -1,5 +1,3 @@
-// ignore_for_file: leading_newlines_in_multiline_strings
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/layers/bloc/auth.dart';
@@ -9,7 +7,7 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
 class AuthPoster extends StatefulWidget {
-  const AuthPoster();
+  const AuthPoster({super.key});
 
   @override
   State<AuthPoster> createState() => AuthPosterState();

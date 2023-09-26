@@ -6,7 +6,6 @@ import 'package:task_me_flutter/layers/repositories/session/session.dart';
 abstract class ApiRepository {
   static Session? _session;
   static String? _url;
-  static bool _debug = false;
   static Dio _dio = Dio();
 
   static set session(Session value) => _setSession(value);
@@ -14,7 +13,6 @@ abstract class ApiRepository {
 
   static void setConfig(Config value) {
     _url = value.apiBaseUrl;
-    _debug = value.debug;
     _updateDio();
   }
 
@@ -33,16 +31,7 @@ abstract class ApiRepository {
       baseUrl: _url ?? '',
       headers: _session?.sign(),
       followRedirects: false,
-    ))
-      ..interceptors.add(
-        LogInterceptor(
-          requestHeader: false,
-          responseHeader: false,
-          requestBody: _debug,
-          responseBody: _debug,
-          error: _debug,
-        ),
-      );
+    ));
   }
 
   Dio get client => _dio;

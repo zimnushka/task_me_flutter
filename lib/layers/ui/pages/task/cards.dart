@@ -6,6 +6,7 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class TaskListStatusHeader extends StatelessWidget {
   const TaskListStatusHeader({
+    super.key,
     required this.child,
     required this.isShow,
     this.status,
@@ -52,7 +53,7 @@ class TaskListStatusHeader extends StatelessWidget {
 }
 
 class TaskBoardStatusHeader extends StatelessWidget {
-  const TaskBoardStatusHeader({required this.status, required this.tasksCount});
+  const TaskBoardStatusHeader({super.key, required this.status, required this.tasksCount});
   final TaskStatus status;
   final int tasksCount;
 
@@ -77,7 +78,8 @@ class TaskBoardStatusHeader extends StatelessWidget {
 }
 
 class TaskListCard extends StatelessWidget {
-  const TaskListCard({required this.item, required this.onTap, required this.onStatusCnange});
+  const TaskListCard(
+      {super.key, required this.item, required this.onTap, required this.onStatusCnange});
   final TaskUi item;
   final VoidCallback onTap;
   final Function(TaskStatus) onStatusCnange;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quil;
 import 'package:provider/provider.dart';
 import 'package:task_me_flutter/app/service/router.dart';
-import 'package:task_me_flutter/layers/bloc/task_detail/task_bloc.dart';
+import 'package:task_me_flutter/layers/bloc/task_vm.dart';
 
 import 'package:task_me_flutter/layers/models/schemes.dart';
 import 'package:task_me_flutter/layers/ui/kit/multi_user_show.dart';
@@ -60,6 +60,10 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.select((TaskDetailVM vm) => vm.state);
+    final isLoading = context.select((TaskDetailVM vm) => vm.isLoading);
+    if (isLoading) {
+      return const CircularProgressIndicator();
+    }
     switch (state) {
       case TaskDetailPageState.view:
         return const _TaskView();

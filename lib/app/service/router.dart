@@ -5,7 +5,7 @@ import 'package:task_me_flutter/app/app.dart';
 import 'package:task_me_flutter/layers/bloc/app_provider.dart';
 
 abstract class AppRouter {
-  static GlobalKey<NavigatorState>? _navigatorKey = null;
+  static GlobalKey<NavigatorState>? _navigatorKey;
 
   static Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _navigatorKey = navigatorKey;

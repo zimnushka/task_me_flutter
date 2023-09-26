@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:task_me_flutter/layers/models/schemes.dart';
 
 enum TaskViewState {
-  @JsonValue(0)
   board,
-  @JsonValue(1)
-  list
+  list;
+
+  static TaskViewState fromInt(int value) {
+    if (value == 1) {
+      return TaskViewState.list;
+    }
+    return TaskViewState.board;
+  }
+
+  int toInt() {
+    switch (this) {
+      case TaskViewState.board:
+        return 0;
+      case TaskViewState.list:
+        return 1;
+    }
+  }
 }
 
 extension TaskViewStateInfo on TaskViewState {

@@ -1,7 +1,4 @@
 name: task_me_flutter
-description: A new Flutter project.
-
-publish_to: 'none' 
 
 version: 1.0.0+1
 
@@ -17,8 +14,6 @@ dependencies:
   shared_preferences: 2.0.6
 
   # models
-  json_annotation: any
-  freezed_annotation: any
   equatable: 2.0.5
 
   # state manager
@@ -38,15 +33,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  json_serializable: any
-  build_runner: any
-  freezed: any
-
-  hive_generator: 2.0.0
-
   flutter_lints: 2.0.0
-  lints: 2.0.0
 
 flutter:
   uses-material-design: true

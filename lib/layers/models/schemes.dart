@@ -1,47 +1,68 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:task_me_flutter/layers/bloc/task/task_state.dart';
 import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
-part 'schemes.freezed.dart';
-part 'schemes.g.dart';
-
-String? getStringDateTime(Map<dynamic, dynamic> data, String key) {
-  if (data[key] is String) {
-    if ((data[key] as String).isNotEmpty) {
-      if (DateTime.tryParse(data[key]) != null) {
-        return data[key];
-      }
-    }
-  }
-  return null;
+DateTime? _dateTimeFromString(String? value) {
+  if (value == null || value.isEmpty) return null;
+  return DateTime.tryParse(value);
 }
 
-@freezed
-class Config with _$Config {
-  const factory Config({
-    required final String apiBaseUrl,
-    required final bool isLightTheme,
-    required final TaskViewState taskView,
-    required final bool debug,
-  }) = _Config;
+class Config {
+  final String apiBaseUrl;
+  final bool isLightTheme;
+  final TaskViewState taskView;
+  final bool debug;
 
-  const Config._();
+  const Config({
+    required this.apiBaseUrl,
+    required this.isLightTheme,
+    required this.taskView,
+    required this.debug,
+  });
 
   ThemeData get theme => isLightTheme ? lightTheme : darkTheme;
 
-  factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'apiBaseUrl': apiBaseUrl,
+      'isLightTheme': isLightTheme,
+      'taskView': taskView.toInt(),
+      'debug': debug,
+    };
+  }
+
+  factory Config.fromJson(Map<String, dynamic> map) {
+    return Config(
+      apiBaseUrl: map['apiBaseUrl'] as String,
+      isLightTheme: map['isLightTheme'] as bool,
+      taskView: TaskViewState.fromInt(map['taskView'] as int),
+      debug: map['debug'] as bool,
+    );
+  }
+
+  Config copyWith({
+    String? apiBaseUrl,
+    bool? isLightTheme,
+    TaskViewState? taskView,
+    bool? debug,
+  }) {
+    return Config(
+      apiBaseUrl: apiBaseUrl ?? this.apiBaseUrl,
+      isLightTheme: isLightTheme ?? this.isLightTheme,
+      taskView: taskView ?? this.taskView,
+      debug: debug ?? this.debug,
+    );
+  }
 }
 
-@Freezed(makeCollectionsUnmodifiable: false)
-class TaskViewFilterModel with _$TaskViewFilterModel {
-  const factory TaskViewFilterModel({
-    required final List<TaskStatus> openedStatuses,
-    final String? text,
-  }) = _TaskViewFilterModel;
+class TaskViewFilterModel {
+  final List<TaskStatus> openedStatuses;
+  final String? text;
 
-  const TaskViewFilterModel._();
+  const TaskViewFilterModel({
+    required this.openedStatuses,
+    this.text,
+  });
 
   List<TaskUi> getTaskByFilter(List<TaskUi> tasks) {
     List<TaskUi> filteredTasks = List.of(tasks);
@@ -57,23 +78,91 @@ class TaskViewFilterModel with _$TaskViewFilterModel {
     return filteredTasks;
   }
 
-  factory TaskViewFilterModel.fromJson(Map<String, dynamic> json) =>
-      _$TaskViewFilterModelFromJson(json);
+  TaskViewFilterModel copyWith({
+    List<TaskStatus>? openedStatuses,
+    String? text,
+  }) {
+    return TaskViewFilterModel(
+      openedStatuses: openedStatuses ?? this.openedStatuses,
+      text: text ?? this.text,
+    );
+  }
 }
 
-@freezed
-class User with _$User {
-  factory User({
-    required final int id,
-    required final String name,
-    required final String email,
-    @JsonKey(name: 'color') required final int colorInt,
-    required final int cost,
-  }) = _User;
+class User {
+  final int id;
+  final String name;
+  final String email;
+  final int colorInt;
+  final int cost;
 
-  const User._();
+  Color get color => Color(colorInt);
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  const User({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.colorInt,
+    required this.cost,
+  });
+
+  String get initials {
+    final words = name.split(' ');
+    if (words.length > 1) {
+      words.removeRange(1, words.length);
+    }
+    return words.fold('', (previousValue, element) => previousValue + element.characters.first);
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'email': email,
+      'color': colorInt,
+      'cost': cost,
+    };
+  }
+
+  factory User.fromJson(Map<String, dynamic> map) {
+    return User(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      email: map['email'] as String,
+      colorInt: map['color'] as int,
+      cost: map['cost'] as int,
+    );
+  }
+
+  User copyWith({
+    int? id,
+    String? name,
+    String? email,
+    int? colorInt,
+    int? cost,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      colorInt: colorInt ?? this.colorInt,
+      cost: cost ?? this.cost,
+    );
+  }
+}
+
+class UserDTO {
+  final int id;
+  final String name;
+  final String email;
+  final int colorInt;
+
+  const UserDTO({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.colorInt,
+  });
 
   String get initials {
     final words = name.split(' ');
@@ -84,75 +173,133 @@ class User with _$User {
   }
 
   Color get color => Color(colorInt);
-}
 
-@freezed
-class UserDTO with _$UserDTO {
-  factory UserDTO({
-    required final int id,
-    required final String name,
-    required final String email,
-    @JsonKey(name: 'color') required final int colorInt,
-  }) = _UserDTO;
-
-  const UserDTO._();
-
-  factory UserDTO.fromJson(Map<String, dynamic> json) => _$UserDTOFromJson(json);
-
-  String get initials {
-    final words = name.split(' ');
-    if (words.length > 1) {
-      words.removeRange(1, words.length);
-    }
-    return words.fold('', (previousValue, element) => previousValue + element.characters.first);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'email': email,
+      'color': colorInt,
+    };
   }
 
-  Color get color => Color(colorInt);
+  factory UserDTO.fromJson(Map<String, dynamic> map) {
+    return UserDTO(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      email: map['email'] as String,
+      colorInt: map['color'] as int,
+    );
+  }
 }
 
-@freezed
-class Project with _$Project {
-  const Project._();
+class Project {
+  final String title;
+  final int color;
+  final int? ownerId;
+  final int? id;
 
-  factory Project({
-    required final String title,
-    required final int color,
-    final int? ownerId,
-    final int? id,
-  }) = _Project;
+  const Project({
+    required this.title,
+    required this.color,
+    this.ownerId,
+    this.id,
+  });
 
-  factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
+  factory Project.empty() => const Project(title: '', color: -1);
 
-  factory Project.empty() => Project(title: '', color: -1);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'title': title,
+      'color': color,
+      'ownerId': ownerId,
+      'id': id,
+    };
+  }
+
+  factory Project.fromJson(Map<String, dynamic> map) {
+    return Project(
+      title: map['title'] as String,
+      color: map['color'] as int,
+      ownerId: map['ownerId'] != null ? map['ownerId'] as int : null,
+      id: map['id'] != null ? map['id'] as int : null,
+    );
+  }
 }
 
-@freezed
-class TimeInterval with _$TimeInterval {
-  @JsonSerializable(fieldRename: FieldRename.snake)
-  factory TimeInterval({
-    required final int id,
-    required final String description,
-    required final TaskDTO task,
-    required final UserDTO user,
-    required final DateTime timeStart,
-    @JsonKey(readValue: getStringDateTime) required final DateTime? timeEnd,
-  }) = _TimeInterval;
+class TimeInterval {
+  final int id;
+  final String description;
+  final TaskDTO task;
+  final UserDTO user;
+  final DateTime timeStart;
+  final DateTime? timeEnd;
+  const TimeInterval({
+    required this.id,
+    required this.description,
+    required this.task,
+    required this.user,
+    required this.timeStart,
+    required this.timeEnd,
+  });
 
-  factory TimeInterval.fromJson(Map<String, dynamic> json) => _$TimeIntervalFromJson(json);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'description': description,
+      'task': task.toJson(),
+      'user': user.toJson(),
+      'time_start': timeStart.toIso8601String(),
+      'time_end': timeEnd?.toIso8601String(),
+    };
+  }
+
+  factory TimeInterval.fromJson(Map<String, dynamic> map) {
+    return TimeInterval(
+      id: map['id'] as int,
+      description: map['description'] as String,
+      task: TaskDTO.fromJson(map['task'] as Map<String, dynamic>),
+      user: UserDTO.fromJson(map['user'] as Map<String, dynamic>),
+      timeStart: DateTime.parse(map['time_start'] as String),
+      timeEnd: _dateTimeFromString(map['time_end']),
+    );
+  }
 }
 
 enum TaskStatus {
-  @JsonValue(0)
   open,
-  @JsonValue(1)
   progress,
-  @JsonValue(2)
   review,
-  @JsonValue(3)
-  closed,
-}
+  closed;
 
-extension TaskStatusExt on TaskStatus {
+  static TaskStatus fromInt(int value) {
+    switch (value) {
+      case 0:
+        return TaskStatus.open;
+      case 1:
+        return TaskStatus.progress;
+      case 2:
+        return TaskStatus.review;
+      case 3:
+        return TaskStatus.closed;
+      default:
+        return TaskStatus.closed;
+    }
+  }
+
+  int toInt() {
+    switch (this) {
+      case TaskStatus.open:
+        return 0;
+      case TaskStatus.progress:
+        return 1;
+      case TaskStatus.review:
+        return 2;
+      case TaskStatus.closed:
+        return 3;
+    }
+  }
+
   Color get color {
     switch (this) {
       case TaskStatus.open:
@@ -180,23 +327,29 @@ extension TaskStatusExt on TaskStatus {
   }
 }
 
-@freezed
-class Task with _$Task {
-  const Task._();
+class Task {
+  final String title;
+  final String description;
+  final int projectId;
+  final DateTime? stopDate;
+  final DateTime startDate;
+  final int cost;
 
-  factory Task({
-    required final String title,
-    required final String description,
-    required final int projectId,
-    @JsonKey(readValue: getStringDateTime) required final DateTime? stopDate,
-    required final DateTime startDate,
-    required final int cost,
-    @JsonKey(name: 'statusId') required final TaskStatus status,
-    final int? id,
-    final List<int>? assigners,
-  }) = _Task;
+  final TaskStatus status;
+  final int? id;
+  final List<int>? assigners;
 
-  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+  const Task({
+    required this.title,
+    required this.description,
+    required this.projectId,
+    required this.stopDate,
+    required this.startDate,
+    required this.cost,
+    required this.status,
+    this.id,
+    this.assigners,
+  });
 
   factory Task.empt() => Task(
         stopDate: null,
@@ -207,6 +360,58 @@ class Task with _$Task {
         cost: 0,
         status: TaskStatus.open,
       );
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'title': title,
+      'description': description,
+      'projectId': projectId,
+      'stopDate': stopDate?.toIso8601String(),
+      'startDate': startDate.toIso8601String(),
+      'cost': cost,
+      'statusId': status.toInt(),
+      'id': id,
+      'assigners': assigners,
+    };
+  }
+
+  factory Task.fromJson(Map<String, dynamic> map) {
+    return Task(
+      title: map['title'] as String,
+      description: map['description'] as String,
+      projectId: map['projectId'] as int,
+      stopDate: _dateTimeFromString(map['stopDate'] as String),
+      startDate: DateTime.parse(map['startDate'] as String),
+      cost: map['cost'] as int,
+      status: TaskStatus.fromInt(map['statusId'] as int),
+      id: map['id'] != null ? map['id'] as int : null,
+      assigners: map['assigners'] != null ? List<int>.from((map['assigners'])) : null,
+    );
+  }
+
+  Task copyWith({
+    String? title,
+    String? description,
+    int? projectId,
+    DateTime? stopDate,
+    DateTime? startDate,
+    int? cost,
+    TaskStatus? status,
+    int? id,
+    List<int>? assigners,
+  }) {
+    return Task(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      projectId: projectId ?? this.projectId,
+      stopDate: stopDate ?? this.stopDate,
+      startDate: startDate ?? this.startDate,
+      cost: cost ?? this.cost,
+      status: status ?? this.status,
+      id: id ?? this.id,
+      assigners: assigners ?? this.assigners,
+    );
+  }
 }
 
 class TaskUi {
@@ -226,17 +431,46 @@ class TaskUi {
   }
 }
 
-@freezed
-class TaskDTO with _$TaskDTO {
-  factory TaskDTO({
-    required final int id,
-    required final int projectId,
-    required final String title,
-    @JsonKey(name: 'statusId') required final TaskStatus status,
-    required final DateTime startDate,
-    @JsonKey(readValue: getStringDateTime) required final DateTime? stopDate,
-    required final int cost,
-  }) = _TaskDTO;
+class TaskDTO {
+  final int id;
+  final int projectId;
+  final String title;
+  final TaskStatus status;
+  final DateTime startDate;
+  final DateTime? stopDate;
+  final int cost;
 
-  factory TaskDTO.fromJson(Map<String, dynamic> json) => _$TaskDTOFromJson(json);
+  const TaskDTO({
+    required this.id,
+    required this.projectId,
+    required this.title,
+    required this.status,
+    required this.startDate,
+    required this.stopDate,
+    required this.cost,
+  });
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'projectId': projectId,
+      'title': title,
+      'statusId': status.toInt(),
+      'startDate': startDate.millisecondsSinceEpoch,
+      'stopDate': stopDate?.millisecondsSinceEpoch,
+      'cost': cost,
+    };
+  }
+
+  factory TaskDTO.fromJson(Map<String, dynamic> map) {
+    return TaskDTO(
+      id: map['id'] as int,
+      projectId: map['projectId'] as int,
+      title: map['title'] as String,
+      status: TaskStatus.fromInt(map['statusId'] as int),
+      startDate: DateTime.parse(map['startDate'] as String),
+      stopDate: _dateTimeFromString(map['stopDate'] as String?),
+      cost: map['cost'] as int,
+    );
+  }
 }

@@ -30,7 +30,7 @@ class AuthCubit extends Cubit<AuthState> {
       if (name != null) {
         final data = await _authApiRepository.registration(email, password, name);
         if (data.message != null) {
-          final AuthPageState pageState = (state as AuthState).pageState;
+          final AuthPageState pageState = (state).pageState;
           emit(AuthState(pageState, authErrorMessage: data.message.toString()));
           Timer(const Duration(seconds: 3), () {
             emit(AuthState(pageState, authErrorMessage: null));
@@ -40,7 +40,7 @@ class AuthCubit extends Cubit<AuthState> {
       } else {
         final data = await _authApiRepository.login(email, password);
         if (data.message != null) {
-          final AuthPageState pageState = (state as AuthState).pageState;
+          final AuthPageState pageState = state.pageState;
           emit(AuthState(pageState, authErrorMessage: data.message.toString()));
           Timer(const Duration(seconds: 3), () {
             emit(AuthState(pageState, authErrorMessage: null));
@@ -49,7 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
         return data.data;
       }
     } catch (e) {
-      final AuthPageState pageState = (state as AuthState).pageState;
+      final AuthPageState pageState = state.pageState;
       emit(AuthState(pageState, authErrorMessage: e.toString()));
       Timer(const Duration(seconds: 3), () {
         emit(AuthState(pageState, authErrorMessage: null));

@@ -4,6 +4,7 @@ import 'package:task_me_flutter/layers/ui/styles/themes.dart';
 
 class ThemePreview extends StatelessWidget {
   const ThemePreview({
+    super.key,
     required this.onTap,
     required this.theme,
     required this.height,

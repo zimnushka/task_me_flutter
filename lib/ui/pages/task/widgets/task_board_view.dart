@@ -1,4 +1,4 @@
-part of 'task_view.dart';
+part of '../task_view.dart';
 
 enum _ScrollDerection { none, left, right }
 

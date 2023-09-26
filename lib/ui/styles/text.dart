@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-String monthLabel(int indexMonth) => _month[indexMonth - 1];
-//TODO:
-const _month = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Now',
-  'Dec',
-];
+String monthLabel(DateTime date) {
+  return DateFormat('MMM').format(date);
+}
 
 class AppLabelTitleText extends StatelessWidget {
   const AppLabelTitleText(this.text, {super.key, this.color, this.weight, this.maxLines});

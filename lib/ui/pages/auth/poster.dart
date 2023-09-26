@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/bloc/auth.dart';
+import 'package:task_me_flutter/ui/pages/auth/auth_vm.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
-
-AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
 class AuthPoster extends StatefulWidget {
   const AuthPoster({super.key});
@@ -18,6 +16,8 @@ class AuthPosterState extends State<AuthPoster> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final isMobile = width < 800;
+    final vm = context.read<AuthVM>();
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +66,7 @@ class AuthPosterState extends State<AuthPoster> {
                 const SizedBox(height: defaultPadding),
                 const SizedBox(height: defaultPadding),
                 ElevatedButton(
-                  onPressed: () => _bloc(context).setNewState(AuthPageState.login),
+                  onPressed: () => vm.setNewState(AuthPageState.login),
                   style: ElevatedButton.styleFrom(minimumSize: const Size(300, 60)),
                   child: const AppTitleText(
                     'Try it now!',

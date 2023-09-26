@@ -1,4 +1,4 @@
-part of 'task_view.dart';
+part of '../task_view.dart';
 
 class _TaskListView extends StatelessWidget {
   const _TaskListView();

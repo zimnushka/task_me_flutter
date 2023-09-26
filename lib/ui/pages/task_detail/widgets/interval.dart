@@ -103,7 +103,7 @@ class _IntervalCard extends StatelessWidget {
   final bool isFirst;
 
   String _dateToText(DateTime date) {
-    return '${date.day} ${monthLabel(date.month)} ${DateFormat('HH:mm').format(date)}';
+    return '${date.day} ${monthLabel(date)} ${DateFormat('HH:mm').format(date)}';
   }
 
   @override

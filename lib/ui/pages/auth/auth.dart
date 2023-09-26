@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:task_me_flutter/bloc/app_provider.dart';
-import 'package:task_me_flutter/bloc/auth.dart';
+import 'package:task_me_flutter/ui/pages/auth/auth_vm.dart';
 import 'package:task_me_flutter/ui/pages/auth/poster.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
-
-AuthCubit _bloc(BuildContext context) => BlocProvider.of(context);
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -15,16 +13,16 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  final cubit = AuthCubit();
+  final cubit = AuthVM();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocProvider.value(
+      body: ChangeNotifierProvider.value(
         value: cubit,
-        child: BlocBuilder<AuthCubit, AuthState>(
-          bloc: cubit,
-          builder: (context, state) {
-            return state.pageState == AuthPageState.none
+        child: Builder(
+          builder: (context) {
+            final pageState = context.select((AuthVM vm) => vm.pageState);
+            return pageState == AuthPageState.none
                 ? const AuthPoster()
                 : Center(
                     child: Container(
@@ -41,11 +39,11 @@ class _AuthPageState extends State<AuthPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
-                                onPressed: () => _bloc(context).setConfig(),
+                                onPressed: () => cubit.setConfig(),
                                 icon: const Icon(Icons.settings_outlined),
                               ),
                               IconButton(
-                                onPressed: () => _bloc(context).setNewState(AuthPageState.none),
+                                onPressed: () => cubit.setNewState(AuthPageState.none),
                                 icon: const Icon(Icons.close),
                               ),
                             ],
@@ -53,7 +51,7 @@ class _AuthPageState extends State<AuthPage> {
                           const SizedBox(height: defaultPadding),
                           Expanded(
                             child: Center(
-                              child: cubit.state.pageState == AuthPageState.login
+                              child: pageState == AuthPageState.login
                                   ? const _AuthLoginPage()
                                   : const _AuthRegistrPage(),
                             ),
@@ -82,7 +80,8 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
 
   Future<void> confirm() async {
     final provider = context.read<AppProvider>();
-    final token = await _bloc(context).confirm(emailController.text, passwordController.text);
+    final vm = context.read<AuthVM>();
+    final token = await vm.confirm(emailController.text, passwordController.text);
     if (token != null) {
       await provider.setToken(token);
     }
@@ -90,7 +89,8 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final errMess = context.select((AuthCubit cubit) => cubit.state.authErrorMessage);
+    final errMess = context.select((AuthVM vm) => vm.authErrorMessage);
+    final vm = context.read<AuthVM>();
     return SizedBox(
       width: 300,
       child: Column(
@@ -135,7 +135,7 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
               onPressed: confirm,
               child: const Text('sign in')),
           TextButton(
-              onPressed: () => _bloc(context).setNewState(AuthPageState.registration),
+              onPressed: () => vm.setNewState(AuthPageState.registration),
               child: const Text('create account?'))
         ],
       ),
@@ -157,8 +157,9 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
 
   Future<void> confirm() async {
     final provider = context.read<AppProvider>();
-    final token = await _bloc(context)
-        .confirm(emailController.text, passwordController.text, name: nameController.text);
+    final vm = context.read<AuthVM>();
+    final token =
+        await vm.confirm(emailController.text, passwordController.text, name: nameController.text);
     if (token != null) {
       await provider.setToken(token);
     }
@@ -166,6 +167,7 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<AuthVM>();
     return SizedBox(
       width: 300,
       child: Column(
@@ -206,8 +208,7 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
               onPressed: confirm,
               child: const Text('sign up')),
           TextButton(
-              onPressed: () => _bloc(context).setNewState(AuthPageState.login),
-              child: const Text('login?'))
+              onPressed: () => vm.setNewState(AuthPageState.login), child: const Text('login?'))
         ],
       ),
     );

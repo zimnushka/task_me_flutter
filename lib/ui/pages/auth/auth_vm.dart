@@ -1,28 +1,27 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/domain/service/router.dart';
 import 'package:task_me_flutter/repositories/api/auth.dart';
 import 'package:task_me_flutter/ui/widgets/overlays/config_editor.dart';
 
 enum AuthPageState { login, registration, none }
 
-class AuthState {
-  final AuthPageState pageState;
-  final String? authErrorMessage;
-
-  const AuthState(
-    this.pageState, {
-    this.authErrorMessage,
-  });
-}
-
-class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(const AuthState(AuthPageState.none));
+class AuthVM extends ChangeNotifier {
   final AuthApiRepository _authApiRepository = AuthApiRepository();
 
-  void setNewState(AuthPageState pageState) {
-    emit(AuthState(pageState));
+  AuthPageState _pageState = AuthPageState.none;
+  AuthPageState get pageState => _pageState;
+
+  String? _authErrorMessage;
+  String? get authErrorMessage => _authErrorMessage;
+
+  AuthVM();
+
+  void setNewState(AuthPageState newPageState) {
+    if (_pageState != newPageState) {
+      _pageState = newPageState;
+      notifyListeners();
+    }
   }
 
   Future<String?> confirm(String email, String password, {String? name}) async {
@@ -30,29 +29,35 @@ class AuthCubit extends Cubit<AuthState> {
       if (name != null) {
         final data = await _authApiRepository.registration(email, password, name);
         if (data.message != null) {
-          final AuthPageState pageState = (state).pageState;
-          emit(AuthState(pageState, authErrorMessage: data.message.toString()));
+          _authErrorMessage = data.message.toString();
+          notifyListeners();
+
           Timer(const Duration(seconds: 3), () {
-            emit(AuthState(pageState, authErrorMessage: null));
+            _authErrorMessage = null;
+            notifyListeners();
           });
         }
         return data.data;
       } else {
         final data = await _authApiRepository.login(email, password);
         if (data.message != null) {
-          final AuthPageState pageState = state.pageState;
-          emit(AuthState(pageState, authErrorMessage: data.message.toString()));
+          _authErrorMessage = data.message.toString();
+          notifyListeners();
+
           Timer(const Duration(seconds: 3), () {
-            emit(AuthState(pageState, authErrorMessage: null));
+            _authErrorMessage = null;
+            notifyListeners();
           });
         }
         return data.data;
       }
     } catch (e) {
-      final AuthPageState pageState = state.pageState;
-      emit(AuthState(pageState, authErrorMessage: e.toString()));
+      _authErrorMessage = e.toString();
+      notifyListeners();
+
       Timer(const Duration(seconds: 3), () {
-        emit(AuthState(pageState, authErrorMessage: null));
+        _authErrorMessage = null;
+        notifyListeners();
       });
     }
     return null;

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/domain/service/router.dart';
 import 'package:task_me_flutter/bloc/app_provider.dart';
 import 'package:task_me_flutter/ui/pages/home/home_vm.dart';
-import 'package:task_me_flutter/bloc/task_vm.dart';
+// import 'package:task_me_flutter/ui/pages/task/task_vm.dart';
 import 'package:task_me_flutter/ui/pages/home/widgets/interval.dart';
 import 'package:task_me_flutter/ui/pages/task/task_view.dart';
+import 'package:task_me_flutter/ui/pages/task/task_vm.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
 import 'package:task_me_flutter/ui/widgets/sidebar.dart';
@@ -116,22 +116,15 @@ class _HomeView extends StatelessWidget {
           ),
           ChangeNotifierProvider.value(
             value: taskBloc,
-            child: const _HomeTaskView(),
+            child: SliverPadding(
+              padding: const EdgeInsets.only(right: defaultPadding, bottom: defaultPadding),
+              sliver: Builder(builder: (context) {
+                return const TaskView();
+              }),
+            ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _HomeTaskView extends StatelessWidget {
-  const _HomeTaskView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SliverPadding(
-      padding: EdgeInsets.only(right: defaultPadding, bottom: defaultPadding),
-      sliver: TaskView(),
     );
   }
 }

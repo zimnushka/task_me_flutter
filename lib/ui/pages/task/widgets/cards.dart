@@ -108,7 +108,7 @@ class TaskListCard extends StatelessWidget {
                   SizedBox(
                       width: 90,
                       child: AppText(
-                          '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'))
+                          '${item.task.startDate.day} ${monthLabel(item.task.startDate)} ${item.task.startDate.year}'))
                 ]),
               ),
             ],
@@ -146,7 +146,7 @@ class TaskBoardCard extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               AppSmallText(
-                  '${item.task.startDate.day} ${monthLabel(item.task.startDate.month)} ${item.task.startDate.year}'),
+                  '${item.task.startDate.day} ${monthLabel(item.task.startDate)} ${item.task.startDate.year}'),
               if (item.users.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),

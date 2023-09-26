@@ -128,7 +128,7 @@ class _HomeTaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SliverPadding(
-      padding: EdgeInsets.only(right: defaultPadding),
+      padding: EdgeInsets.only(right: defaultPadding, bottom: defaultPadding),
       sliver: TaskView(),
     );
   }

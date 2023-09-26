@@ -221,17 +221,26 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
             ),
             if (page == ProjectPageState.info)
               const SliverPadding(
-                padding: EdgeInsets.only(right: defaultPadding),
+                padding: EdgeInsets.only(
+                  right: defaultPadding,
+                  bottom: defaultPadding,
+                ),
                 sliver: InfoProjectView(),
               ),
             if (page == ProjectPageState.users)
               const SliverPadding(
-                padding: EdgeInsets.only(right: defaultPadding),
+                padding: EdgeInsets.only(
+                  right: defaultPadding,
+                  bottom: defaultPadding,
+                ),
                 sliver: UserProjectView(),
               ),
             if (page == ProjectPageState.tasks)
               SliverPadding(
-                padding: const EdgeInsets.only(right: defaultPadding),
+                padding: const EdgeInsets.only(
+                  right: defaultPadding,
+                  bottom: defaultPadding,
+                ),
                 sliver: TaskViewFilter(
                   onChangeView: (view) async {
                     await Future.delayed(const Duration(milliseconds: 200));
@@ -244,7 +253,11 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
               ),
             if (page == ProjectPageState.tasks)
               const SliverPadding(
-                  padding: EdgeInsets.only(right: defaultPadding), sliver: TaskView()),
+                  padding: EdgeInsets.only(
+                    right: defaultPadding,
+                    bottom: defaultPadding,
+                  ),
+                  sliver: TaskView()),
           ],
         );
       },

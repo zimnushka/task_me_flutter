@@ -20,9 +20,7 @@ enum TaskViewState {
         return 1;
     }
   }
-}
 
-extension TaskViewStateInfo on TaskViewState {
   String get label {
     switch (this) {
       case TaskViewState.board:

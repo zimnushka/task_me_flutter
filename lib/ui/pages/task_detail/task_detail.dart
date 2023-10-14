@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quil;
 import 'package:provider/provider.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/router/app_router.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/task_vm.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/widgets/interval.dart';
@@ -46,8 +47,13 @@ class TaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainBloc = context.read<MainBloc>();
     return ChangeNotifierProvider(
-      create: (_) => TaskDetailVM(initProjectId: projectId, taskId: taskId),
+      create: (_) => TaskDetailVM(
+        initProjectId: projectId,
+        taskId: taskId,
+        mainBloc: mainBloc,
+      ),
       child: const _Body(),
     );
   }

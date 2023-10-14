@@ -80,7 +80,7 @@ class __TaskEditViewState extends State<_TaskEditView> {
               const SizedBox(height: defaultPadding),
               if (!hasUpdate) const AppText('Time intervals'),
               const SizedBox(height: 10),
-              if (!hasUpdate) TaskIntervalsView(readOnly: false, taskId: editedTask.id!)
+              if (!hasUpdate) TaskIntervalsView(taskId: editedTask.id!)
             ],
           ),
         ),

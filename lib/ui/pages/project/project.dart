@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/router/app_router.dart';
 import 'package:task_me_flutter/ui/pages/project/project_vm.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/pages/project/widgets/info_view.dart';
 import 'package:task_me_flutter/ui/pages/project/widgets/user_view.dart';
 import 'package:task_me_flutter/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/ui/pages/task/task_vm.dart';
+import 'package:task_me_flutter/ui/pages/task_detail/task_detail.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:task_me_flutter/ui/widgets/overlays/invite_member.dart';
+import 'package:task_me_flutter/ui/widgets/overlays/project_dialog.dart';
 import 'package:task_me_flutter/ui/widgets/sidebar.dart';
 
 class ProjectRoute implements AppPage {
@@ -36,13 +39,23 @@ class ProjectPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainBloc = context.read<MainBloc>();
     return ChangeNotifierProvider(
-      create: (context) => ProjectVM(projectId: id),
+      create: (context) => ProjectVM(
+        projectId: id,
+        mainBloc: mainBloc,
+      ),
       child: Builder(builder: (context) {
         final tasks = context.select((ProjectVM vm) => vm.tasks);
         final vm = context.read<ProjectVM>();
-        final taskView = context.read<AppProvider>().state.config.taskView;
-        final taskBloc = TaskVM(onTaskClick: vm.onTaskTap, tasks: tasks, state: taskView);
+        final mainBloc = context.read<MainBloc>();
+        final taskView = mainBloc.state.config.taskView;
+        final taskBloc = TaskVM(
+          onTaskClick: vm.onTaskTap,
+          tasks: tasks,
+          state: taskView,
+          mainBloc: mainBloc,
+        );
         return ChangeNotifierProvider.value(
           value: taskBloc,
           child: const _ProjectView(),
@@ -80,7 +93,8 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final vm = context.read<ProjectVM>();
-    final userMe = context.select((AppProvider vm) => vm.state.user!);
+    final mainBloc = context.read<MainBloc>();
+    final userMe = context.select((MainBloc vm) => vm.state.authState.user!);
     final taskView = context.select((TaskVM vm) => vm.state);
     final tasks = context.select((ProjectVM vm) => vm.tasks);
     final project = context.select((ProjectVM vm) => vm.project);
@@ -204,7 +218,34 @@ class _BodyState extends State<_Body> with TickerProviderStateMixin {
                         backgroundColor: Colors.white,
                         foregroundColor: Theme.of(context).primaryColor,
                       ),
-                      onPressed: vm.onHeaderButtonTap,
+                      onPressed: () async {
+                        switch (page) {
+                          case ProjectPageState.tasks:
+                            await mainBloc.router.goTo(TaskPage.route(vm.projectId));
+                            break;
+                          case ProjectPageState.users:
+                            if (mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => InviteMemberDialog(
+                                  projectId: vm.projectId,
+                                  onInvite: () => vm.refresh(user: true),
+                                ),
+                              );
+                            }
+
+                            break;
+                          case ProjectPageState.info:
+                            if (mounted) {
+                              await showDialog(
+                                context: context,
+                                builder: (context) => ProjectDialog(project: project),
+                              );
+                            }
+
+                            break;
+                        }
+                      },
                       child: Text(page.headerButtonLabel),
                     ),
                   )

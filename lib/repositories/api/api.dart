@@ -1,40 +1,30 @@
 import 'package:dio/dio.dart';
 import 'package:task_me_flutter/domain/models/api_response.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/session/session.dart';
+import 'dart:convert';
 
-abstract class ApiRepository {
-  static Session? _session;
-  static String? _url;
-  static Dio _dio = Dio();
+part 'auth.dart';
+part 'interval.dart';
+part 'project.dart';
+part 'task.dart';
+part 'user.dart';
 
-  static set session(Session value) => _setSession(value);
-  static set url(String value) => _setUrl(value);
+class ApiRepository {
+  final String? token;
+  final String url;
 
-  static void setConfig(Config value) {
-    _url = value.apiBaseUrl;
-    _updateDio();
-  }
+  const ApiRepository({
+    this.token,
+    required this.url,
+  });
 
-  static _setUrl(String value) {
-    _url = value;
-    _updateDio();
-  }
-
-  static _setSession(Session value) {
-    _session = value;
-    _updateDio();
-  }
-
-  static _updateDio() {
-    _dio = Dio(BaseOptions(
-      baseUrl: _url ?? '',
-      headers: _session?.sign(),
-      followRedirects: false,
-    ));
-  }
-
-  Dio get client => _dio;
+  Dio get client => Dio(
+        BaseOptions(
+          baseUrl: url,
+          headers: token != null ? {'Authorization': token} : null,
+          followRedirects: false,
+        ),
+      );
 }
 
 class ApiErrorHandler<T> {

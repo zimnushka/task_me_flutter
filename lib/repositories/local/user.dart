@@ -1,18 +1,14 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_me_flutter/repositories/storage.dart';
+part of 'local_storage.dart';
 
-class UserTokenStorage implements AppStorage<String> {
-  @override
+extension TokenStorage on LocalStorage {
   String get storageKey => 'userToken';
 
-  @override
-  Future<String?> get() async {
+  Future<String?> getToken() async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString(storageKey);
   }
 
-  @override
-  Future<bool> save(String token) async {
+  Future<bool> saveToken(String token) async {
     final pref = await SharedPreferences.getInstance();
     try {
       return pref.setString(storageKey, token);
@@ -21,8 +17,7 @@ class UserTokenStorage implements AppStorage<String> {
     }
   }
 
-  @override
-  Future<bool> delete() async {
+  Future<bool> deleteToken() async {
     final pref = await SharedPreferences.getInstance();
     try {
       return pref.remove(storageKey);

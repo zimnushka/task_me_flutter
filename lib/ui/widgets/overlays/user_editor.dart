@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/bloc/events/edit_user_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
 
@@ -17,51 +18,40 @@ class _UserEditDialogState extends State<UserEditDialog> {
   String? errorNameMessage;
   String? errorEmailMessage;
   late final User initialUser;
-  late final provider = context.read<AppProvider>();
   final costController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
 
   Future<void> save() async {
     final count = int.tryParse(costController.text);
-    if (count != null) {
-      if (nameController.text.isEmpty || emailController.text.isEmpty) {
-        setState(() {
-          errorNameMessage = 'Name is empty';
-          errorEmailMessage = 'Email is empty';
-        });
-        Timer(const Duration(seconds: 1), () {
-          setState(() {
-            errorNameMessage = null;
-            errorEmailMessage = null;
-          });
-        });
-        return;
-      } else {
-        final user = initialUser.copyWith(
-          name: nameController.text,
-          email: emailController.text,
-          cost: count,
-        );
-
-        Navigator.pop(context);
-        await provider.updateUser(user);
-      }
-    } else {
+    if (count == null || nameController.text.isEmpty || emailController.text.isEmpty) {
       setState(() {
-        errorCostMessage = 'Can not be a number';
+        errorCostMessage = count == null ? 'Can not be a number' : null;
+        errorNameMessage = nameController.text.isEmpty ? 'Name is empty' : null;
+        errorEmailMessage = emailController.text.isEmpty ? 'Email is empty' : null;
       });
       Timer(const Duration(seconds: 1), () {
         setState(() {
           errorCostMessage = null;
+          errorNameMessage = null;
+          errorEmailMessage = null;
         });
       });
+      return;
     }
+
+    final user = initialUser.copyWith(
+      name: nameController.text,
+      email: emailController.text,
+      cost: count,
+    );
+    Navigator.pop(context);
+    context.read<MainBloc>().add(EditUserEvent(user: user));
   }
 
   @override
   void initState() {
-    initialUser = provider.state.user!;
+    initialUser = context.read<MainBloc>().state.authState.user!;
     nameController.text = initialUser.name;
     emailController.text = initialUser.email;
     costController.text = initialUser.cost.toString();

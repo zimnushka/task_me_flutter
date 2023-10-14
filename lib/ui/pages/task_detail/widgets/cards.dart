@@ -66,6 +66,8 @@ class _TaskIDCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.read<TaskDetailVM>();
+    final mainBloc = context.read<MainBloc>();
+
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -76,7 +78,7 @@ class _TaskIDCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
-            onTap: AppRouter.pop,
+            onTap: mainBloc.router.pop,
             child: Container(
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 10),

@@ -1,19 +1,24 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:task_me_flutter/bloc/events/overlay_event.dart';
+import 'package:task_me_flutter/bloc/events/time_interval_start_event.dart';
+import 'package:task_me_flutter/bloc/events/time_interval_stop_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/error.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/domain/service/snackbar.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
+import 'package:task_me_flutter/service/snackbar.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/user.dart';
-import 'package:task_me_flutter/service/task.dart';
 
 enum TaskDetailPageState { view, edit, creation }
 
 class TaskDetailVM extends ChangeNotifier {
-  final _taskService = TaskService();
-  final _userApiRepository = UserApiRepository();
+  final MainBloc mainBloc;
 
-  TaskDetailVM({required this.initProjectId, int? taskId}) {
+  TaskDetailVM({
+    required this.initProjectId,
+    required this.mainBloc,
+    int? taskId,
+  }) {
     _initTaskId = taskId;
     _init();
   }
@@ -30,6 +35,9 @@ class TaskDetailVM extends ChangeNotifier {
 
   List<User> _assigners = [];
   List<User> get assigners => _assigners;
+
+  List<TimeInterval> _intervals = [];
+  List<TimeInterval> get intervals => _intervals;
 
   Task? _task;
   Task? get task => _task;
@@ -48,13 +56,13 @@ class TaskDetailVM extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final usersData = await _userApiRepository.getUserFromProject(initProjectId);
+    final usersData = await mainBloc.state.repo.getUserFromProject(initProjectId);
     _users = usersData.data ?? [];
 
     if (initTaskId != null) {
       //TODO: optimaze
-      _assigners = await _taskService.getTaskMembers(initTaskId!);
-      _task = await _taskService.getTaskById(initTaskId!);
+      _assigners = (await mainBloc.state.repo.getUserFromTask(initTaskId!)).data ?? [];
+      _task = (await mainBloc.state.repo.getTaskById(initTaskId!)).data;
 
       if (_task != null) {
         _editedTask = _task!;
@@ -66,6 +74,7 @@ class TaskDetailVM extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      _intervals = (await mainBloc.state.repo.getTaskIntervals(initTaskId!)).data ?? [];
     }
     _editedTask = _editedTask.copyWith(projectId: initProjectId);
 
@@ -75,13 +84,13 @@ class TaskDetailVM extends ChangeNotifier {
 
   Future<void> delete() async {
     if (_task != null) {
-      final responce = await _taskService.deleteTask(_task!.id!);
+      final responce = (await mainBloc.state.repo.deleteTask(_task!.id!)).data ?? false;
       if (responce) {
         _initTaskId = null;
         _task = null;
         await _getData();
       } else {
-        AppSnackBar.show(AppRouter.context, 'Delete error', AppSnackBarType.error);
+        mainBloc.add(OverlayEvent(message: 'Delete error', type: OverlayType.error));
       }
     }
   }
@@ -90,19 +99,25 @@ class TaskDetailVM extends ChangeNotifier {
     try {
       // TODO: localize
       if (editedTask.id != null) {
-        await _taskService.editTask(editedTask, users);
-        AppSnackBar.show(AppRouter.context, 'Edited', AppSnackBarType.success);
+        await mainBloc.state.repo.editTask(editedTask);
+        mainBloc.add(OverlayEvent(message: 'Edited', type: OverlayType.success));
         _initTaskId = editedTask.id;
       } else {
-        final newTask = await _taskService.addTask(editedTask);
-        AppSnackBar.show(AppRouter.context, 'Created', AppSnackBarType.success);
-        _initTaskId = newTask.id;
+        final newTask = editedTask.copyWith(
+          startDate: DateTime.now(),
+          cost: 0,
+        );
+        // TODO:
+        final createdTask = (await mainBloc.state.repo.createTask(newTask)).data!;
+
+        mainBloc.add(OverlayEvent(message: 'Created', type: OverlayType.success));
+        _initTaskId = createdTask.id;
       }
       await _getData();
     } on LogicalException catch (e) {
-      AppSnackBar.show(AppRouter.context, e.message, AppSnackBarType.error);
+      mainBloc.add(OverlayEvent(message: e.message, type: OverlayType.error));
     } catch (e) {
-      AppSnackBar.show(AppRouter.context, e.toString(), AppSnackBarType.error);
+      mainBloc.add(OverlayEvent(message: e.toString(), type: OverlayType.error));
     }
   }
 
@@ -115,7 +130,8 @@ class TaskDetailVM extends ChangeNotifier {
 
   Future<void> onUserSwap(List<User> users) async {
     try {
-      await _taskService.editTaskMemberList(task!, users);
+      //TODO: fix !
+      await mainBloc.state.repo.updateTaskMemberList(task!.id!, users);
       // ignore: empty_catches
     } catch (e) {}
 
@@ -131,5 +147,28 @@ class TaskDetailVM extends ChangeNotifier {
   Future<void> onDescriptionUpdate(String value) async {
     _editedTask = editedTask.copyWith(description: value);
     notifyListeners();
+  }
+
+  // Future<void> _updateIntervals() async {
+  //   if (editedTask.id == null) return;
+
+  //   _isLoading = true;
+  //   notifyListeners();
+
+  //   _intervals = (await mainBloc.state.repo.getTaskIntervals(editedTask.id!)).data ?? [];
+
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
+
+  Future<void> stopInterval(String? desc) async {
+    mainBloc.add(TimeIntervalStopEvent(desc: desc));
+    //TODO: _updateIntervals();
+  }
+
+  Future<void> startInterval() async {
+    if (editedTask.id == null) return;
+    mainBloc.add(TimeIntervalStartEvent(taskId: editedTask.id!));
+    //TODO: _updateIntervals();
   }
 }

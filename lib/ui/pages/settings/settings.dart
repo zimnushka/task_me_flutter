@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_me_flutter/bloc/events/edit_user_event.dart';
+import 'package:task_me_flutter/bloc/events/logout_event.dart';
+import 'package:task_me_flutter/bloc/events/set_config_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/router/app_router.dart';
 import 'package:task_me_flutter/ui/pages/settings/theme_previev.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
@@ -33,18 +36,30 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class _Body extends StatefulWidget {
+class _Body extends StatelessWidget {
   const _Body();
 
-  @override
-  State<_Body> createState() => __BodyState();
-}
+  Future<void> editUserColor(BuildContext context, Color color, User user) async {
+    final newUser = user.copyWith(colorInt: color.value);
+    context.read<MainBloc>().add(EditUserEvent(user: newUser));
+  }
 
-class __BodyState extends State<_Body> {
-  late final AppProvider appProvider = context.watch<AppProvider>();
+  Future<void> editTheme(BuildContext context, bool isLightTheme) async {
+    final vm = context.read<MainBloc>();
+    vm.add(SetConfigEvent(vm.state.config.copyWith(isLightTheme: isLightTheme)));
+  }
+
+  Future<void> editTaskView(BuildContext context, TaskViewState state) async {
+    final vm = context.read<MainBloc>();
+    vm.add(SetConfigEvent(vm.state.config.copyWith(taskView: state)));
+  }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<MainBloc>();
+    final user = context.select((MainBloc vm) => vm.state.authState.user!);
+    final config = context.select((MainBloc vm) => vm.state.config);
+
     return SizedBox(
       height: double.infinity,
       child: SingleChildScrollView(
@@ -84,29 +99,41 @@ class __BodyState extends State<_Body> {
                       subTitle: 'Email, name, cost',
                     ),
                     GestureDetector(
-                      onTap: () => AppRouter.dialog((context) => Center(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => Center(
                             child: Card(
                               child: SizedBox(
-                                  width: 320,
-                                  height: 420,
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(defaultPadding),
-                                      child: ColorSelector(
-                                        initColor: Theme.of(context).primaryColor,
-                                        onSetColor: (value) {
-                                          appProvider.setTheme(color: value);
-                                          Navigator.pop(context);
-                                        },
-                                      ))),
+                                width: 320,
+                                height: 420,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(defaultPadding),
+                                  child: ColorSelector(
+                                    initColor: Theme.of(context).primaryColor,
+                                    onSetColor: (value) {
+                                      editUserColor(context, value, user);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              ),
                             ),
-                          )),
+                          ),
+                        );
+                      },
                       child: CircleAvatar(
                         radius: 25,
                         backgroundColor: Theme.of(context).primaryColor,
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => AppRouter.dialog((context) => const UserEditDialog()),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const UserEditDialog(),
+                        );
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -118,11 +145,11 @@ class __BodyState extends State<_Body> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             AppText(
-                              appProvider.state.user!.name,
+                              user.name,
                               weight: FontWeight.bold,
                             ),
                             AppText(
-                              appProvider.state.user!.email,
+                              user.email,
                             ),
                           ],
                         ),
@@ -147,12 +174,12 @@ class __BodyState extends State<_Body> {
                     Stack(
                       children: [
                         ThemePreview(
-                          onTap: () => appProvider.setTheme(isLightTheme: true),
-                          theme: setPrimaryColor(lightTheme, appProvider.state.user!.color),
+                          onTap: () => editTheme(context, true),
+                          theme: setPrimaryColor(lightTheme, user.color),
                           height: double.infinity,
                           width: double.infinity,
                         ),
-                        if (appProvider.state.config.isLightTheme)
+                        if (config.isLightTheme)
                           const Align(
                             alignment: Alignment.topLeft,
                             child: Icon(Icons.check_circle, color: Colors.green, size: 30),
@@ -162,12 +189,12 @@ class __BodyState extends State<_Body> {
                     Stack(
                       children: [
                         ThemePreview(
-                          onTap: () => appProvider.setTheme(isLightTheme: false),
-                          theme: setPrimaryColor(darkTheme, appProvider.state.user!.color),
+                          onTap: () => editTheme(context, false),
+                          theme: setPrimaryColor(darkTheme, user.color),
                           height: double.infinity,
                           width: double.infinity,
                         ),
-                        if (!appProvider.state.config.isLightTheme)
+                        if (!config.isLightTheme)
                           const Align(
                             alignment: Alignment.topLeft,
                             child: Icon(Icons.check_circle, color: Colors.green, size: 30),
@@ -186,11 +213,13 @@ class __BodyState extends State<_Body> {
                 width: double.infinity,
                 child: Wrap(
                   children: TaskViewState.values
-                      .map((e) => _TaskViewCard(
-                            isActive: appProvider.state.config.taskView == e,
-                            onTap: () => appProvider.changeTaskView(e),
-                            state: e,
-                          ))
+                      .map(
+                        (e) => _TaskViewCard(
+                          isActive: config.taskView == e,
+                          onTap: () => editTaskView(context, e),
+                          state: e,
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -200,10 +229,11 @@ class __BodyState extends State<_Body> {
                 subTitle: 'When you logout all your cached data deleted from this device',
               ),
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.error),
-                  onPressed: appProvider.deleteToken,
-                  child: const Text('logout')),
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+                onPressed: () => vm.add(LogoutEvent()),
+                child: const Text('logout'),
+              ),
             ],
           ),
         ),

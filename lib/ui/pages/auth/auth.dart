@@ -1,69 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/ui/pages/auth/auth_vm.dart';
 import 'package:task_me_flutter/ui/pages/auth/poster.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:task_me_flutter/ui/widgets/overlays/config_editor.dart';
 
-class AuthPage extends StatefulWidget {
+class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
-}
-
-class _AuthPageState extends State<AuthPage> {
-  final cubit = AuthVM();
-  @override
   Widget build(BuildContext context) {
+    final mainBloc = context.read<MainBloc>();
     return Scaffold(
-      body: ChangeNotifierProvider.value(
-        value: cubit,
-        child: Builder(
-          builder: (context) {
-            final pageState = context.select((AuthVM vm) => vm.pageState);
-            return pageState == AuthPageState.none
-                ? const AuthPoster()
-                : Center(
-                    child: Container(
-                      margin: const EdgeInsets.all(defaultPadding),
-                      padding: const EdgeInsets.all(defaultPadding),
-                      width: 300,
-                      height: 400,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: const BorderRadius.all(radius)),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () => cubit.setConfig(),
-                                icon: const Icon(Icons.settings_outlined),
-                              ),
-                              IconButton(
-                                onPressed: () => cubit.setNewState(AuthPageState.none),
-                                icon: const Icon(Icons.close),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: defaultPadding),
-                          Expanded(
-                            child: Center(
-                              child: pageState == AuthPageState.login
-                                  ? const _AuthLoginPage()
-                                  : const _AuthRegistrPage(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-          },
-        ),
+      body: ChangeNotifierProvider(
+        create: (context) => AuthVM(mainBloc: mainBloc),
+        child: const _AuthPageView(),
       ),
     );
+  }
+}
+
+class _AuthPageView extends StatelessWidget {
+  const _AuthPageView();
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<AuthVM>();
+    final pageState = context.select((AuthVM vm) => vm.pageState);
+
+    return pageState == AuthPageState.none
+        ? const AuthPoster()
+        : Center(
+            child: Container(
+              margin: const EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.all(defaultPadding),
+              width: 300,
+              height: 400,
+              decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor, borderRadius: const BorderRadius.all(radius)),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const ConfigEditorDialog(),
+                          );
+                        },
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                      IconButton(
+                        onPressed: () => vm.setNewState(AuthPageState.none),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Expanded(
+                    child: Center(
+                      child: pageState == AuthPageState.login
+                          ? const _AuthLoginPage()
+                          : const _AuthRegistrPage(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
   }
 }
 
@@ -79,12 +86,8 @@ class _AuthLoginPageState extends State<_AuthLoginPage> {
   final passwordController = TextEditingController();
 
   Future<void> confirm() async {
-    final provider = context.read<AppProvider>();
     final vm = context.read<AuthVM>();
-    final token = await vm.confirm(emailController.text, passwordController.text);
-    if (token != null) {
-      await provider.setToken(token);
-    }
+    await vm.confirm(emailController.text, passwordController.text);
   }
 
   @override
@@ -156,13 +159,8 @@ class _AuthRegistrPageState extends State<_AuthRegistrPage> {
   final passwordController = TextEditingController();
 
   Future<void> confirm() async {
-    final provider = context.read<AppProvider>();
     final vm = context.read<AuthVM>();
-    final token =
-        await vm.confirm(emailController.text, passwordController.text, name: nameController.text);
-    if (token != null) {
-      await provider.setToken(token);
-    }
+    await vm.confirm(emailController.text, passwordController.text, name: nameController.text);
   }
 
   @override

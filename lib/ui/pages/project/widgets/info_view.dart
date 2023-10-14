@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
 import 'package:task_me_flutter/ui/pages/project/project_vm.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
@@ -16,9 +15,9 @@ class InfoProjectView extends StatefulWidget {
 class _InfoProjectViewState extends State<InfoProjectView> {
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<ProjectVM>();
     final tasks = context.select((ProjectVM vm) => vm.tasks);
     final users = context.select((ProjectVM vm) => vm.users);
-    final project = context.select((ProjectVM vm) => vm.project);
 
     int maxCountGetedTasks = 0;
 
@@ -173,7 +172,7 @@ class _InfoProjectViewState extends State<InfoProjectView> {
             child: Center(
               child: TextButton(
                 style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-                onPressed: () => context.read<AppProvider>().deleteProject(project.id!),
+                onPressed: vm.onDeleteProject,
                 child: const Text('Delete project'),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/pages/home/home.dart';
 import 'package:task_me_flutter/ui/pages/project/project.dart';
@@ -19,23 +18,23 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> {
-  late final AppProvider appProvider = context.watch<AppProvider>();
-
-  Future<void> showProjectEditor({Project? project}) async {
+  Future<void> showProjectEditor() async {
     await showDialog(
       context: context,
-      builder: (context) {
-        return ProjectDialog(
-          project: project,
-          onUpdate: () => context.read<AppProvider>().load(),
-        );
-      },
+      builder: (context) => const ProjectDialog(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final projects = context.read<AppProvider>().state.projects;
+    final vm = context.read<MainBloc>();
+    final projects = context.select((MainBloc vm) => vm.state.sideBarState.projects);
+    final user = context.select((MainBloc vm) => vm.state.authState.user);
+    // TODO: check on auth
+    if (user == null) {
+      return const SizedBox();
+    }
+
     return ResponsiveUi(
       widthExpand: 800,
       sideBar: SizedBox(
@@ -52,7 +51,7 @@ class _SideBarState extends State<SideBar> {
                 padding:
                     const EdgeInsets.fromLTRB(defaultPadding, defaultPadding, defaultPadding, 0),
                 child: GestureDetector(
-                  onTap: () => AppRouter.goTo(HomePage.route()),
+                  onTap: () => vm.router.goTo(HomePage.route()),
                   child: Row(
                     children: [
                       CircleAvatar(backgroundColor: Theme.of(context).primaryColor),
@@ -61,9 +60,9 @@ class _SideBarState extends State<SideBar> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            AppText(appProvider.state.user!.name, weight: FontWeight.bold),
+                            AppText(user.name, weight: FontWeight.bold),
                             const SizedBox(height: 5),
-                            AppSmallText(appProvider.state.user!.email),
+                            AppSmallText(user.email),
                           ],
                         ),
                       )
@@ -100,7 +99,7 @@ class _SideBarState extends State<SideBar> {
                             final item = projects[index];
                             return ProjectButton(
                               item: item,
-                              onTap: () => AppRouter.goTo(ProjectPage.route(item.id!)),
+                              onTap: () => vm.router.goTo(ProjectPage.route(item.id!)),
                             );
                           },
                         ),

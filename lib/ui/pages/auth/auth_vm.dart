@@ -1,21 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/repositories/api/auth.dart';
-import 'package:task_me_flutter/ui/widgets/overlays/config_editor.dart';
+import 'package:task_me_flutter/bloc/events/login_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
 
 enum AuthPageState { login, registration, none }
 
 class AuthVM extends ChangeNotifier {
-  final AuthApiRepository _authApiRepository = AuthApiRepository();
+  final MainBloc mainBloc;
+  AuthVM({required this.mainBloc});
 
   AuthPageState _pageState = AuthPageState.none;
   AuthPageState get pageState => _pageState;
 
   String? _authErrorMessage;
   String? get authErrorMessage => _authErrorMessage;
-
-  AuthVM();
 
   void setNewState(AuthPageState newPageState) {
     if (_pageState != newPageState) {
@@ -24,32 +23,23 @@ class AuthVM extends ChangeNotifier {
     }
   }
 
-  Future<String?> confirm(String email, String password, {String? name}) async {
+  Future<void> confirm(String email, String password, {String? name}) async {
     try {
-      if (name != null) {
-        final data = await _authApiRepository.registration(email, password, name);
-        if (data.message != null) {
-          _authErrorMessage = data.message.toString();
-          notifyListeners();
+      final data = name != null
+          ? await mainBloc.state.repo.signUp(email, password, name)
+          : await mainBloc.state.repo.signIn(email, password);
 
-          Timer(const Duration(seconds: 3), () {
-            _authErrorMessage = null;
-            notifyListeners();
-          });
-        }
-        return data.data;
-      } else {
-        final data = await _authApiRepository.login(email, password);
-        if (data.message != null) {
-          _authErrorMessage = data.message.toString();
-          notifyListeners();
+      if (data.message != null) {
+        _authErrorMessage = data.message.toString();
+        notifyListeners();
 
-          Timer(const Duration(seconds: 3), () {
-            _authErrorMessage = null;
-            notifyListeners();
-          });
-        }
-        return data.data;
+        Timer(const Duration(seconds: 3), () {
+          _authErrorMessage = null;
+          notifyListeners();
+        });
+      }
+      if (data.data != null) {
+        mainBloc.add(LoginEvent(token: data.data!));
       }
     } catch (e) {
       _authErrorMessage = e.toString();
@@ -60,13 +50,5 @@ class AuthVM extends ChangeNotifier {
         notifyListeners();
       });
     }
-    return null;
-  }
-
-  Future<void> setConfig() async {
-    await showDialog(
-      context: AppRouter.context,
-      builder: (context) => const ConfigEditorDialog(),
-    );
   }
 }

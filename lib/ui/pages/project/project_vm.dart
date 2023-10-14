@@ -1,19 +1,17 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/bloc/events/update_project_list_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/project.dart';
-import 'package:task_me_flutter/repositories/api/task.dart';
-import 'package:task_me_flutter/repositories/api/user.dart';
+import 'package:task_me_flutter/ui/pages/home/home.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/task_detail.dart';
-import 'package:task_me_flutter/ui/widgets/overlays/invite_member.dart';
-import 'package:task_me_flutter/ui/widgets/overlays/project_dialog.dart';
 
-enum ProjectPageState { tasks, users, info }
+enum ProjectPageState {
+  tasks,
+  users,
+  info;
 
-extension ProjectPageStateExt on ProjectPageState {
   String get headerButtonLabel {
     switch (this) {
       case ProjectPageState.tasks:
@@ -27,15 +25,12 @@ extension ProjectPageStateExt on ProjectPageState {
 }
 
 class ProjectVM extends ChangeNotifier {
-  final projectApiRepository = ProjectApiRepository();
-  final userApiRepository = UserApiRepository();
-  final taskApiRepository = TaskApiRepository();
+  final MainBloc mainBloc;
+  final int projectId;
 
-  ProjectVM({required this.projectId}) {
+  ProjectVM({required this.projectId, required this.mainBloc}) {
     _init();
   }
-
-  final int projectId;
 
   Project _project = Project.empty();
   Project get project => _project;
@@ -56,9 +51,9 @@ class ProjectVM extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final projectData = await projectApiRepository.getById(projectId);
-    final users = await userApiRepository.getUserFromProject(projectId);
-    final tasksData = await taskApiRepository.getByProject(projectId);
+    final projectData = await mainBloc.state.repo.getProjectById(projectId);
+    final users = await mainBloc.state.repo.getUserFromProject(projectId);
+    final tasksData = await mainBloc.state.repo.getTasksByProject(projectId);
     final tasks = tasksData.data ?? [];
     tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
 
@@ -74,19 +69,18 @@ class ProjectVM extends ChangeNotifier {
 
   Future<void> refresh({bool user = false, bool project = false, bool tasks = false}) async {
     if (user) {
-      final users = await userApiRepository.getUserFromProject(projectId);
+      final users = await mainBloc.state.repo.getUserFromProject(projectId);
       _users = users.data ?? [];
     }
     if (project) {
-      final projectData = await projectApiRepository.getById(projectId);
-      final provider = AppRouter.context.read<AppProvider>();
-      await provider.load();
+      final projectData = await mainBloc.state.repo.getProjectById(projectId);
+      mainBloc.add(UpdateProjectListEvent());
       if (projectData.data != null) {
         _project = projectData.data!;
       }
     }
     if (tasks) {
-      final tasksData = await taskApiRepository.getByProject(projectId);
+      final tasksData = await mainBloc.state.repo.getTasksByProject(projectId);
       final tasks = tasksData.data ?? [];
       tasks.sort((a, b) => a.status.index.compareTo(b.status.index));
       _tasks =
@@ -97,34 +91,19 @@ class ProjectVM extends ChangeNotifier {
   }
 
   Future<void> onDeleteUser(int userId) async {
-    await userApiRepository.deleteMemberFromProject(userId, projectId);
+    await mainBloc.state.repo.deleteMemberFromProject(userId, projectId);
     refresh(user: true);
   }
 
-  Future<void> onHeaderButtonTap() async {
-    switch (pageState) {
-      case ProjectPageState.tasks:
-        await AppRouter.goTo(TaskPage.route(projectId));
-        break;
-      case ProjectPageState.users:
-        await AppRouter.dialog(
-          (context) => InviteMemberDialog(
-            projectId: projectId,
-            onInvite: () => refresh(user: true),
-          ),
-        );
-        break;
-      case ProjectPageState.info:
-        await AppRouter.dialog((context) => ProjectDialog(
-              project: project,
-              onUpdate: () => refresh(project: true),
-            ));
-        break;
-    }
+  Future<void> onDeleteProject() async {
+    await mainBloc.state.repo.deleteProject(projectId);
+    mainBloc.add(UpdateProjectListEvent());
+    //TODO: clear routs?
+    mainBloc.router.goTo(HomeRoute());
   }
 
   Future<void> onTaskTap(int taskId) async {
-    await AppRouter.goTo(TaskPage.route(projectId, taskId: taskId));
+    await mainBloc.router.goTo(TaskPage.route(projectId, taskId: taskId));
   }
 
   Future<void> onTabTap(ProjectPageState page) async {

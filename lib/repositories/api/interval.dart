@@ -1,10 +1,6 @@
-// ignore_for_file: unnecessary_lambdas
+part of 'api.dart';
 
-import 'package:task_me_flutter/domain/models/api_response.dart';
-import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/api.dart';
-
-class IntervalApiRepository extends ApiRepository {
+extension IntervalApiExt on ApiRepository {
   Future<ApiResponse<List<TimeInterval>?>> getMyIntervals() async {
     return ApiErrorHandler(() async {
       final data = await client.get('/timeIntervals');
@@ -25,14 +21,14 @@ class IntervalApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<TimeInterval?>> start(int id) async {
+  Future<ApiResponse<TimeInterval?>> startInterval(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.post('/timeIntervals/$id');
       return ApiResponse(body: TimeInterval.fromJson(data.data), status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<bool?>> stop(String? desc) async {
+  Future<ApiResponse<bool?>> stopInterval(String? desc) async {
     return ApiErrorHandler(() async {
       final data = await client.put(
         '/timeIntervals',

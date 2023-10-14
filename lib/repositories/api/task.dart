@@ -1,17 +1,14 @@
-// ignore_for_file: unnecessary_lambdas
-import 'package:task_me_flutter/domain/models/api_response.dart';
-import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/api.dart';
+part of 'api.dart';
 
-class TaskApiRepository extends ApiRepository {
-  Future<ApiResponse<Task?>> getById(int id) async {
+extension TaskApiExt on ApiRepository {
+  Future<ApiResponse<Task?>> getTaskById(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.get('/task/$id');
       return ApiResponse(body: Task.fromJson(data.data!), status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<List<Task>?>> getAll() async {
+  Future<ApiResponse<List<Task>?>> getTasksAll() async {
     return ApiErrorHandler(() async {
       final data = await client.get('/task');
       return ApiResponse(
@@ -21,7 +18,7 @@ class TaskApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<List<Task>?>> getByProject(int projectId) async {
+  Future<ApiResponse<List<Task>?>> getTasksByProject(int projectId) async {
     return ApiErrorHandler(() async {
       final data = await client.get('/task/project/$projectId');
 
@@ -32,21 +29,21 @@ class TaskApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<Task?>> create(Task item) async {
+  Future<ApiResponse<Task?>> createTask(Task item) async {
     return ApiErrorHandler(() async {
       final data = await client.post('/task', data: item.toJson());
       return ApiResponse(body: Task.fromJson(data.data), status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<bool?>> edit(Task item) async {
+  Future<ApiResponse<bool?>> editTask(Task item) async {
     return ApiErrorHandler(() async {
       final data = await client.put('/task', data: item.toJson());
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<bool?>> delete(int id) async {
+  Future<ApiResponse<bool?>> deleteTask(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.delete('/task/$id');
       return ApiResponse(body: true, status: data.statusCode!);

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+import 'package:task_me_flutter/router/app_router.dart';
 import 'package:task_me_flutter/ui/pages/home/home_vm.dart';
-// import 'package:task_me_flutter/ui/pages/task/task_vm.dart';
-import 'package:task_me_flutter/ui/pages/home/widgets/interval.dart';
 import 'package:task_me_flutter/ui/pages/task/task_view.dart';
 import 'package:task_me_flutter/ui/pages/task/task_vm.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
@@ -23,20 +21,16 @@ class HomeRoute implements AppPage {
   Map<String, String>? get queryParams => null;
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   static AppPage route() => HomeRoute();
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
   Widget build(BuildContext context) {
+    final mainBloc = context.read<MainBloc>();
     return ChangeNotifierProvider(
-      create: (_) => HomeVM(),
+      create: (_) => HomeVM(mainBloc: mainBloc),
       child: const _HomeView(),
     );
   }
@@ -46,14 +40,18 @@ class _HomeView extends StatelessWidget {
   const _HomeView();
   @override
   Widget build(BuildContext context) {
-    final user = context.select((AppProvider vm) => vm.state.user!);
     final homeVM = context.read<HomeVM>();
+    final mainBloc = context.read<MainBloc>();
+    final user = context.select((MainBloc vm) => vm.state.authState.user!);
     final tasks = context.select((HomeVM vm) => vm.tasks);
+
     final taskBloc = TaskVM(
+      mainBloc: mainBloc,
       onTaskClick: homeVM.onTaskTap,
       tasks: tasks.map((e) => TaskUi(e, [])).toList(),
       state: TaskViewState.list,
     );
+
     return SideBar(
       child: CustomScrollView(
         slivers: [
@@ -71,29 +69,20 @@ class _HomeView extends StatelessWidget {
               backgroundColor: Theme.of(context).primaryColor,
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(radius)),
               flexibleSpace: FlexibleSpaceBar(
-                  background: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(defaultPadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 40),
-                          const AppSmallText('Email', color: Colors.white),
-                          AppTitleText(user.email, color: Colors.white),
-                          const SizedBox(height: defaultPadding),
-                          const AppSmallText('Hourly payment', color: Colors.white),
-                          AppTitleText('${user.cost}', color: Colors.white),
-                          const Expanded(child: SizedBox()),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Expanded(flex: 3, child: HomeIntervalsView()),
-                ],
+                  background: Padding(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    const AppSmallText('Email', color: Colors.white),
+                    AppTitleText(user.email, color: Colors.white),
+                    const SizedBox(height: defaultPadding),
+                    const AppSmallText('Hourly payment', color: Colors.white),
+                    AppTitleText('${user.cost}', color: Colors.white),
+                    const Expanded(child: SizedBox()),
+                  ],
+                ),
               )),
               bottom: PreferredSize(
                 preferredSize: const Size(double.infinity, 40),

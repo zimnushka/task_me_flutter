@@ -1,9 +1,6 @@
-import 'dart:convert';
-import 'package:task_me_flutter/domain/models/api_response.dart';
-import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/api.dart';
+part of 'api.dart';
 
-class UserApiRepository extends ApiRepository {
+extension UserApiExt on ApiRepository {
   Future<ApiResponse<User?>> getUserMe() async {
     return ApiErrorHandler(() async {
       final data = await client.get('/user/me');

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_me_flutter/bloc/events/update_project_list_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/project.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
 import 'package:task_me_flutter/ui/widgets/overlays/color_selector.dart';
 
 class ProjectDialog extends StatefulWidget {
-  const ProjectDialog({required this.onUpdate, this.project, super.key});
-  final VoidCallback onUpdate;
+  const ProjectDialog({this.project, super.key});
   final Project? project;
 
   @override
@@ -14,10 +16,29 @@ class ProjectDialog extends StatefulWidget {
 }
 
 class _ProjectDialogState extends State<ProjectDialog> {
-  final ProjectApiRepository projectApiRepository = ProjectApiRepository();
-  late String projectName = '';
-  late Color projectColor = Theme.of(context).primaryColor;
+  String projectName = '';
+  Color projectColor = defaultPrimaryColor;
   int stepIndex = 0;
+
+  Future<void> save(String name) async {
+    if (name.isNotEmpty) return;
+    final project = Project(
+      title: name,
+      color: projectColor.value,
+      id: widget.project?.id,
+    );
+
+    final vm = context.read<MainBloc>();
+    if (widget.project != null) {
+      await vm.state.repo.editProject(project);
+    } else {
+      await vm.state.repo.addProject(project);
+    }
+    if (mounted) {
+      Navigator.pop(context);
+      context.read<MainBloc>().add(UpdateProjectListEvent());
+    }
+  }
 
   @override
   void initState() {
@@ -42,26 +63,12 @@ class _ProjectDialogState extends State<ProjectDialog> {
         },
       ),
       _NameSelector(
-          initName: projectName,
-          onBack: () {
-            setState(() {
-              stepIndex--;
-            });
-          },
-          onSetName: (value) async {
-            if (value.isNotEmpty) {
-              final project =
-                  Project(title: value, color: projectColor.value, id: widget.project?.id);
-              if (widget.project != null) {
-                await projectApiRepository.edit(project);
-              } else {
-                await projectApiRepository.add(project);
-              }
-
-              widget.onUpdate();
-              Navigator.pop(context);
-            }
-          })
+        initName: projectName,
+        onBack: () {
+          setState(() => stepIndex--);
+        },
+        onSetName: save,
+      )
     ];
     return Center(
       child: Theme(

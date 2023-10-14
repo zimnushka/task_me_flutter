@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:task_me_flutter/repositories/api/user.dart';
+import 'package:provider/provider.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
 
 class InviteMemberDialog extends StatefulWidget {
@@ -15,18 +17,21 @@ class InviteMemberDialog extends StatefulWidget {
 class _InviteMemberDialogState extends State<InviteMemberDialog> {
   String? errorMessage;
   final controller = TextEditingController();
-  final repository = UserApiRepository();
 
   Future<void> save() async {
     if (controller.text.isNotEmpty) {
-      if ((await repository.addMemberToProject(controller.text, widget.projectId)).data ?? false) {
-        Navigator.pop(context);
-        widget.onInvite();
-      } else {
-        setError('User must be registr or this user was added');
-      }
-    } else {
       setError('Can not be empty');
+      return;
+    }
+    final repo = context.read<MainBloc>().state.repo;
+    final success = (await repo.addMemberToProject(controller.text, widget.projectId)).data;
+    if (!mounted) return;
+
+    if (success ?? false) {
+      Navigator.pop(context);
+      widget.onInvite();
+    } else {
+      setError('User must be registr or this user was added');
     }
   }
 
@@ -62,9 +67,10 @@ class _InviteMemberDialogState extends State<InviteMemberDialog> {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
-                    onPressed: save,
-                    child: const Text('Save'))
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
+                  onPressed: save,
+                  child: const Text('Save'),
+                )
               ],
             ),
           ),

@@ -1,15 +1,9 @@
-import 'dart:convert';
+part of 'local_storage.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/storage.dart';
-
-class ConfigStorage implements AppStorage<Config> {
-  @override
+extension ConfigStorage on LocalStorage {
   String get storageKey => 'configStorageKey';
 
-  @override
-  Future<Config?> get() async {
+  Future<Config?> getConfig() async {
     final pref = await SharedPreferences.getInstance();
     try {
       final configData = (pref.getString(storageKey)) ?? '';
@@ -20,8 +14,7 @@ class ConfigStorage implements AppStorage<Config> {
     }
   }
 
-  @override
-  Future<bool> save(Config config) async {
+  Future<bool> saveConfig(Config config) async {
     final pref = await SharedPreferences.getInstance();
     try {
       return await pref.setString(storageKey, jsonEncode(config.toJson()));
@@ -30,8 +23,7 @@ class ConfigStorage implements AppStorage<Config> {
     }
   }
 
-  @override
-  Future<bool> delete() async {
+  Future<bool> deleteConfig() async {
     final pref = await SharedPreferences.getInstance();
     try {
       return await pref.remove(storageKey);

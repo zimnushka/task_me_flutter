@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:task_me_flutter/bloc/events/overlay_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/error.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/domain/service/snackbar.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
+import 'package:task_me_flutter/service/snackbar.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/service/task.dart';
 
 class TaskVM extends ChangeNotifier {
   final Function(int) _onTaskClick;
-  final _taskService = TaskService();
+  final MainBloc mainBloc;
 
   List<TaskUi> _tasks;
   List<TaskUi> get tasks => _tasks;
@@ -23,6 +24,7 @@ class TaskVM extends ChangeNotifier {
   TaskViewState get state => _state;
 
   TaskVM({
+    required this.mainBloc,
     required Function(int) onTaskClick,
     required List<TaskUi> tasks,
     required TaskViewState state,
@@ -56,7 +58,12 @@ class TaskVM extends ChangeNotifier {
 
   Future<void> onChangeTaskStatus(TaskUi taskUi, TaskStatus taskStatus) async {
     try {
-      if (await _taskService.editTaskStatus(taskUi.task, taskStatus, [])) {
+      final newTask = taskUi.task.copyWith(status: taskStatus);
+      if (taskUi.task.status == TaskStatus.closed) {
+        throw const LogicalException('This task is closed');
+      }
+      final success = (await mainBloc.state.repo.editTask(newTask)).data ?? false;
+      if (success) {
         final List<TaskUi> taskUIList = List.of(_tasks);
         taskUIList.removeWhere((element) => element.task.id == taskUi.task.id);
         taskUIList.add(taskUi.copyWith(task: taskUi.task.copyWith(status: taskStatus)));
@@ -67,9 +74,9 @@ class TaskVM extends ChangeNotifier {
         notifyListeners();
       }
     } on LogicalException catch (e) {
-      AppSnackBar.show(AppRouter.context, e.message, AppSnackBarType.error);
+      mainBloc.add(OverlayEvent(message: e.message, type: OverlayType.error));
     } catch (e) {
-      AppSnackBar.show(AppRouter.context, e.toString(), AppSnackBarType.error);
+      mainBloc.add(OverlayEvent(message: e.toString(), type: OverlayType.error));
     }
   }
 

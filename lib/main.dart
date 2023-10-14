@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:task_me_flutter/bloc/events/start_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/bloc/main_state.dart';
 import 'package:task_me_flutter/domain/configs.dart';
-import 'package:task_me_flutter/domain/service/router.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
+
 import 'package:task_me_flutter/domain/models/schemes.dart';
+import 'package:task_me_flutter/domain/states/auth_state.dart';
+import 'package:task_me_flutter/domain/states/overlay_state.dart';
+import 'package:task_me_flutter/domain/states/sidebar_state.dart';
+import 'package:task_me_flutter/repositories/api/api.dart';
+import 'package:task_me_flutter/repositories/local/local_storage.dart';
+import 'package:task_me_flutter/router/app_router.dart';
+import 'package:task_me_flutter/service/snackbar.dart';
 import 'package:task_me_flutter/ui/pages/home/home.dart';
 import 'package:task_me_flutter/ui/pages/landing.dart';
 import 'package:task_me_flutter/ui/pages/project/project.dart';
 import 'package:task_me_flutter/ui/pages/settings/settings.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/task_detail.dart';
 
-void main() => runApp(TaskMyApp(config: debugConfig));
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(TaskMyApp(config: debugConfig));
+}
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class TaskMyApp extends StatelessWidget {
   TaskMyApp({required this.config, super.key});
   final Config config;
-  late final AppProvider provider = AppProvider(config);
 
   late final GoRouter _route = GoRouter(
     navigatorKey: navigatorKey,
@@ -65,7 +76,6 @@ class TaskMyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppRouter.init(navigatorKey);
     return MaterialApp.router(
       routeInformationProvider: _route.routeInformationProvider,
       routeInformationParser: _route.routeInformationParser,
@@ -73,8 +83,18 @@ class TaskMyApp extends StatelessWidget {
       debugShowCheckedModeBanner: config.debug,
       title: 'Task Me',
       builder: (context, child) {
-        return BlocProvider.value(
-          value: provider,
+        return BlocProvider(
+          create: (context) => MainBloc(
+            MainState(
+              authState: AuthState.empty(),
+              overlayState: const OverlayMessageState(message: '', type: OverlayType.none),
+              repo: ApiRepository(url: config.apiBaseUrl),
+              config: config,
+              sideBarState: const SideBarState(projects: []),
+            ),
+            router: AppRouter(_route),
+            storage: LocalStorage(),
+          )..add(StartEvent()),
           child: Overlay(
             initialEntries: [
               OverlayEntry(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
-import 'package:task_me_flutter/service/config.dart';
+import 'package:task_me_flutter/bloc/events/set_config_event.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
 
 class ConfigEditorDialog extends StatefulWidget {
@@ -13,19 +13,22 @@ class ConfigEditorDialog extends StatefulWidget {
 
 class _ConfigEditorDialogState extends State<ConfigEditorDialog> {
   final urlBaseApiController = TextEditingController();
-  late final provider = context.watch<AppProvider>();
 
   Future<void> save() async {
-    await ConfigService()
-        .setConfig(provider.state.config.copyWith(apiBaseUrl: urlBaseApiController.text));
-    await provider.setToken('');
+    final vm = context.read<MainBloc>();
+    vm.add(SetConfigEvent(vm.state.config.copyWith(apiBaseUrl: urlBaseApiController.text)));
     Navigator.pop(context);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final config = provider.state.config;
+  void initState() {
+    final config = context.read<MainBloc>().state.config;
     urlBaseApiController.text = config.apiBaseUrl;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Card(
         child: SizedBox(

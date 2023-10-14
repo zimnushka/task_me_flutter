@@ -1,9 +1,7 @@
-import 'package:task_me_flutter/domain/models/api_response.dart';
-import 'package:task_me_flutter/domain/models/schemes.dart';
-import 'package:task_me_flutter/repositories/api/api.dart';
+part of 'api.dart';
 
-class ProjectApiRepository extends ApiRepository {
-  Future<ApiResponse<List<Project>?>> getAll() {
+extension ProjectApiExt on ApiRepository {
+  Future<ApiResponse<List<Project>?>> getProjectsAll() {
     return ApiErrorHandler(() async {
       final data = await client.get('/project');
       final jsonData = data.data;
@@ -14,7 +12,7 @@ class ProjectApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<Project?>> getById(int id) async {
+  Future<ApiResponse<Project?>> getProjectById(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.get('/project/$id');
       return ApiResponse(
@@ -24,21 +22,21 @@ class ProjectApiRepository extends ApiRepository {
     }).result;
   }
 
-  Future<ApiResponse<bool?>> add(Project project) async {
+  Future<ApiResponse<bool?>> addProject(Project project) async {
     return ApiErrorHandler(() async {
       final data = await client.post('/project', data: project.toJson());
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<bool?>> edit(Project item) async {
+  Future<ApiResponse<bool?>> editProject(Project item) async {
     return ApiErrorHandler(() async {
       final data = await client.put('/project', data: item.toJson());
       return ApiResponse(body: true, status: data.statusCode!);
     }).result;
   }
 
-  Future<ApiResponse<bool?>> delete(int id) async {
+  Future<ApiResponse<bool?>> deleteProject(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.delete('/project/$id');
       return ApiResponse(body: true, status: data.statusCode!);

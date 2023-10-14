@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:task_me_flutter/bloc/app_provider.dart';
-import 'package:task_me_flutter/bloc/interval_vm.dart';
+import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
+import 'package:task_me_flutter/ui/pages/task_detail/task_vm.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:task_me_flutter/ui/widgets/overlays/interval_description_editor.dart';
 
 class TaskIntervalsView extends StatelessWidget {
-  const TaskIntervalsView({required this.readOnly, required this.taskId, super.key});
-  final bool readOnly;
+  const TaskIntervalsView({required this.taskId, super.key});
   final int taskId;
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => IntervalVM(
-        taskId: taskId,
-        readOnly: readOnly,
-        me: context.read<AppProvider>().state.user!,
-      ),
-      child: const _Body(),
-    );
-  }
-}
+    final state = context.select((TaskDetailVM vm) => vm.state);
+    final intervals = context.select((TaskDetailVM vm) => vm.intervals);
+    final readOnly = state == TaskDetailPageState.view;
 
-class _Body extends StatelessWidget {
-  const _Body();
-
-  @override
-  Widget build(BuildContext context) {
-    final readOnly = context.select((IntervalVM vm) => vm.readOnly);
-    final intervals = context.select((IntervalVM vm) => vm.intervals);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,21 +37,30 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<IntervalVM>();
-    final notClosedInterval = context.select((IntervalVM vm) => vm.notClosedIntervals);
-    final taskId = context.select((IntervalVM vm) => vm.taskId);
+    final vm = context.read<TaskDetailVM>();
+    final hasNotClosedInterval =
+        context.select((MainBloc vm) => vm.state.currentTimeInterval != null);
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 300),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
         onPressed: () {
-          if (notClosedInterval.isNotEmpty) {
-            vm.stopInterval();
+          if (hasNotClosedInterval) {
+            showDialog(
+              context: context,
+              builder: (context) => IntervalDescriptionEditorDialog(
+                initValue: '',
+                onEdit: (val) {
+                  vm.stopInterval(val);
+                },
+              ),
+            );
           } else {
-            vm.startInterval(taskId!);
+            vm.startInterval();
           }
         },
-        child: Text(notClosedInterval.isNotEmpty ? 'stop' : 'start'),
+        child: Text(hasNotClosedInterval ? 'stop' : 'start'),
       ),
     );
   }

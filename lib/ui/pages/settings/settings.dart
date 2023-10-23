@@ -39,9 +39,8 @@ class SettingsPage extends StatelessWidget {
 class _Body extends StatelessWidget {
   const _Body();
 
-  Future<void> editUserColor(BuildContext context, Color color, User user) async {
-    final newUser = user.copyWith(colorInt: color.value);
-    context.read<MainBloc>().add(EditUserEvent(user: newUser));
+  Future<void> editUserColor(BuildContext context, User user) async {
+    context.read<MainBloc>().add(EditUserEvent(user: user));
   }
 
   Future<void> editTheme(BuildContext context, bool isLightTheme) async {
@@ -112,7 +111,7 @@ class _Body extends StatelessWidget {
                                   child: ColorSelector(
                                     initColor: Theme.of(context).primaryColor,
                                     onSetColor: (value) {
-                                      editUserColor(context, value, user);
+                                      editUserColor(context, user.copyWith(colorInt: value.value));
                                       Navigator.pop(context);
                                     },
                                   ),

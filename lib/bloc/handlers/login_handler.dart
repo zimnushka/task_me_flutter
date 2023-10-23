@@ -25,6 +25,7 @@ loginHandler(LoginEvent event, Emitter<MainState> emit, MainBloc mainBloc) async
     return;
   }
 
+  mainBloc.storage.saveToken(token);
   final projects = (await repo.getProjectsAll()).data ?? [];
 
   emit(

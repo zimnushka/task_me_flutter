@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:task_me_flutter/ui/styles/themes.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+
+import 'package:task_me_flutter/ui/styles/themes.dart';
 
 DateTime? _dateTimeFromString(String? value) {
   if (value == null || value.isEmpty) return null;
@@ -190,6 +191,22 @@ class User {
       colorInt: colorInt ?? this.colorInt,
       cost: cost ?? this.cost,
     );
+  }
+
+  @override
+  bool operator ==(covariant User other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.name == name &&
+        other.email == email &&
+        other.colorInt == colorInt &&
+        other.cost == cost;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ name.hashCode ^ email.hashCode ^ colorInt.hashCode ^ cost.hashCode;
   }
 }
 

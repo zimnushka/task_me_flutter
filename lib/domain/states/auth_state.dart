@@ -39,7 +39,7 @@ class AuthStepAuthenticated extends AuthStep {
   });
 
   @override
-  List<Object?> get props => [token];
+  List<Object?> get props => [token, user];
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{'token': token, 'user': user.toJson()};

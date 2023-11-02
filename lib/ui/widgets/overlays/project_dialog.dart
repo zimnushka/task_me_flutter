@@ -21,7 +21,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
   int stepIndex = 0;
 
   Future<void> save(String name) async {
-    if (name.isNotEmpty) return;
+    if (name.isEmpty) return;
     final project = Project(
       title: name,
       color: projectColor.value,
@@ -67,7 +67,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
         onBack: () {
           setState(() => stepIndex--);
         },
-        onSetName: save,
+        onSetName: (value) => save(value),
       )
     ];
     return Center(

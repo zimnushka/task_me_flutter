@@ -9,6 +9,7 @@ import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/widgets/interval.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:task_me_flutter/ui/widgets/load_container.dart';
 import 'package:task_me_flutter/ui/widgets/multi_user_show.dart';
 import 'package:task_me_flutter/ui/widgets/multiselector.dart';
 import 'package:task_me_flutter/ui/widgets/slide_animation_container.dart';
@@ -17,6 +18,7 @@ part 'widgets/create_state.dart';
 part 'widgets/edit_state.dart';
 part 'widgets/cards.dart';
 part 'widgets/view_state.dart';
+part 'widgets/load_state.dart';
 
 class TaskRoute implements AppPage {
   final int projectId;
@@ -83,7 +85,7 @@ class _Body extends StatelessWidget {
     final state = context.select((TaskDetailVM vm) => vm.state);
     final isLoading = context.select((TaskDetailVM vm) => vm.isLoading);
     if (isLoading) {
-      return const CircularProgressIndicator();
+      return const _LoadState();
     }
     switch (state) {
       case TaskDetailPageState.view:

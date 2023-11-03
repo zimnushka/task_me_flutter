@@ -38,7 +38,13 @@ class HomeVM extends ChangeNotifier {
 
   Future<void> onTaskTap(int id) async {
     final task = _tasks.firstWhere((element) => element.id == id);
-    await mainBloc.router.goTo(TaskPage.route(task.projectId, taskId: task.id));
+    await mainBloc.router.goTo(
+      TaskPage.route(
+        task.projectId,
+        taskId: task.id,
+        onTaskUpdate: updateTasks,
+      ),
+    );
   }
 
   Future<void> updateTasks() async {

@@ -10,6 +10,7 @@ class AppRouter {
       page.name,
       params: page.params ?? {},
       queryParams: page.queryParams ?? {},
+      extra: page.extra,
     );
   }
 
@@ -24,4 +25,5 @@ abstract class AppPage {
   String get name;
   Map<String, String>? get params;
   Map<String, String>? get queryParams;
+  Object? get extra;
 }

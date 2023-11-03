@@ -20,6 +20,9 @@ class HomeRoute implements AppPage {
 
   @override
   Map<String, String>? get queryParams => null;
+
+  @override
+  Object? get extra => null;
 }
 
 class HomePage extends StatelessWidget {

@@ -21,8 +21,9 @@ part 'widgets/view_state.dart';
 class TaskRoute implements AppPage {
   final int projectId;
   final int? taskId;
+  final VoidCallback? onTaskUpdate;
 
-  const TaskRoute(this.projectId, this.taskId);
+  const TaskRoute(this.projectId, this.taskId, {this.onTaskUpdate});
 
   @override
   String get name => 'task';
@@ -32,24 +33,39 @@ class TaskRoute implements AppPage {
 
   @override
   Map<String, String>? get queryParams => {'projectId': projectId.toString()};
+
+  @override
+  VoidCallback? get extra => onTaskUpdate;
 }
 
 class TaskPage extends StatelessWidget {
   const TaskPage({
     required this.projectId,
     this.taskId,
+    this.onTaskUpdate,
     super.key,
   });
   final int projectId;
   final int? taskId;
+  final VoidCallback? onTaskUpdate;
 
-  static AppPage route(int projectId, {int? taskId}) => TaskRoute(projectId, taskId);
+  static AppPage route(
+    int projectId, {
+    int? taskId,
+    VoidCallback? onTaskUpdate,
+  }) =>
+      TaskRoute(
+        projectId,
+        taskId,
+        onTaskUpdate: onTaskUpdate,
+      );
 
   @override
   Widget build(BuildContext context) {
     final mainBloc = context.read<MainBloc>();
     return ChangeNotifierProvider(
       create: (_) => TaskDetailVM(
+        onTaskUpdate: onTaskUpdate,
         initProjectId: projectId,
         taskId: taskId,
         mainBloc: mainBloc,

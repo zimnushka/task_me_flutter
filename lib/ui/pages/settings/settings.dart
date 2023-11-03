@@ -23,6 +23,9 @@ class SettingsRoute implements AppPage {
 
   @override
   Map<String, String>? get queryParams => null;
+
+  @override
+  Object? get extra => null;
 }
 
 class SettingsPage extends StatelessWidget {

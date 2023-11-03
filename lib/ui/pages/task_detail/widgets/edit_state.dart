@@ -88,45 +88,53 @@ class __TaskEditViewState extends State<_TaskEditView> {
       bottomNavigationBar: hasUpdate
           ? PreferredSize(
               preferredSize: const Size(double.infinity, 70),
-              child: SlideAnimatedContainer(
-                replayInBuild: false,
-                start: const Offset(0, 1),
-                end: Offset.zero,
-                duration: const Duration(seconds: 1),
-                curve: Curves.elasticOut,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.only(bottom: 10),
-                  height: 60,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(radius),
-                    color: Theme.of(context).cardColor,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Expanded(child: Text('Task have change, please save')),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 200),
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 40),
-                              backgroundColor: hasUpdate
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).disabledColor,
-                            ),
-                            onPressed: () {
-                              if (hasUpdate) {
-                                vm.save();
-                              }
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text('Save'),
-                            )),
-                      )
-                    ],
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  defaultPadding,
+                  0,
+                  defaultPadding,
+                  defaultPadding,
+                ),
+                child: SlideAnimatedContainer(
+                  replayInBuild: false,
+                  start: const Offset(0, 1),
+                  end: Offset.zero,
+                  duration: const Duration(seconds: 1),
+                  curve: Curves.elasticOut,
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    height: 60,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(radius),
+                      color: Theme.of(context).cardColor,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Expanded(child: Text('Task have change, please save')),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 40),
+                                backgroundColor: hasUpdate
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).disabledColor,
+                              ),
+                              onPressed: () {
+                                if (hasUpdate) {
+                                  vm.save();
+                                }
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('Save'),
+                              )),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ))

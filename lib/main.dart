@@ -62,6 +62,7 @@ class TaskMyApp extends StatelessWidget {
             TaskPage(
               taskId: int.tryParse(state.params['taskId'] ?? ''),
               projectId: int.parse(state.queryParams['projectId']!),
+              onTaskUpdate: state.extra is VoidCallback ? state.extra as VoidCallback : null,
             )),
       ),
     ],

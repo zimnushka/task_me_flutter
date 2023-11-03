@@ -30,6 +30,9 @@ class ProjectRoute implements AppPage {
 
   @override
   Map<String, String>? get queryParams => null;
+
+  @override
+  Object? get extra => null;
 }
 
 class ProjectPage extends StatelessWidget {
@@ -228,7 +231,12 @@ class _ProjectViewState extends State<_ProjectView> with TickerProviderStateMixi
                             onPressed: () async {
                               switch (page) {
                                 case ProjectPageState.tasks:
-                                  await mainBloc.router.goTo(TaskPage.route(vm.projectId));
+                                  await mainBloc.router.goTo(
+                                    TaskPage.route(
+                                      vm.projectId,
+                                      onTaskUpdate: () => vm.refresh(tasks: true),
+                                    ),
+                                  );
                                   break;
                                 case ProjectPageState.users:
                                   if (mounted) {

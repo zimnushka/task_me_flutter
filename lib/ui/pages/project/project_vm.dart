@@ -103,7 +103,15 @@ class ProjectVM extends ChangeNotifier {
   }
 
   Future<void> onTaskTap(int taskId) async {
-    await mainBloc.router.goTo(TaskPage.route(projectId, taskId: taskId));
+    await mainBloc.router.goTo(
+      TaskPage.route(
+        projectId,
+        taskId: taskId,
+        onTaskUpdate: () {
+          refresh(tasks: true);
+        },
+      ),
+    );
   }
 
   Future<void> onTabTap(ProjectPageState page) async {

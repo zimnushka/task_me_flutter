@@ -17,12 +17,14 @@ class TaskDetailVM extends ChangeNotifier {
   TaskDetailVM({
     required this.initProjectId,
     required this.mainBloc,
+    required this.onTaskUpdate,
     int? taskId,
   }) {
     _initTaskId = taskId;
     _init();
   }
   final int initProjectId;
+  final VoidCallback? onTaskUpdate;
 
   int? _initTaskId;
   int? get initTaskId => _initTaskId;
@@ -69,13 +71,13 @@ class TaskDetailVM extends ChangeNotifier {
         _state = _task!.status == TaskStatus.closed
             ? TaskDetailPageState.view
             : TaskDetailPageState.edit;
-
-        _isLoading = false;
-        notifyListeners();
-        return;
       }
       _intervals = (await mainBloc.state.repo.getTaskIntervals(initTaskId!)).data ?? [];
+      _isLoading = false;
+      notifyListeners();
+      return;
     }
+    _state = TaskDetailPageState.creation;
     _editedTask = _editedTask.copyWith(projectId: initProjectId);
 
     _isLoading = false;
@@ -88,6 +90,7 @@ class TaskDetailVM extends ChangeNotifier {
       if (responce) {
         _initTaskId = null;
         _task = null;
+        onTaskUpdate?.call();
         await _getData();
       } else {
         mainBloc.add(OverlayEvent(message: 'Delete error', type: OverlayType.error));
@@ -100,19 +103,18 @@ class TaskDetailVM extends ChangeNotifier {
       // TODO: localize
       if (editedTask.id != null) {
         await mainBloc.state.repo.editTask(editedTask);
+        onTaskUpdate?.call();
         mainBloc.add(OverlayEvent(message: 'Edited', type: OverlayType.success));
         _initTaskId = editedTask.id;
       } else {
-        final newTask = editedTask.copyWith(
-          startDate: DateTime.now(),
-          cost: 0,
-        );
         // TODO:
+        final newTask = editedTask.copyWith(startDate: DateTime.now());
         final createdTask = (await mainBloc.state.repo.createTask(newTask)).data!;
-
+        onTaskUpdate?.call();
         mainBloc.add(OverlayEvent(message: 'Created', type: OverlayType.success));
         _initTaskId = createdTask.id;
       }
+
       await _getData();
     } on LogicalException catch (e) {
       mainBloc.add(OverlayEvent(message: e.message, type: OverlayType.error));
@@ -132,10 +134,11 @@ class TaskDetailVM extends ChangeNotifier {
     try {
       //TODO: fix !
       await mainBloc.state.repo.updateTaskMemberList(task!.id!, users);
+      onTaskUpdate?.call();
       // ignore: empty_catches
     } catch (e) {}
 
-    _assigners = List.of(users);
+    _assigners = [...users];
     notifyListeners();
   }
 

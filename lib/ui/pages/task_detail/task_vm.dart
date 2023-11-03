@@ -84,18 +84,20 @@ class TaskDetailVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> delete() async {
+  Future<bool> delete() async {
     if (_task != null) {
       final responce = (await mainBloc.state.repo.deleteTask(_task!.id!)).data ?? false;
       if (responce) {
         _initTaskId = null;
         _task = null;
         onTaskUpdate?.call();
-        await _getData();
+        return true;
       } else {
         mainBloc.add(OverlayEvent(message: 'Delete error', type: OverlayType.error));
+        return false;
       }
     }
+    return false;
   }
 
   Future<void> save() async {

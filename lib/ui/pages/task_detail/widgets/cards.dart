@@ -99,7 +99,10 @@ class _TaskIDCard extends StatelessWidget {
           ),
           if (taskId != null)
             GestureDetector(
-              onTap: vm.delete,
+              onTap: () async {
+                await vm.delete();
+                mainBloc.router.pop();
+              },
               child: Container(
                 height: 40,
                 padding: const EdgeInsets.symmetric(horizontal: 10),

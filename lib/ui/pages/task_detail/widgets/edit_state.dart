@@ -21,69 +21,85 @@ class __TaskEditViewState extends State<_TaskEditView> {
     final hasUpdate = task != editedTask;
 
     return Scaffold(
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(defaultPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(defaultPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _TaskIDCard(task?.id),
-                  const Expanded(child: SizedBox()),
-                  _TaskStatusSelector(
-                    value: editedTask.status,
-                    readOnly: false,
-                    onChanged: vm.onTaskStatusSwap,
+                  Row(
+                    children: [
+                      _TaskIDCard(task?.id),
+                      const Expanded(child: SizedBox()),
+                      _TaskStatusSelector(
+                        value: editedTask.status,
+                        readOnly: false,
+                        onChanged: vm.onTaskStatusSwap,
+                      ),
+                      const SizedBox(width: defaultPadding),
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return MultiSelector<User>(
+                                    title: 'Select assigners',
+                                    onChange: (newList) {
+                                      final activeUsers = newList
+                                          .where((e) => e.isActive)
+                                          .map((e) => e.value)
+                                          .toList();
+                                      vm.onUserSwap(activeUsers);
+                                      Navigator.pop(context);
+                                    },
+                                    items: users.map((e) {
+                                      return MultiSelectItem(
+                                          isActive: assigners.contains(e),
+                                          value: e,
+                                          child: _UserCard(e));
+                                    }).toList());
+                              });
+                        },
+                        child: assigners.isEmpty
+                            ? const Text('Without assigner', style: TextStyle(fontSize: 18))
+                            : MultiUserShow(assigners, radius: 20),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: defaultPadding),
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return MultiSelector<User>(
-                                title: 'Select assigners',
-                                onChange: (newList) {
-                                  final activeUsers =
-                                      newList.where((e) => e.isActive).map((e) => e.value).toList();
-                                  vm.onUserSwap(activeUsers);
-                                  Navigator.pop(context);
-                                },
-                                items: users.map((e) {
-                                  return MultiSelectItem(
-                                      isActive: assigners.contains(e),
-                                      value: e,
-                                      child: _UserCard(e));
-                                }).toList());
-                          });
-                    },
-                    child: assigners.isEmpty
-                        ? const Text('Without assigner', style: TextStyle(fontSize: 18))
-                        : MultiUserShow(assigners, radius: 20),
+                  const SizedBox(height: defaultPadding),
+                  _TaskTitleEditor(
+                    initValue: editedTask.title,
+                    readOnly: false,
+                    onChanged: vm.onTitleUpdate,
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  _TaskDescriptionEditor(
+                    initValue: editedTask.description,
+                    onChanged: vm.onDescriptionUpdate,
+                    readOnly: false,
                   ),
                 ],
               ),
-              const SizedBox(height: defaultPadding),
-              _TaskTitleEditor(
-                initValue: editedTask.title,
-                readOnly: false,
-                onChanged: vm.onTitleUpdate,
-              ),
-              const SizedBox(height: defaultPadding),
-              _TaskDescriptionEditor(
-                initValue: editedTask.description,
-                onChanged: vm.onDescriptionUpdate,
-                readOnly: false,
-              ),
-              const SizedBox(height: defaultPadding),
-              if (!hasUpdate) const AppText('Time intervals'),
-              const SizedBox(height: 10),
-              if (!hasUpdate) TaskIntervalsView(taskId: editedTask.id!)
-            ],
+            ),
           ),
-        ),
+          SizedBox(
+            width: 350,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                0,
+                defaultPadding,
+                defaultPadding,
+                defaultPadding,
+              ),
+              child: TaskIntervalsView(
+                taskId: editedTask.id!,
+              ),
+            ),
+          )
+        ],
       ),
       bottomNavigationBar: hasUpdate
           ? PreferredSize(

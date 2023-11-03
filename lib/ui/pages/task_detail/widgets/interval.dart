@@ -18,16 +18,29 @@ class TaskIntervalsView extends StatelessWidget {
     final intervals = context.select((TaskDetailVM vm) => vm.intervals);
     final readOnly = state == TaskDetailPageState.view;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!readOnly)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10),
-            child: _Button(),
-          ),
-        _IntervalsList(intervals),
-      ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.all(radius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AppTitleText('Time intervals'),
+            const SizedBox(height: defaultPadding),
+            if (!readOnly)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: _Button(),
+              ),
+            Expanded(
+              child: _IntervalsList(intervals),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -84,18 +97,14 @@ class _IntervalsList extends StatelessWidget {
         itemBuilder: (context, index) {
           return _IntervalCard(
             intervals[index],
-            isFirst: index == 0,
-            isLast: index == intervals.length - 1,
           );
         });
   }
 }
 
 class _IntervalCard extends StatelessWidget {
-  const _IntervalCard(this.item, {this.isFirst = false, this.isLast = false});
+  const _IntervalCard(this.item);
   final TimeInterval item;
-  final bool isLast;
-  final bool isFirst;
 
   String _dateToText(DateTime date) {
     return '${date.day} ${monthLabel(date)} ${DateFormat('HH:mm').format(date)}';
@@ -103,13 +112,8 @@ class _IntervalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(
-            top: isFirst ? radius : Radius.zero, bottom: isLast ? radius : Radius.zero),
-        color: Theme.of(context).cardColor,
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

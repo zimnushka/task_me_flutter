@@ -94,8 +94,7 @@ class _TaskIDCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(taskId == null ? 'Task creation' : 'Task $taskId',
-                style: const TextStyle(fontSize: 20)),
+            child: AppTitleText(taskId == null ? 'Task creation' : 'Task $taskId'),
           ),
           if (taskId != null)
             GestureDetector(
@@ -231,7 +230,7 @@ class __TaskDescriptionEditorState extends State<_TaskDescriptionEditor> {
           ),
         const SizedBox(height: 10),
         Container(
-          height: 300,
+          height: 500,
           width: double.infinity,
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(radius), color: Theme.of(context).cardColor),

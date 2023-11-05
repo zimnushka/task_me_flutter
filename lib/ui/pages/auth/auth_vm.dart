@@ -4,13 +4,13 @@ import 'package:task_me_flutter/bloc/events/login_event.dart';
 import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/repositories/api/api.dart';
 
-enum AuthPageState { login, registration, none }
+enum AuthPageState { login, registration }
 
 class AuthVM extends ChangeNotifier {
   final MainBloc mainBloc;
   AuthVM({required this.mainBloc});
 
-  AuthPageState _pageState = AuthPageState.none;
+  AuthPageState _pageState = AuthPageState.login;
   AuthPageState get pageState => _pageState;
 
   String? _authErrorMessage;

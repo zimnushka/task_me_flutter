@@ -59,7 +59,7 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.read<MainBloc>();
-    final user = context.select((MainBloc vm) => vm.state.authState.user!);
+    final user = context.select((MainBloc vm) => vm.state.authState.user) ?? User.empty();
     final config = context.select((MainBloc vm) => vm.state.config);
 
     return SizedBox(

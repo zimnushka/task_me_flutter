@@ -157,6 +157,14 @@ class User {
     return words.fold('', (previousValue, element) => previousValue + element.characters.first);
   }
 
+  factory User.empty() => const User(
+        id: -1,
+        name: '',
+        email: '',
+        colorInt: -1,
+        cost: -1,
+      );
+
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

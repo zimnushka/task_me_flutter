@@ -73,6 +73,7 @@ class TaskDetailVM extends ChangeNotifier {
             : TaskDetailPageState.edit;
       }
       _intervals = (await mainBloc.state.repo.getTaskIntervals(initTaskId!)).data ?? [];
+      _intervals = [..._intervals.reversed];
       _isLoading = false;
       notifyListeners();
       return;
@@ -154,26 +155,25 @@ class TaskDetailVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> _updateIntervals() async {
-  //   if (editedTask.id == null) return;
+  Future<void> updateIntervals() async {
+    if (editedTask.id == null) return;
 
-  //   _isLoading = true;
-  //   notifyListeners();
+    _isLoading = true;
+    notifyListeners();
 
-  //   _intervals = (await mainBloc.state.repo.getTaskIntervals(editedTask.id!)).data ?? [];
+    _intervals = (await mainBloc.state.repo.getTaskIntervals(editedTask.id!)).data ?? [];
+    _intervals = [..._intervals.reversed];
 
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
+    _isLoading = false;
+    notifyListeners();
+  }
 
   Future<void> stopInterval(String? desc) async {
     mainBloc.add(TimeIntervalStopEvent(desc: desc));
-    //TODO: _updateIntervals();
   }
 
   Future<void> startInterval() async {
     if (editedTask.id == null) return;
     mainBloc.add(TimeIntervalStartEvent(taskId: editedTask.id!));
-    //TODO: _updateIntervals();
   }
 }

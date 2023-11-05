@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:task_me_flutter/bloc/main_bloc.dart';
+import 'package:task_me_flutter/bloc/main_state.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'package:task_me_flutter/ui/pages/task_detail/task_vm.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
@@ -14,25 +16,33 @@ class TaskIntervalsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<TaskDetailVM>();
     final state = context.select((TaskDetailVM vm) => vm.state);
     final intervals = context.select((TaskDetailVM vm) => vm.intervals);
     final readOnly = state == TaskDetailPageState.view;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(radius),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 10),
+    return BlocListener<MainBloc, MainState>(
+      listenWhen: (prev, cur) {
+        return prev.currentTimeInterval != cur.currentTimeInterval;
+      },
+      listener: (context, state) {
+        vm.updateIntervals();
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.all(radius),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppTitleText('Time intervals'),
-            const SizedBox(height: defaultPadding),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: defaultPadding),
+              child: AppTitleText('Time intervals'),
+            ),
             if (!readOnly)
               const Padding(
-                padding: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 10),
                 child: _Button(),
               ),
             Expanded(
@@ -86,6 +96,7 @@ class _IntervalsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+        padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, defaultPadding),
         separatorBuilder: (context, index) => Container(
               color: Colors.black,
               height: 0.5,

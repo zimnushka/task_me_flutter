@@ -29,11 +29,8 @@ class _SideBarState extends State<SideBar> {
   Widget build(BuildContext context) {
     final vm = context.read<MainBloc>();
     final projects = context.select((MainBloc vm) => vm.state.sideBarState.projects);
-    final user = context.select((MainBloc vm) => vm.state.authState.user);
-    // TODO: check on auth
-    if (user == null) {
-      return const SizedBox();
-    }
+    final interval = context.select((MainBloc vm) => vm.state.currentTimeInterval);
+    final user = context.select((MainBloc vm) => vm.state.authState.user) ?? User.empty();
 
     return ResponsiveUi(
       widthExpand: 800,
@@ -123,6 +120,7 @@ class _SideBarState extends State<SideBar> {
                         ),
                       ),
               ),
+              interval != null ? _IntervalCard(item: interval) : const SizedBox(),
             ],
           ),
         ),
@@ -156,6 +154,58 @@ class ProjectButton extends StatelessWidget {
       ),
       minLeadingWidth: 10,
       title: AppText(item.title),
+    );
+  }
+}
+
+class _IntervalCard extends StatefulWidget {
+  const _IntervalCard({required this.item});
+  final TimeInterval item;
+
+  @override
+  State<_IntervalCard> createState() => _IntervalCardState();
+}
+
+class _IntervalCardState extends State<_IntervalCard> {
+  Duration diff = const Duration();
+  final stream = Stream.periodic(
+    const Duration(seconds: 1),
+    (tic) => tic,
+  );
+
+  @override
+  void initState() {
+    diff = DateTime.now().difference(widget.item.timeStart.toLocal());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 10),
+      child: SizedBox(
+        width: double.infinity,
+        height: 70,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.item.task.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(width: 10),
+            StreamBuilder<int>(
+                stream: stream,
+                builder: (context, snapshot) {
+                  if (snapshot.data != null) {
+                    diff += Duration(seconds: snapshot.data!);
+                  }
+                  return Text('${diff.inHours}h ${diff.inMinutes}m ${diff.inSeconds}s');
+                }),
+          ],
+        ),
+      ),
     );
   }
 }

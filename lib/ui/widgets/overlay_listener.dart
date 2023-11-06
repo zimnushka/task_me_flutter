@@ -21,10 +21,11 @@ class OverlayListener extends StatelessWidget {
       listener: ((context, state) {
         if (state.overlayState.message != '') {
           OverlayManager.showOverlayMessage(
-            overlayState: Overlay.of(context),
-            messageText: state.overlayState.message,
-            backgroundColor: Colors.white,
-          );
+              overlayState: Overlay.of(context),
+              event: OverlayEvent(
+                message: state.overlayState.message,
+                type: state.overlayState.type,
+              ));
           context.read<MainBloc>().add(OverlayEvent(message: '', type: OverlayType.none));
         }
       }),

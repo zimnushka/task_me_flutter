@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/ui/pages/auth/auth.dart';
 import 'package:task_me_flutter/ui/styles/themes.dart';
+import 'package:task_me_flutter/ui/widgets/overlay_listener.dart';
 
 class Landing extends StatelessWidget {
   const Landing({required this.child, super.key});
@@ -11,7 +12,7 @@ class Landing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.select((MainBloc vm) => vm.state.authState.user);
-    return user == null ? const _LandingAuth() : _LandingUser(child);
+    return OverlayListener(child: user == null ? const _LandingAuth() : _LandingUser(child));
   }
 }
 

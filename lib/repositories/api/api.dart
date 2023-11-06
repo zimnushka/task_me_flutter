@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:task_me_flutter/domain/models/api_response.dart';
+import 'package:task_me_flutter/domain/models/error.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
 import 'dart:convert';
 
@@ -38,7 +39,8 @@ class ApiErrorHandler<T> {
       final result = await func();
       return result;
     } on DioError catch (e) {
-      return ApiResponse<T?>(body: null, status: e.response?.statusCode ?? 0, error: e);
+      throw LogicalException(
+          '${e.response?.data ?? e.message}\ncode: ${e.response?.statusCode ?? 0}');
     } catch (e) {
       return ApiResponse<T?>(body: null, status: 0, error: Exception(e.toString()));
     }

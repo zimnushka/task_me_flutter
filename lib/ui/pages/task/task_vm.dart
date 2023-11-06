@@ -62,17 +62,16 @@ class TaskVM extends ChangeNotifier {
       if (taskUi.task.status == TaskStatus.closed) {
         throw const LogicalException('This task is closed');
       }
-      final success = (await mainBloc.state.repo.editTask(newTask)).data ?? false;
-      if (success) {
-        final List<TaskUi> taskUIList = List.of(_tasks);
-        taskUIList.removeWhere((element) => element.task.id == taskUi.task.id);
-        taskUIList.add(taskUi.copyWith(task: taskUi.task.copyWith(status: taskStatus)));
-        taskUIList.sort((a, b) => a.task.status.index.compareTo(b.task.status.index));
+      await mainBloc.state.repo.editTask(newTask);
 
-        _tasks = [...taskUIList];
-        _filteredTasks = [..._filter.getTaskByFilter(taskUIList)];
-        notifyListeners();
-      }
+      final List<TaskUi> taskUIList = List.of(_tasks);
+      taskUIList.removeWhere((element) => element.task.id == taskUi.task.id);
+      taskUIList.add(taskUi.copyWith(task: taskUi.task.copyWith(status: taskStatus)));
+      taskUIList.sort((a, b) => a.task.status.index.compareTo(b.task.status.index));
+
+      _tasks = [...taskUIList];
+      _filteredTasks = [..._filter.getTaskByFilter(taskUIList)];
+      notifyListeners();
     } on LogicalException catch (e) {
       mainBloc.add(OverlayEvent(message: e.message, type: OverlayType.error));
     } catch (e) {

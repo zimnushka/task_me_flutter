@@ -127,7 +127,7 @@ class TaskDetailVM extends ChangeNotifier {
   }
 
   Future<void> onTaskStatusSwap(TaskStatus status) async {
-    if (editedTask.status == status) {
+    if (editedTask.status != status) {
       _editedTask = editedTask.copyWith(status: status);
       notifyListeners();
     }

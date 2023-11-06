@@ -27,12 +27,14 @@ loginHandler(LoginEvent event, Emitter<MainState> emit, MainBloc mainBloc) async
 
   mainBloc.storage.saveToken(token);
   final projects = (await repo.getProjectsAll()).data ?? [];
+  final intervals = (await repo.getMyIntervals()).data ?? [];
 
   emit(
     mainBloc.state.copyWith(
       authState: AuthState(AuthStepAuthenticated(token: token, user: user)),
       repo: repo,
       config: config,
+      currentTimeInterval: intervals.isEmpty ? null : intervals.first,
       sideBarState: SideBarState(projects: projects),
     ),
   );

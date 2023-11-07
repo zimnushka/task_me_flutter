@@ -11,6 +11,16 @@ extension IntervalApiExt on ApiRepository {
     }).result;
   }
 
+  Future<ApiResponse<TimeInterval?>> getNotClosedIntervals() async {
+    return ApiErrorHandler(() async {
+      final data = await client.get('/timeIntervals/open');
+      return ApiResponse(
+        body: TimeInterval.fromJson(data.data),
+        status: data.statusCode!,
+      );
+    }).result;
+  }
+
   Future<ApiResponse<List<TimeInterval>?>> getTaskIntervals(int id) async {
     return ApiErrorHandler(() async {
       final data = await client.get('/timeIntervals/task/$id');

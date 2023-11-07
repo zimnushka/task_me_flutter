@@ -125,9 +125,11 @@ class _OverlayToastState extends State<_OverlayToast> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            widget.event.message,
-                            style: const TextStyle(color: Colors.white, fontSize: 15),
+                          Expanded(
+                            child: Text(
+                              widget.event.message,
+                              style: const TextStyle(color: Colors.white, fontSize: 15),
+                            ),
                           ),
                         ],
                       ),

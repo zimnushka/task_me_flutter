@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_me_flutter/bloc/main_bloc.dart';
 import 'package:task_me_flutter/domain/models/schemes.dart';
+import 'package:task_me_flutter/helpers/string_helper.dart';
 import 'package:task_me_flutter/ui/pages/home/home.dart';
 import 'package:task_me_flutter/ui/pages/project/project.dart';
 import 'package:task_me_flutter/ui/styles/text.dart';
@@ -201,7 +202,7 @@ class _IntervalCardState extends State<_IntervalCard> {
                   if (snapshot.data != null) {
                     diff += Duration(seconds: snapshot.data!);
                   }
-                  return Text('${diff.inHours}h ${diff.inMinutes}m ${diff.inSeconds}s');
+                  return Text(StringHelper.durationToString(diff));
                 }),
           ],
         ),

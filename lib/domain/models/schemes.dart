@@ -218,48 +218,6 @@ class User {
   }
 }
 
-class UserDTO {
-  final int id;
-  final String name;
-  final String email;
-  final int colorInt;
-
-  const UserDTO({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.colorInt,
-  });
-
-  String get initials {
-    final words = name.split(' ');
-    if (words.length > 1) {
-      words.removeRange(1, words.length);
-    }
-    return words.fold('', (previousValue, element) => previousValue + element.characters.first);
-  }
-
-  Color get color => Color(colorInt);
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'name': name,
-      'email': email,
-      'color': colorInt,
-    };
-  }
-
-  factory UserDTO.fromJson(Map<String, dynamic> map) {
-    return UserDTO(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      email: map['email'] as String,
-      colorInt: map['color'] as int,
-    );
-  }
-}
-
 class Project {
   final String title;
   final int color;
@@ -297,8 +255,8 @@ class Project {
 class TimeInterval {
   final int id;
   final String description;
-  final TaskDTO task;
-  final UserDTO user;
+  final Task task;
+  final User user;
   final DateTime timeStart;
   final DateTime? timeEnd;
   const TimeInterval({
@@ -325,8 +283,8 @@ class TimeInterval {
     return TimeInterval(
       id: map['id'] as int,
       description: map['description'] as String,
-      task: TaskDTO.fromJson(map['task'] as Map<String, dynamic>),
-      user: UserDTO.fromJson(map['user'] as Map<String, dynamic>),
+      task: Task.fromJson(map['task'] as Map<String, dynamic>),
+      user: User.fromJson(map['user'] as Map<String, dynamic>),
       timeStart: DateTime.parse(map['time_start'] as String),
       timeEnd: _dateTimeFromString(map['time_end']),
     );
@@ -494,50 +452,6 @@ class TaskUi {
     return TaskUi(
       task ?? this.task,
       users ?? this.users,
-    );
-  }
-}
-
-class TaskDTO {
-  final int id;
-  final int projectId;
-  final String title;
-  final TaskStatus status;
-  final DateTime startDate;
-  final DateTime? stopDate;
-  final int cost;
-
-  const TaskDTO({
-    required this.id,
-    required this.projectId,
-    required this.title,
-    required this.status,
-    required this.startDate,
-    required this.stopDate,
-    required this.cost,
-  });
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'projectId': projectId,
-      'title': title,
-      'statusId': status.toInt(),
-      'startDate': startDate.millisecondsSinceEpoch,
-      'stopDate': stopDate?.millisecondsSinceEpoch,
-      'cost': cost,
-    };
-  }
-
-  factory TaskDTO.fromJson(Map<String, dynamic> map) {
-    return TaskDTO(
-      id: map['id'] as int,
-      projectId: map['projectId'] as int,
-      title: map['title'] as String,
-      status: TaskStatus.fromInt(map['statusId'] as int),
-      startDate: DateTime.parse(map['startDate'] as String),
-      stopDate: _dateTimeFromString(map['stopDate'] as String?),
-      cost: map['cost'] as int,
     );
   }
 }

@@ -10,7 +10,6 @@ import '../main_bloc.dart';
 import '../main_state.dart';
 
 loginHandler(LoginEvent event, Emitter<MainState> emit, MainBloc mainBloc) async {
-  //TODO: get time interval
   final token = event.token;
   final config = await mainBloc.storage.getConfig();
   final repo = ApiRepository(
@@ -27,14 +26,14 @@ loginHandler(LoginEvent event, Emitter<MainState> emit, MainBloc mainBloc) async
 
   mainBloc.storage.saveToken(token);
   final projects = (await repo.getProjectsAll()).data ?? [];
-  final intervals = (await repo.getMyIntervals()).data ?? [];
+  final intervals = (await repo.getNotClosedIntervals()).data;
 
   emit(
     mainBloc.state.copyWith(
       authState: AuthState(AuthStepAuthenticated(token: token, user: user)),
       repo: repo,
       config: config,
-      currentTimeInterval: intervals.isEmpty ? null : intervals.first,
+      currentTimeInterval: intervals,
       sideBarState: SideBarState(projects: projects),
     ),
   );

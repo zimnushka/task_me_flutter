@@ -1,56 +1,42 @@
 name: task_me_flutter
-description: A new Flutter project.
-
-publish_to: 'none' 
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.18.2 <3.0.0'
+  sdk: '>=3.0.6 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  hive: 2.2.2
-  hive_flutter: 1.1.0
-  syncfusion_flutter_charts: 20.4.38
-  intl: 0.17.0
-  flutter_heatmap_calendar: 1.0.5
-  http: ^0.13.4
-  flutter_svg: 1.1.1+1
-  flutter_colorpicker: 1.0.3
-  flutter_bloc: 8.1.1
-  bloc: 8.1.0
-  provider: 6.0.3
+  
+  # repositories
   dio: 4.0.6
-  json_annotation: any
-  freezed_annotation: any
   shared_preferences: 2.0.6
-  google_fonts: 3.0.1
+
+  # models
+  equatable: 2.0.5
+
+  # state manager
+  flutter_bloc: 8.1.3
+  bloc_concurrency: 0.2.2
+  provider: 6.0.5
+
+  # ui
+  syncfusion_flutter_charts: 22.2.10
   top_snackbar_flutter: 2.1.1
+  flutter_quill: 7.4.3
+  intl: 0.18.0
+  flutter_svg: 2.0.7
+  flutter_colorpicker: 1.0.3
   go_router: 5.1.10
-  flutter_quill: ^7.2.2
-  carousel_slider: 4.2.1
-  dynamic_theme:
-    git: https://github.com/Norbert515/dynamic_theme.git
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  json_serializable: any
-  build_runner: any
-  freezed: any
-
-  hive_generator: 2.0.0
-
   flutter_lints: 2.0.0
-  lints: 2.0.0
 
 flutter:
-
   uses-material-design: true
-
   assets:
     - assets/
     - assets/icons/
